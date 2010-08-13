@@ -1,0 +1,16 @@
+<package>
+  <description brief="ccd">
+
+     ccd
+
+  </description>
+  <author>dimilar</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/ccd</url>
+  <depend package="roscpp"/>
+  <depend package="rosmsg"/>
+
+</package>
+
+
