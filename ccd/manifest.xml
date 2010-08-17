@@ -9,8 +9,8 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/ccd</url>
   <depend package="roscpp"/>
-  <depend package="rosmsg"/>
   <depend package="opencv2"/>
+
 </package>
 
 

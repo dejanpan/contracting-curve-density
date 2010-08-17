@@ -8,6 +8,7 @@
 /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles/rospack_genmsg.dir
 /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles/rospack_genmsg_libexe.dir
 /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles/rospack_gensrv.dir
+/home/dimilar/ros/external/shulei/ccd/build/CMakeFiles/snake.dir
 /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles/test.dir
 /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles/test-future.dir
 /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles/test-results.dir

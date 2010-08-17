@@ -229,6 +229,19 @@ rospack_gensrv/fast:
 .PHONY : rospack_gensrv/fast
 
 #=============================================================================
+# Target rules for targets named snake
+
+# Build rule for target.
+snake: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 snake
+.PHONY : snake
+
+# fast build rule for target.
+snake/fast:
+	$(MAKE) -f CMakeFiles/snake.dir/build.make CMakeFiles/snake.dir/build
+.PHONY : snake/fast
+
+#=============================================================================
 # Target rules for targets named test
 
 # Build rule for target.
@@ -294,6 +307,21 @@ tests/fast:
 .PHONY : tests/fast
 
 # target to build an object file
+src/snake.o:
+	$(MAKE) -f CMakeFiles/snake.dir/build.make CMakeFiles/snake.dir/src/snake.o
+.PHONY : src/snake.o
+
+# target to preprocess a source file
+src/snake.i:
+	$(MAKE) -f CMakeFiles/snake.dir/build.make CMakeFiles/snake.dir/src/snake.i
+.PHONY : src/snake.i
+
+# target to generate assembly for a file
+src/snake.s:
+	$(MAKE) -f CMakeFiles/snake.dir/build.make CMakeFiles/snake.dir/src/snake.s
+.PHONY : src/snake.s
+
+# target to build an object file
 src/test.o:
 	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/test.o
 .PHONY : src/test.o
@@ -326,11 +354,15 @@ help:
 	@echo "... rospack_genmsg"
 	@echo "... rospack_genmsg_libexe"
 	@echo "... rospack_gensrv"
+	@echo "... snake"
 	@echo "... test"
 	@echo "... test-future"
 	@echo "... test-results"
 	@echo "... test-results-run"
 	@echo "... tests"
+	@echo "... src/snake.o"
+	@echo "... src/snake.i"
+	@echo "... src/snake.s"
 	@echo "... src/test.o"
 	@echo "... src/test.i"
 	@echo "... src/test.s"

@@ -58,6 +58,7 @@ SET(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/rospack_genmsg.dir/DependInfo.cmake"
   "CMakeFiles/rospack_genmsg_libexe.dir/DependInfo.cmake"
   "CMakeFiles/rospack_gensrv.dir/DependInfo.cmake"
+  "CMakeFiles/snake.dir/DependInfo.cmake"
   "CMakeFiles/test.dir/DependInfo.cmake"
   "CMakeFiles/test-future.dir/DependInfo.cmake"
   "CMakeFiles/test-results.dir/DependInfo.cmake"

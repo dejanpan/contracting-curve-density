@@ -11,12 +11,6 @@ SET(CMAKE_FORCE_UNIX_PATHS 1)
 # The C and CXX include file search paths:
 SET(CMAKE_C_INCLUDE_PATH
   "../include"
-  "/opt/ros/cturtle/ros/tools/rosbag/include"
-  "/opt/ros/cturtle/ros/tools/topic_tools/include"
-  "/opt/ros/cturtle/ros/tools/topic_tools/srv_gen/cpp/include"
-  "/opt/ros/cturtle/ros/std_msgs/include"
-  "/opt/ros/cturtle/ros/std_msgs/msg_gen/cpp/include"
-  "/opt/ros/cturtle/ros/test/rostest/include"
   "/opt/ros/cturtle/ros/core/roscpp/include"
   "/opt/ros/cturtle/ros/core/roscpp/msg_gen/cpp/include"
   "/opt/ros/cturtle/ros/core/roscpp/srv_gen/cpp/include"

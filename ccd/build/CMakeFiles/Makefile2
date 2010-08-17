@@ -365,6 +365,41 @@ clean: CMakeFiles/rospack_gensrv.dir/clean
 .PHONY : clean
 
 #=============================================================================
+# Target rules for target CMakeFiles/snake.dir
+
+# All Build rule for target.
+CMakeFiles/snake.dir/all: CMakeFiles/rosbuild_precompile.dir/all
+	$(MAKE) -f CMakeFiles/snake.dir/build.make CMakeFiles/snake.dir/depend
+	$(MAKE) -f CMakeFiles/snake.dir/build.make CMakeFiles/snake.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles  1
+	@echo "Built target snake"
+.PHONY : CMakeFiles/snake.dir/all
+
+# Include target in all.
+all: CMakeFiles/snake.dir/all
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/snake.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles 1
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/snake.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles 0
+.PHONY : CMakeFiles/snake.dir/rule
+
+# Convenience name for target.
+snake: CMakeFiles/snake.dir/rule
+.PHONY : snake
+
+# clean rule for target.
+CMakeFiles/snake.dir/clean:
+	$(MAKE) -f CMakeFiles/snake.dir/build.make CMakeFiles/snake.dir/clean
+.PHONY : CMakeFiles/snake.dir/clean
+
+# clean rule for target.
+clean: CMakeFiles/snake.dir/clean
+.PHONY : clean
+
+#=============================================================================
 # Target rules for target CMakeFiles/test.dir
 
 # All Build rule for target.
@@ -372,7 +407,7 @@ CMakeFiles/test.dir/all: CMakeFiles/rosbuild_precompile.dir/all
 CMakeFiles/test.dir/all: CMakeFiles/tests.dir/all
 	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/depend
 	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles  1
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles  2
 	@echo "Built target test"
 .PHONY : CMakeFiles/test.dir/all
 
