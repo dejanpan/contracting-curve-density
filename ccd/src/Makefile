@@ -1,6 +1,6 @@
 CC = g++
 EXTRA = 
-INCDIR =-I. -I./include -I/usr/include -I/usr/include/opencv
+INCDIR =-I. -I./include -I/usr/include -I/usr/include/opencv -I/opt/ros/cturtle/ros/core/roscpp/include/
 LDDIR = -L./lib -L/usr/lib64 -L/usr/lib
 CFLAGS = -g3 -Wall -DLINUX $(EXTRA) $(INCDIR) $(LDDIR)
 LDLIBS =
