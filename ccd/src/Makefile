@@ -5,7 +5,7 @@ LDDIR = -L./lib -L/usr/lib64 -L/usr/lib
 CFLAGS = -g3 -Wall -DLINUX $(EXTRA) $(INCDIR) $(LDDIR)
 LDLIBS =
 LDFLAGS = $(LDLIBS) -lm -lcv -lhighgui
-OBJECTS=bspline.o ccd.o
+OBJECTS=bspline.o 
 $(OBJECTS): %.o: %.cpp
 	$(CC) $(INCDIR) -c $(CFLAGS) $< -o $@
 PROGRAMS=snake test
