@@ -164,6 +164,19 @@ clean-test-results/fast:
 .PHONY : clean-test-results/fast
 
 #=============================================================================
+# Target rules for targets named ros_to_openCV
+
+# Build rule for target.
+ros_to_openCV: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ros_to_openCV
+.PHONY : ros_to_openCV
+
+# fast build rule for target.
+ros_to_openCV/fast:
+	$(MAKE) -f CMakeFiles/ros_to_openCV.dir/build.make CMakeFiles/ros_to_openCV.dir/build
+.PHONY : ros_to_openCV/fast
+
+#=============================================================================
 # Target rules for targets named rosbuild_precompile
 
 # Build rule for target.
@@ -308,18 +321,39 @@ tests/fast:
 
 # target to build an object file
 src/bspline.o:
+	$(MAKE) -f CMakeFiles/ros_to_openCV.dir/build.make CMakeFiles/ros_to_openCV.dir/src/bspline.o
+	$(MAKE) -f CMakeFiles/snake.dir/build.make CMakeFiles/snake.dir/src/bspline.o
 	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/bspline.o
 .PHONY : src/bspline.o
 
 # target to preprocess a source file
 src/bspline.i:
+	$(MAKE) -f CMakeFiles/ros_to_openCV.dir/build.make CMakeFiles/ros_to_openCV.dir/src/bspline.i
+	$(MAKE) -f CMakeFiles/snake.dir/build.make CMakeFiles/snake.dir/src/bspline.i
 	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/bspline.i
 .PHONY : src/bspline.i
 
 # target to generate assembly for a file
 src/bspline.s:
+	$(MAKE) -f CMakeFiles/ros_to_openCV.dir/build.make CMakeFiles/ros_to_openCV.dir/src/bspline.s
+	$(MAKE) -f CMakeFiles/snake.dir/build.make CMakeFiles/snake.dir/src/bspline.s
 	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/bspline.s
 .PHONY : src/bspline.s
+
+# target to build an object file
+src/ros_to_openCv.o:
+	$(MAKE) -f CMakeFiles/ros_to_openCV.dir/build.make CMakeFiles/ros_to_openCV.dir/src/ros_to_openCv.o
+.PHONY : src/ros_to_openCv.o
+
+# target to preprocess a source file
+src/ros_to_openCv.i:
+	$(MAKE) -f CMakeFiles/ros_to_openCV.dir/build.make CMakeFiles/ros_to_openCV.dir/src/ros_to_openCv.i
+.PHONY : src/ros_to_openCv.i
+
+# target to generate assembly for a file
+src/ros_to_openCv.s:
+	$(MAKE) -f CMakeFiles/ros_to_openCV.dir/build.make CMakeFiles/ros_to_openCV.dir/src/ros_to_openCv.s
+.PHONY : src/ros_to_openCv.s
 
 # target to build an object file
 src/snake.o:
@@ -364,6 +398,7 @@ help:
 	@echo "... clean-test-results"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... ros_to_openCV"
 	@echo "... rosbuild_precompile"
 	@echo "... rosbuild_premsgsrvgen"
 	@echo "... rospack_genmsg"
@@ -378,6 +413,9 @@ help:
 	@echo "... src/bspline.o"
 	@echo "... src/bspline.i"
 	@echo "... src/bspline.s"
+	@echo "... src/ros_to_openCv.o"
+	@echo "... src/ros_to_openCv.i"
+	@echo "... src/ros_to_openCv.s"
 	@echo "... src/snake.o"
 	@echo "... src/snake.i"
 	@echo "... src/snake.s"

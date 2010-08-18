@@ -1,5 +1,6 @@
 FILE(REMOVE_RECURSE
   "CMakeFiles/snake.dir/src/snake.o"
+  "CMakeFiles/snake.dir/src/bspline.o"
   "../bin/snake.pdb"
   "../bin/snake"
 )

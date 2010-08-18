@@ -29,7 +29,7 @@ void BSpline::computeKnots()
         }
 }
 
-void BSpline::computePoint(point *control, point *output, double v)
+void BSpline::computePoint(BSPoint *control, BSPoint *output, double v)
 {
 	double temp;
 	// initialize the variables that will hold our outputted point
@@ -43,11 +43,11 @@ void BSpline::computePoint(point *control, point *output, double v)
         }
 }
 
-BSpline::BSpline(int m, int n, int resolution, point *control)
+BSpline::BSpline(int m, int n, int resolution, BSPoint *control)
     :n_control_points(m), n_degree(n), knots(std::vector<int>(m+n+2, 0)), curve(new CvPoint[resolution])
 {
 	double increment, interval;
-	point tmp_point;
+	BSPoint tmp_point;
 	int output_index;
     
 	computeKnots();

@@ -3,6 +3,7 @@
 /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles/ROSBUILD_gensrv_cpp.dir
 /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles/ROSBUILD_gensrv_lisp.dir
 /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles/clean-test-results.dir
+/home/dimilar/ros/external/shulei/ccd/build/CMakeFiles/ros_to_openCV.dir
 /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles/rosbuild_precompile.dir
 /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles/rosbuild_premsgsrvgen.dir
 /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles/rospack_genmsg.dir

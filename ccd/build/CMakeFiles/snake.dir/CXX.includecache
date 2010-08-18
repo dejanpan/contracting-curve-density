@@ -6,6 +6,8 @@
 
 #IncludeRegexTransform: 
 
+/home/dimilar/ros/external/shulei/ccd/src/bspline.h
+
 /home/dimilar/ros/external/shulei/ccd/src/snake.cpp
 iostream
 -
@@ -17,6 +19,8 @@ opencv/highgui.h
 -
 opencv2/legacy/legacy.hpp
 -
+bspline.h
+/home/dimilar/ros/external/shulei/ccd/src/bspline.h
 
 /opt/ros/cturtle/stacks/vision_opencv/opencv2/opencv/include/opencv/cv.h
 opencv2/core/core_c.h

@@ -12,22 +12,22 @@
   <author>Dejan Pangercic</author>
   <license>BSD</license>
   <url></url>
-  <review status="experimental" notes="beta"/>
+  <!-- <review status="experimental" notes="beta"/> -->
   <depend package="roscpp" />
-  <depend package="std_msgs" />
   <depend package="opencv2" /> 
+  <!-- <depend package="std_msgs" /> -->
   <depend package="cv_bridge" />
-  <depend package="rosconsole" />
+  <!-- <depend package="rosconsole" /> -->
 <!--   <depend package="libdc1394v2"/> -->
-  <depend package="sensor_msgs"/>
+  <!-- <depend package="sensor_msgs"/> -->
   <depend package="image_transport"/>
-  <depend package="pluginlib"/>
+  <!-- <depend package="pluginlib"/> -->
 <!--   <depend package="detect_objects_chamfer"/> -->
-  <depend package="compressed_image_transport"/>
-  <depend package="dynamic_reconfigure"/>
-  <depend package="tf"/>
-  <depend package="image_geometry"/>
-  <depend package="angles" />
+  <!-- <depend package="compressed_image_transport"/> -->
+  <!-- <depend package="dynamic_reconfigure"/> -->
+  <!-- <depend package="tf"/> -->
+  <!-- <depend package="image_geometry"/> -->
+  <!-- <depend package="angles" /> -->
 
   <export>
     <cpp cflags="-I${prefix}/include/" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib "/>
