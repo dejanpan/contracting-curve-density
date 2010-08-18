@@ -1,7 +1,10 @@
 #include <iostream>
-#include <cv.h>
+#include <opencv/cv.h>
 #include <string>
-#include <highgui.h>
+#include <opencv/highgui.h>
+#include <opencv2/legacy/legacy.hpp>
+//#include <opencv/cvexts.h>
+
 using namespace std;
 void onChange(int);
 IplImage *image = 0 ;
@@ -77,7 +80,7 @@ void onChange(int pos)
 	criteria.type = CV_TERMCRIT_ITER; 
 	criteria.max_iter = 1000; 
 	criteria.epsilon = 0.1; 
-	cvSnakeImage( image, point,length, &alpha, &beta, &gamma,CV_VALUE,size,criteria,0 );
+	cvSnakeImage( image, point,length, &alpha, &beta, &gamma,1,size,criteria,0 );
 	for(int i=0;i<length;i++)
 	{
 		int j = (i+1)%length;

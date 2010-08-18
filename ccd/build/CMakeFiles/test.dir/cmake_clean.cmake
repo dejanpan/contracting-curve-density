@@ -1,5 +1,6 @@
 FILE(REMOVE_RECURSE
   "CMakeFiles/test.dir/src/test.o"
+  "CMakeFiles/test.dir/src/bspline.o"
   "CMakeFiles/test"
   "../bin/test.pdb"
   "../bin/test"

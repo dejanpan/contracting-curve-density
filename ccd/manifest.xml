@@ -1,16 +1,37 @@
 <package>
-  <description brief="ccd">
-
-     ccd
-
+  <description>
+    Robotic perception algorithms for 2D images. They are intended to 
+    be flexible and tightly work together with following packages:
+    cloud_tools (using table_memory functionality)
+    cloud_algos (using IAS 3D perception algorithms)
+    pcl stack (using  general 3D perception algorithms and tools)
+    knowledge stack (for reasoning and inferences)
+    cognitive_perception (for some further CV algorithms).
   </description>
-  <author>dimilar</author>
+
+  <author>Dejan Pangercic</author>
   <license>BSD</license>
-  <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/ccd</url>
-  <depend package="roscpp"/>
-  <depend package="opencv2"/>
+  <url></url>
+  <review status="experimental" notes="beta"/>
+  <depend package="roscpp" />
+  <depend package="std_msgs" />
+  <depend package="opencv2" /> 
+  <depend package="cv_bridge" />
+  <depend package="rosconsole" />
+<!--   <depend package="libdc1394v2"/> -->
+  <depend package="sensor_msgs"/>
+  <depend package="image_transport"/>
+  <depend package="pluginlib"/>
+<!--   <depend package="detect_objects_chamfer"/> -->
+  <depend package="compressed_image_transport"/>
+  <depend package="dynamic_reconfigure"/>
+  <depend package="tf"/>
+  <depend package="image_geometry"/>
+  <depend package="angles" />
 
+  <export>
+    <cpp cflags="-I${prefix}/include/" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib "/>
+    <image_algos plugin="${prefix}/plugins.xml"/>
+  </export>
 </package>
-
 

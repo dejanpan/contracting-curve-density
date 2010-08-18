@@ -1,7 +1,6 @@
 #include <vector>
 #include <cv.h>
 #include "bspline.h"
-
 double BSpline::blend(int k, int t, double v)
 {
 	double value;
@@ -44,8 +43,8 @@ void BSpline::computePoint(point *control, point *output, double v)
         }
 }
 
-BSpline::BSpline(int m, int n, int resolution, point *control, CvPoint *output)
-    :n_control_points(m), n_degree(n), knots(std::vector<int> (m+n+2, 0))
+BSpline::BSpline(int m, int n, int resolution, point *control)
+    :n_control_points(m), n_degree(n), knots(std::vector<int>(m+n+2, 0)), curve(new CvPoint[resolution])
 {
 	double increment, interval;
 	point tmp_point;
@@ -57,10 +56,17 @@ BSpline::BSpline(int m, int n, int resolution, point *control, CvPoint *output)
 
     for (output_index = 0; output_index < resolution - 1; ++output_index){
         computePoint(control, &tmp_point, interval);
-        output[output_index].x = round(tmp_point.x);
-        output[output_index].y = round(tmp_point.y);
+        curve[output_index].x = round(tmp_point.x);
+        curve[output_index].y = round(tmp_point.y);
         interval += increment;
     }
-	output[resolution-1].x=control[m].x;
-	output[resolution-1].y=control[m].y;
+	curve[resolution-1].x=control[m].x;
+	curve[resolution-1].y=control[m].y;
+}
+CvPoint& BSpline::operator[](const size_t index){
+    return curve[index];
+}
+
+const CvPoint& BSpline::operator[](const size_t index) const{
+    return curve[index];
 }

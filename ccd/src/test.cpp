@@ -31,13 +31,11 @@ int main()
     // pts[4].x = 4;    pts[4].y = -2;
     // pts[5].x = 5;    pts[5].y = 1;
 
-	const int resolution = 1500; 
-	CvPoint *out_pts = new CvPoint[resolution];
-	BSpline BSpline(n, t , resolution, pts , out_pts);
+	const int resolution = 1500;
+	BSpline bs = BSpline(n, t , resolution, pts);
     for (int i = 0; i < resolution; ++i){
-        std::cout << i << ": " <<  out_pts[i].x << " " << out_pts[i].y << std::endl;
+        std::cout << i << ": " <<  bs[i].x << " " << bs[i].y << std::endl;
     }
-
     IplImage* img = cvCreateImage(cvSize(491,370),IPL_DEPTH_32F,3);
     CvScalar color;
     int thickness = 0;
@@ -52,7 +50,7 @@ int main()
         //     }
         // }
 //        std::cout << thickness << std::endl;
-		cvLine( img, out_pts[i],out_pts[i+1], color , thickness, 8, 0 ); 
+		cvLine( img, bs[i],bs[i+1], color , thickness, 8, 0 ); 
 	}
 
     CvPoint *tmp_pts = new CvPoint[n+1];
@@ -70,7 +68,6 @@ int main()
 		cvShowImage("win1",img);
 	}
     cvReleaseImage(&img);
-	delete out_pts;
 	delete pts;
     delete tmp_pts;
 	return 0;

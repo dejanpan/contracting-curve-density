@@ -307,6 +307,21 @@ tests/fast:
 .PHONY : tests/fast
 
 # target to build an object file
+src/bspline.o:
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/bspline.o
+.PHONY : src/bspline.o
+
+# target to preprocess a source file
+src/bspline.i:
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/bspline.i
+.PHONY : src/bspline.i
+
+# target to generate assembly for a file
+src/bspline.s:
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/bspline.s
+.PHONY : src/bspline.s
+
+# target to build an object file
 src/snake.o:
 	$(MAKE) -f CMakeFiles/snake.dir/build.make CMakeFiles/snake.dir/src/snake.o
 .PHONY : src/snake.o
@@ -360,6 +375,9 @@ help:
 	@echo "... test-results"
 	@echo "... test-results-run"
 	@echo "... tests"
+	@echo "... src/bspline.o"
+	@echo "... src/bspline.i"
+	@echo "... src/bspline.s"
 	@echo "... src/snake.o"
 	@echo "... src/snake.i"
 	@echo "... src/snake.s"

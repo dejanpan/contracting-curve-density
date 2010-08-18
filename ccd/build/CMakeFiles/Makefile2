@@ -407,13 +407,13 @@ CMakeFiles/test.dir/all: CMakeFiles/rosbuild_precompile.dir/all
 CMakeFiles/test.dir/all: CMakeFiles/tests.dir/all
 	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/depend
 	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles  2
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles  2 3
 	@echo "Built target test"
 .PHONY : CMakeFiles/test.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/test.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles 2
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/test.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles 0
 .PHONY : CMakeFiles/test.dir/rule

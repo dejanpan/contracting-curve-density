@@ -1,0 +1,16 @@
+<package>
+  <description brief="test">
+
+     test
+
+  </description>
+  <author>dimilar</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/test</url>
+  <depend package="roscpp"/>
+  <depend package="rosmsg"/>
+
+</package>
+
+
