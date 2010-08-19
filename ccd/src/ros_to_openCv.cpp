@@ -8,61 +8,19 @@
 #include "bspline.h"
 #include <opencv/highgui.h>
 #include <string.h>
+
 class ImageConverter {
 
 public:
-    ImageConverter(ros::NodeHandle &n) :
+    ImageConverter(ros::NodeHandle &n, char **argv) :
         n_(n), it_(n_), resolution_(1000), contour_(new CvPoint[resolution_])
         {
-            // IplImage* img1 = cvCreateImage(cvSize(cv_image->width,cv_image->height),IPL_DEPTH_8U,3);
-            // IplImage* img2 = cvCreateImage(cvSize(cv_image->width,cv_image->height),IPL_DEPTH_8U,1);
-            // cvThreshold(cv_image, img1, Thresholdness, 255, CV_THRESH_BINARY);
-            // cvConvertImage(img1, img2, 0);
-            // CvMemStorage* storage = cvCreateMemStorage(0);
-            // CvSeq* contours = 0;
- 
-            // cvFindContours( img2, storage, &contours, sizeof(CvContour), CV_RETR_EXTERNAL , CV_CHAIN_APPROX_SIMPLE );
- 
-            // if(!contours) return ; 
-            // const int length = contours->total;	
-            // if(length<10) return ; 
-            // CvPoint* point = new CvPoint[length];
-            // CvSeqReader reader;
-            // CvPoint pt= cvPoint(0,0);
-            // CvSeq *contour2=contours;
-
             int m ,t;
             m = 16;
             t = 3;
             resolution_ = 1000;
             // CvPoint* contour = new CvPoint[resolution_];
-            BSPoint *pts = new BSPoint[m+1];
-            
-            // pts[0].x=282-86;  pts[0].y=60;
-            // pts[1].x=278-86;   pts[1].y=75;  
-            // pts[2].x=276-86;  pts[2].y= 91;
-            // pts[3].x=272-86;  pts[3].y=109;
-            // pts[4].x=271-86;  pts[4].y=129;
-            // pts[5].x=275-86;  pts[5].y=166;
-            // pts[6].x=282-86;  pts[6].y=181;
-            // pts[7].x=293-86;  pts[7].y=198;
-            // pts[8].x=312-86;  pts[8].y=205;
-            // pts[9].x=334-86;  pts[9].y=200;
-            // pts[10].x=353-86;  pts[10].y=190;
-            // pts[11].x=362-86;  pts[11].y=170;
-            // pts[12].x=367-86;  pts[12].y=151;
-            // pts[13].x=367-86;  pts[13].y=134;
-            // pts[14].x=369-86;  pts[14].y=117;
-            // pts[15].x=369-86;  pts[15].y=101;
-            // pts[16].x=366-86;  pts[16].y=83;
-            // pts[17].x=361-86;  pts[17].y=64;
-            // pts[18].x=352-86;  pts[18].y=50;
-            // pts[19].x=335-86;  pts[19].y=39;
-            // pts[20].x=317-86;  pts[20].y=38;
-            // pts[21].x=303-86;  pts[21].y=37;
-            // pts[22].x=289-86;  pts[22].y=44;
-            // pts[23].x=282-86;  pts[23].y=60;
-                        
+            BSPoint *pts = new BSPoint[m+1];                        
             pts[0].x=204;  pts[0].y=63;
             pts[1].x=201;   pts[1].y=90;  
             pts[2].x=200;  pts[2].y= 117;
@@ -86,7 +44,7 @@ public:
                 contour_[i] = bs[i];
             }
             cvNamedWindow("Image window");
-            image_sub_ = it_.subscribe("/narrow_stereo/right/image_rect_color", 1, &ImageConverter::imageCallback, this);
+            image_sub_ = it_.subscribe(argv[1], 1, &ImageConverter::imageCallback, this);
             n_.param ("save_image", save_image_, std::string(""));
         }
 
@@ -108,30 +66,51 @@ public:
                 {
                     ROS_ERROR("error");
                 }
-            // int Thresholdness = 100;
-            int ialpha = 0;
-            int ibeta= 15;
-            int igamma=2;
+            int ialpha = 20;
+            int ibeta= 10;
+            int igamma=20;
 
-            // if (cv_image->width > 60 && cv_image->height > 60)
-            //     cvCircle(cv_image, cvPoint(50,50), 10, cvScalar(255));
+            IplImage* img1 = cvCreateImage(cvGetSize(cv_image),IPL_DEPTH_8U,1);
+            cvCvtColor(cv_image,img1,CV_RGB2GRAY);
+            cvSetImageROI(img1, cvRect(0, 0, 640, 360 ));
+            IplImage* img2 = cvCreateImage(cvGetSize(img1),IPL_DEPTH_8U,1);
+            cvSmooth( img1, img1);
+            cvCanny(img1, img2 ,0,80);
+            cvDilate(img2, img2, NULL, 10);
+            cvErode(img2, img2, NULL, 10);            
+            CvMemStorage* storage = cvCreateMemStorage(0);
+            CvSeq* contours = 0;
+            cvFindContours( img2, storage, &contours, sizeof(CvContour), CV_RETR_EXTERNAL, 2);
+            if(!contours) return ;
+            int length = contours->total;
+            std::cout<< "length: " << length << std::endl;
+            if(length<10) return ; 
+            // for(CvSeq *c = contours ; c != NULL; c = contours->h_next)
+            //     {
+            //         // std::cout<< "hello" << std::endl;
+            //         /* replace CV_FILLED with 1 to see the outlines */
+            //         cvDrawContours( dst, c, color, color, -1, 2, 8 );
+            //     }
 
-            // cvStartReadSeq(contour2, &reader);
-            // for (int i = 0; i < resolution_; i++)
-            //     {
-            //         CV_READ_SEQ_ELEM(pt, reader);
-            //         point[i]=pt;
-            //     }
-            // cvReleaseMemStorage(&storage);
-            // for(int i=0;i<resolution_;i++)
-            //     {
-            //         int j = (i+1)%resolution_;
-            //         // cout << point[i].x << " " << point[i].y << endl;
-            //         cvLine( cv_image, point[i], point[j], CV_RGB( 0, 0, 255 ), 1, 8, 0); 
-            //     }
-            IplImage* img2 = cvCreateImage(cvSize(cv_image->width,cv_image->height),IPL_DEPTH_8U,1);
-            // std::cout << cv_image->width  << " "<< cv_image->height << std::endl; // 
-            cvConvertImage(cv_image, img2, 0);    
+            // // cvShowImage( "Image window", dst);
+            // cvReleaseImage(&dst);
+            // int length = contours->total;
+            CvPoint* point = new CvPoint[length];
+            CvSeqReader reader;
+            CvPoint pt= cvPoint(0,0);
+    
+            cvStartReadSeq(contours, &reader);
+            for (int i = 0; i < length; i++)
+                {
+                    CV_READ_SEQ_ELEM(pt, reader);
+                    point[i] = pt;
+                }
+            cvReleaseMemStorage(&storage);
+            for(int i=0;i<length;i++){
+            	int j = (i+1)%length;
+                // cout << point[i].x << " " << point[i].y << endl;
+            	cvLine( cv_image, point[i], point[j], CV_RGB( 0, 0, 255 ), 1, 8, 0); 
+            }
             float alpha=ialpha/100.0f; 
             float beta=ibeta/100.0f;
             float gamma=igamma/100.0f;
@@ -142,21 +121,22 @@ public:
             criteria.type = CV_TERMCRIT_ITER; 
             criteria.max_iter = 1000; 
             criteria.epsilon = 0.01; 
-            cvSnakeImage( img2, contour_, resolution_, &alpha, &beta, &gamma,1,size,criteria,0 );
-            for(int i=0;i<resolution_;i++)
+            cvSnakeImage( img1, point, length, &alpha, &beta, &gamma,1,size,criteria,0 );
+            for(int i=0;i<length;i++)
                 {
-                    int j = (i+1)%resolution_;
-                    cvLine( cv_image, contour_[i],contour_[j],CV_RGB( 0, 255, 0 ),1,8,0 );
+                    int j = (i+1)%length;
+                    cvLine( cv_image, point[i],point[j],CV_RGB( 0, 255, 0 ),1,8,0 );
                 }
             cvShowImage("Image window", cv_image);
             n_.getParam("save_image", save_image_);
+            cvReleaseImage(&img1);
             cvReleaseImage(&img2);
             if(save_image_ != "")
                 {
                     ROS_INFO("Saving image to %s", save_image_.c_str());
                     cvSaveImage(save_image_.c_str(), cv_image);
                 }
-            // exit(-1);
+            delete [] point;
             if(cvWaitKey(3) == 27) exit(-1);
         }
 protected:
@@ -170,9 +150,10 @@ protected:
 };
 int main(int argc, char** argv)
 {
+    if(argc < 1) exit(-1);
     ros::init(argc, argv, "ros_to_openCv");
     ros::NodeHandle n("~");
-    ImageConverter ic(n);
+    ImageConverter ic(n, argv);
     ros::spin();
     return 0;
 }
