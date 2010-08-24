@@ -1,0 +1,21 @@
+<package>
+  <description brief="snake">
+
+     snake
+
+  </description>
+  <author>dimilar</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/snake</url>
+  <depend package="roscpp" />
+  <depend package="opencv2" /> 
+  <!-- <depend package="std_msgs" /> -->
+  <depend package="cv_bridge" />
+  <!-- <depend package="rosconsole" /> -->
+<!--   <depend package="libdc1394v2"/> -->
+  <!-- <depend package="sensor_msgs"/> -->
+  <depend package="image_transport"/>
+</package>
+
+
