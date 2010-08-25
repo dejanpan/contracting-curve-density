@@ -1,5 +1,5 @@
 #include "ccd.h"
-#include "opencv/cv.hpp"
+#include "opencv/cv.h"
 #include "opencv/highgui.h"
 #include "bspline.h"
 #include <iostream>
@@ -18,22 +18,17 @@ CvMat imageMap(IplImage *image, BSpline &curve_points, int n_points){
         for (int j = 0; j < image_points->cols; ++j){
             p.x = (float)j, p.y = (float)i;
             // if(i == 60 && j == 282)
-            std::cout << i << " " << j << ": "  <<  cvPointPolygonTest(contour, p, 0) << std::endl;
+            // std::cout << i << " " << j << ": "  <<  cvPointPolygonTest(contour, p, 0) << std::endl;
             if(cvPointPolygonTest(contour, p, 0) == -100)
-                cvmSet(image_points,i,j, 60.0);
+                cvmSet(image_points,i,j, 0);
             else
-                cvmSet(image_points,i,j, 0.0);
+                cvmSet(image_points,i,j, 60);
         }
     }
     cvReleaseMemStorage(&storage);
     return *image_points;
 }
 
-typedef struct{
-    double r;
-    double g;
-    double b;
-} RGB;
 
 void computeMean(CvMat *image_map, IplImage *image, CvMat *mean_in, CvMat *mean_out, CvSeq* inputMatrix_in, CvSeq* inputMatrix_out)
 {
@@ -41,7 +36,7 @@ void computeMean(CvMat *image_map, IplImage *image, CvMat *mean_in, CvMat *mean_
     for (int i = 0 ; i < image->height; ++i){
         for (int j = 0; j < image->width; ++j)
             if(cvmGet(image_map, i,j) == 60){
-                std::cout << i << " " << j << " " << std::endl;
+                // std::cout << i << " " << j << " " <<  cvmGet(image_map, i,j) << " "<< std::endl;
                 mean_in->data.db[0] += img.at<Vec3b>(i,j)[0];
                 mean_in->data.db[1] += img.at<Vec3b>(i,j)[1];
                 mean_in->data.db[2] += img.at<Vec3b>(i,j)[2];
@@ -56,12 +51,24 @@ void computeMean(CvMat *image_map, IplImage *image, CvMat *mean_in, CvMat *mean_
                 cvSeqPush(inputMatrix_out, data);
             }
         }
+    mean_in->data.db[0] /= inputMatrix_in->total;
+    mean_in->data.db[1] /= inputMatrix_in->total;
+    mean_in->data.db[2] /= inputMatrix_in->total;
+    mean_out->data.db[0] /= inputMatrix_out->total;
+    mean_out->data.db[1] /= inputMatrix_out->total;
+    mean_out->data.db[2] /= inputMatrix_out->total;
 }
 
 void computeCov(CvMat **arr_in, CvMat **arr_out, CvMat *mean_in, CvMat *mean_out, CvMat *covar_in, CvMat *covar_out, int in_count, int out_count)
 {
     cvCalcCovarMatrix((const void **)arr_in,in_count,covar_in,mean_in,CV_COVAR_NORMAL);
     cvCalcCovarMatrix((const void **)arr_out,out_count,covar_out,mean_out,CV_COVAR_NORMAL);
+    for (int i = 0; i < 3; ++i){
+        for (int j = 0; j < 3; ++j){
+            covar_in->data.db[i*3+j] /=  in_count - 1;
+            covar_out->data.db[i*3+j] /=  out_count - 1;
+        }
+    }
 }
 
 int main (int argc, char * argv[]) 
@@ -98,24 +105,23 @@ int main (int argc, char * argv[])
     int t = 3;
     BSPoint *pts = new BSPoint[n+1];
     pts[0].x=1;  pts[0].y=1;
-    pts[1].x=2;   pts[1].y=1;  
-    pts[2].x=3;  pts[2].y= 1;
-    pts[3].x=3;  pts[3].y=2;
+    pts[1].x=1;   pts[1].y=2;  
+    pts[2].x=1;  pts[2].y= 3;
+    pts[3].x=2;  pts[3].y=3;
     pts[4].x=2;  pts[4].y=2;
-    pts[5].x=1;  pts[5].y=2;
+    pts[5].x=2;  pts[5].y=1;
     pts[6].x=1;  pts[6].y=1;
     const int resolution = 7;
 	BSpline bs = BSpline(n, t , resolution, pts);
     IplImage *img1= cvLoadImage(argv[1], 1);
     CvMat imap= imageMap(img1, bs, resolution);
-    std::cout << "bs points " << std::endl;
-    for (int i = 0; i < resolution; ++i){
-        std::cout << bs[i].x << " " << bs[i].y << std::endl;
-    }
-    std::cout << "bs points " << std::endl;
+    // std::cout << "bs points " << std::endl;
+    // for (int i = 0; i < resolution; ++i)
+    //     std::cout << bs[i].x << " " << bs[i].y << std::endl;
+    // std::cout << "bs points " << std::endl;
     IplImage stub, *dst_img;   
     dst_img = cvGetImage(&imap, &stub);
-    std::cout << dst_img->width << " " << dst_img->height<<  std::endl;
+    // std::cout << dst_img->width << " " << dst_img->height<<  std::endl;
     cvSaveImage("bspline.png", dst_img);
     // cvNamedWindow("image map");
     // cvShowImage("image map", dst_img);
@@ -131,6 +137,8 @@ int main (int argc, char * argv[])
     CvMat *covar_in =  cvCreateMat(3, 3, CV_64FC1);
     CvMat *covar_out =  cvCreateMat(3, 3, CV_64FC1);
     computeMean(&imap, img1, mean_in, mean_out, seq_in, seq_out);
+    std::cout << mean_in->data.db[0] << " " << mean_in->data.db[1] << " " << mean_in->data.db[2] << std::endl;
+    std::cout << mean_out->data.db[0] << " " << mean_out->data.db[1] << " " << mean_out->data.db[2] << std::endl;
     CvMat **arr_in = new CvMat*[seq_in->total], **arr_out = new CvMat*[seq_out->total];
     CvSeqReader reader;
     cvStartReadSeq(seq_in, &reader);
@@ -138,6 +146,7 @@ int main (int argc, char * argv[])
     for (int i = 0 ; i < seq_in->total; ++i){
            arr_in[i] = cvCreateMat(1,3, CV_64FC1);
            CV_READ_SEQ_ELEM(tmp,reader);
+           std::cout << tmp[0] << " " << tmp[1] << " " << tmp[2] << std::endl;           
            cvmSet(arr_in[i], 0, 0, tmp[0]);
            cvmSet(arr_in[i], 0, 1, tmp[1]);
            cvmSet(arr_in[i], 0, 2, tmp[2]);
@@ -158,8 +167,6 @@ int main (int argc, char * argv[])
         }
         std::cout << std::endl;
     }
-    std::cout << mean_in->data.db[0] << " " << mean_in->data.db[1] << " " << mean_in->data.db[2] << std::endl;
-    std::cout << mean_out->data.db[0] << " " << mean_out->data.db[1] << " " << mean_out->data.db[2] << std::endl;
     cvReleaseImage(&img1);
     return 0;
 }
