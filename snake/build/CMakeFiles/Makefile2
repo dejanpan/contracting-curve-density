@@ -438,8 +438,8 @@ clean: CMakeFiles/snake.dir/clean
 # Target rules for target CMakeFiles/test.dir
 
 # All Build rule for target.
-CMakeFiles/test.dir/all: CMakeFiles/tests.dir/all
 CMakeFiles/test.dir/all: CMakeFiles/rosbuild_precompile.dir/all
+CMakeFiles/test.dir/all: CMakeFiles/tests.dir/all
 	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/depend
 	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/build
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/dimilar/ros/external/shulei/snake/build/CMakeFiles  5 6
