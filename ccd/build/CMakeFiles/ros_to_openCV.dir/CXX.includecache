@@ -6,6 +6,14 @@
 
 #IncludeRegexTransform: 
 
+/home/dimilar/ros/external/shulei/ccd/src/bspline.cpp
+vector
+-
+cv.h
+-
+bspline.h
+/home/dimilar/ros/external/shulei/ccd/src/bspline.h
+
 /home/dimilar/ros/external/shulei/ccd/src/bspline.h
 
 /home/dimilar/ros/external/shulei/ccd/src/ros_to_openCv.cpp

@@ -43,5 +43,6 @@ CMakeFiles/snake.dir/src/snake.o
  /opt/ros/cturtle/stacks/vision_opencv/opencv2/opencv/include/opencv2/imgproc/imgproc.hpp
  /opt/ros/cturtle/stacks/vision_opencv/opencv2/opencv/include/opencv2/imgproc/imgproc_c.h
  /opt/ros/cturtle/stacks/vision_opencv/opencv2/opencv/include/opencv2/imgproc/types_c.h
+ /opt/ros/cturtle/stacks/vision_opencv/opencv2/opencv/include/opencv2/legacy/legacy.hpp
  /opt/ros/cturtle/stacks/vision_opencv/opencv2/opencv/include/opencv2/objdetect/objdetect.hpp
  /opt/ros/cturtle/stacks/vision_opencv/opencv2/opencv/include/opencv2/video/tracking.hpp

@@ -1,72 +1,136 @@
 #include <vector>
+#include <iostream>
 #include <cv.h>
 #include "bspline.h"
-double BSpline::blend(int k, int t, double v)
+
+double BSpline::basic(int i,
+                      int k,
+                      double t)
 {
-	double value;
-	if (t == 0)
-        ((v >= knots[k]) && (v<knots[k+1]))? value = 1 : value = 0;
-    else{
-        if((knots[k+t] == knots[k]) && (knots[k+t+1] == knots[k+1])) value = 0;
-        else if(knots[k+t] == knots[k]) value = (knots[k+t+1] -v )/(knots[k+t+1] -knots[k+1])*blend(k+1,t -1 ,v );
-        else if(knots[k+t+1] == knots[k+1]) value = (v - knots[k])/(knots[k+t] - knots[k]) * blend(k,t-1, v);
-        else value = (v - knots[k])/(knots[k+t] - knots[k]) * blend(k,t-1, v) + (knots[k+t+1] -v )/(knots[k+t+1] -knots[k+1])*blend(k+1,t -1 ,v );
-    }
-	return value;
+  double value;
+  if (k == 1)
+    ((t >= knots[i]) && (t<knots[i+1]))? value = 1 : value = 0;
+  else{
+    if((knots[i+k-1] == knots[i]) && (knots[i+k] == knots[i+1])) value = 0;
+    else if(knots[i+k-1] == knots[i]) value = (knots[i+k] -t )/(knots[i+k] -knots[i+1])*basic(i+1,k -1 , t);
+    else if(knots[i+k] == knots[i+1]) value = (t - knots[i])/(knots[i+k-1] - knots[i]) * basic(i,k-1, t);
+    else value = (t - knots[i])/(knots[i+k-1] - knots[i]) * basic(i,k-1, t) + (knots[i+k] -t )/(knots[i+k] -knots[i+1])*basic(i+1,k -1 , t);
+  }
+  return value;
 }
+
+double BSpline::basic(int i,
+                      double t,
+                      double *bp)
+{
+  double temp = 0;
+  double t_floor = t-floor(t);
+  // std::cout << " t_floor: " << t_floor<<std::endl;
+  if(t -i >= 2 && t- i < 3)
+  {
+    temp = 0.5*(1- t_floor)*(1-t_floor);
+    *bp = t_floor - 1;
+  }
+  else if (t - i >= 1 && t-i< 2)
+  {
+    temp = -t_floor*t_floor + t_floor + 0.5;
+    *bp = 1 - 2*t_floor;
+  }
+  else if (t-i >= 0 && t-i < 1)
+  {
+    temp = 0.5*t_floor*t_floor;
+    *bp = t_floor;
+  }
+  else
+  {
+    temp = 0;
+    *bp = 0;
+  }
+  return temp;
+}
+
 
 void BSpline::computeKnots()
 {
     
-	for (size_t j = 0; j < knots.size() ; ++j){
-            if (j <= n_degree)
-                knots[j] = 0;
-            else if ((j > n_degree) && (j <= n_control_points))
-                knots[j] = j-n_degree;
-            else if (j > n_control_points)
-                knots[j] = n_control_points - n_degree + 1;
-            // std::cout << knots[j] << std::endl;
-        }
+  for (size_t j = 0; j < knots.size() ; ++j){
+    knots[j] = j;
+    // if (j < n_order)
+    //     knots[j] = 0;
+    // else if ((j >= n_order) && (j <= n_control_points))
+    //     knots[j] = j-n_order + 1;
+    // else if (j > n_control_points)
+    //     knots[j] = n_control_points - n_order + 2;
+    std::cout << knots[j] << std::endl;
+  }
 }
 
-void BSpline::computePoint(BSPoint *control, BSPoint *output, double v)
+void BSpline::computePoint(
+    CvPoint2D64f *control,
+    CvPoint2D64f *output,
+    CvPoint2D64f *slope,
+    double *mat_ptr,
+    double t)
 {
-	double temp;
-	// initialize the variables that will hold our outputted point
-	output->x=0;
-	output->y=0;
-	for (size_t k = 0; k <= n_control_points; k++)
-        {
-            temp = blend(k, n_degree, v);
-            output->x += (control[k]).x * temp;
-            output->y += (control[k]).y * temp;
-        }
-}
+  double b = 0, bp = 0;
+  // initialize the variables that will hold our outputted point
+  output->x=0;
+  output->y=0;
+  slope->x = 0;
+  slope->y = 0;
+  for (size_t i = 0; i <= n_control_points_; i++)
+  {
+    // b = basic(i, n_order, t);
+    b = basic(i, t, &bp);
+    mat_ptr[i] = b;
+    output->x += control[i].x * b;
+    output->y += control[i].y * b;
+    slope->x += (control[i]).x * bp;
+    slope->y += (control[i]).y * bp;
+  }
+}  
 
-BSpline::BSpline(int m, int n, int resolution, BSPoint *control)
-    :n_control_points(m), n_degree(n), knots(std::vector<int>(m+n+2, 0)), curve(new CvPoint[resolution])
+BSpline::BSpline(int m,
+                 int n,
+                 int resolution,
+                 CvPoint2D64f *control)
+    :basic_mat_(cv::Mat(resolution, m+1, CV_64FC1)),
+     n_control_points_(m), n_order_(n),
+     knots(std::vector<int>(m+n+1, 0)),
+     curve_(new CvPoint[resolution]),
+     tangent_(new CvPoint[resolution])
 {
-	double increment, interval;
-	BSPoint tmp_point;
-	int output_index;
-    
-	computeKnots();
-	increment = (double) (m - n + 1)/(resolution - 1); // why ?
-	interval = 0;    
+  double increment, interval;
+  CvPoint2D64f tmp_point, tmp_tangent;
+  int i;
+  computeKnots();
+  increment = (double) (m - n + 1)/resolution;
+  interval = 0;
 
-    for (output_index = 0; output_index < resolution - 1; ++output_index){
-        computePoint(control, &tmp_point, interval);
-        curve[output_index].x = round(tmp_point.x);
-        curve[output_index].y = round(tmp_point.y);
-        interval += increment;
-    }
-	curve[resolution-1].x=control[m].x;
-	curve[resolution-1].y=control[m].y;
-}
-CvPoint& BSpline::operator[](const size_t index){
-    return curve[index];
+  for (i = 0, interval = n-1; interval <= m ; ++i){
+    double *mat_ptr = basic_mat_.ptr<double>(i);
+    computePoint(control, &tmp_point, &tmp_tangent, mat_ptr, interval);
+    curve_[i].x = round(tmp_point.x);
+    curve_[i].y = round(tmp_point.y);
+    tangent_[i].x = tmp_tangent.x;
+    tangent_[i].y = tmp_tangent.y;
+    interval += increment;
+  }
+  // curve_[resolution-1].x=control[m].x;
+  // curve_[resolution-1].y=control[m].y;
 }
 
-const CvPoint& BSpline::operator[](const size_t index) const{
-    return curve[index];
+CvPoint& BSpline::operator[](const size_t index)
+{
+  return curve_[index];
+}
+
+const CvPoint& BSpline::operator[](const size_t index) const
+{
+  return curve_[index];
+}
+
+CvPoint& BSpline::dt(const size_t index)
+{
+  return tangent_[index];
 }

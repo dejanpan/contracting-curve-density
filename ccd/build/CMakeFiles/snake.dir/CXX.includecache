@@ -6,12 +6,24 @@
 
 #IncludeRegexTransform: 
 
+/home/dimilar/ros/external/shulei/ccd/src/bspline.cpp
+vector
+-
+cv.h
+-
+bspline.h
+/home/dimilar/ros/external/shulei/ccd/src/bspline.h
+
+/home/dimilar/ros/external/shulei/ccd/src/bspline.h
+
 /home/dimilar/ros/external/shulei/ccd/src/snake.cpp
 iostream
 -
 string.h
 -
 cv.h
+-
+opencv2/legacy/legacy.hpp
 -
 highgui.h
 -
@@ -207,6 +219,20 @@ opencv2/core/core_c.h
 /opt/ros/cturtle/stacks/vision_opencv/opencv2/opencv/include/opencv2/imgproc/opencv2/core/core_c.h
 opencv2/imgproc/types_c.h
 /opt/ros/cturtle/stacks/vision_opencv/opencv2/opencv/include/opencv2/imgproc/opencv2/imgproc/types_c.h
+
+/opt/ros/cturtle/stacks/vision_opencv/opencv2/opencv/include/opencv2/legacy/legacy.hpp
+opencv2/imgproc/imgproc.hpp
+/opt/ros/cturtle/stacks/vision_opencv/opencv2/opencv/include/opencv2/legacy/opencv2/imgproc/imgproc.hpp
+opencv2/imgproc/imgproc_c.h
+/opt/ros/cturtle/stacks/vision_opencv/opencv2/opencv/include/opencv2/legacy/opencv2/imgproc/imgproc_c.h
+opencv2/features2d/features2d.hpp
+/opt/ros/cturtle/stacks/vision_opencv/opencv2/opencv/include/opencv2/legacy/opencv2/features2d/features2d.hpp
+opencv2/calib3d/calib3d.hpp
+/opt/ros/cturtle/stacks/vision_opencv/opencv2/opencv/include/opencv2/legacy/opencv2/calib3d/calib3d.hpp
+iosfwd
+-
+limits
+-
 
 /opt/ros/cturtle/stacks/vision_opencv/opencv2/opencv/include/opencv2/objdetect/objdetect.hpp
 opencv2/core/core.hpp

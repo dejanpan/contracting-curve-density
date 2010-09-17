@@ -229,19 +229,51 @@ void localStati(CvMat *image_map,
     vin_assign_t = 1 - vout_assign_t;
 }
 
+void computeJacob(
+    IplImage *image,
+    BSpline &s,
+    int n_points
+                  )
+{
+  Mat img(image);
+ int tx, ty;
+  double rx, ry, gx, gy, bx, by;
+  for (int i = 0; i < n_points; ++i){
+    if(i == 0)
+    {
+      tx = s[i].x - s[n_points - 1].x;
+      ty = s[i].y - s[n_points - 1].y;
+    }
+    else
+    {
+      tx = s[i].x - s[i-1].x;
+      ty = s[i].x - s[i-1].y;
+    }
+    (tx == 0)?(rx = 0, gx = 0, bx = 0):(rx = img.at<Vec3b>(s[i].x,s[i].y)[0]/tx, \
+                                        gx = img.at<Vec3b>(s[i].x,s[i].y)[1]/tx, \
+                                        bx = img.at<Vec3b>(s[i].x,s[i].y)[2]/tx);
+    (ty == 0)?(ry = 0, gy = 0, by = 0):(ry = img.at<Vec3b>(s[i].x,s[i].y)[0]/ty, \
+                                        gy = img.at<Vec3b>(s[i].x,s[i].y)[1]/ty, \
+                                        by = img.at<Vec3b>(s[i].x,s[i].y)[2]/ty);
+    
+  }
+
+  // if()
+}
+
 void ccd(){
     bool converged = false;
     while (!converged){
-        
+      
     }
 }
 
 
 int main (int argc, char * argv[]) 
 {
-    int n = 23;
+    int n = 25;
     int t =3;
-    BSPoint *pts = new BSPoint[n+1];
+    CvPoint2D64f *pts = new CvPoint2D64f[n+1];
     pts[0].x=282;  pts[0].y=60;
     pts[1].x=278;   pts[1].y=75;  
     pts[2].x=276;  pts[2].y= 91;
@@ -266,10 +298,12 @@ int main (int argc, char * argv[])
     pts[21].x=303;  pts[21].y=37;
     pts[22].x=289;  pts[22].y=44;
     pts[23].x=282;  pts[23].y=60;
+    pts[24].x=278;   pts[24].y=75;  
+    pts[25].x=276;  pts[25].y= 91;
     const int resolution = 1500;
     // int n = 6;
     // int t = 3;
-    // BSPoint *pts = new BSPoint[n+1];
+    // CvPoint2D64f *pts = new CvPoint2D64f[n+1];
     // pts[0].x=1;  pts[0].y=1;
     // pts[1].x=1;   pts[1].y=2;  
     // pts[2].x=1;  pts[2].y= 3;
