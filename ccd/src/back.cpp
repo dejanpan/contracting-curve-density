@@ -22,3 +22,24 @@
             // pts[21].x=303-86;  pts[21].y=37;
             // pts[22].x=289-86;  pts[22].y=44;
             // pts[23].x=282-86;  pts[23].y=60;
+
+  // for (int i = 0; i < in_count; ++i){
+  //   for (int k = 0; k < 3; ++k){
+  //     for (int j = 0; j < 3; ++j){
+  //       weight.at<double>(3*i+k, 3*i+j) = covar_in_inv.at<double>(k,j);
+  //     }
+  //   }
+  // }  
+  // for (int i = 0; i < in_count; ++i){
+  //   for (int k = 0; k < 3; ++k){
+  //     for (int j = 0; j < 3; ++j){
+  //       weight.at<double>(3*(i+in_count)+k, 3*(i+in_count) + j) = covar_out_inv.at<double>(k,j);
+  //     }
+  //   }
+  // }
+  // for (int i = 0; i < 6; ++i){
+  //   for (int j = 0; j < 6; ++j){
+  //     std::cout << weight.at<double>(i,j) << " " ;
+  //   }
+  //   std::cout << std::endl;    
+  // }

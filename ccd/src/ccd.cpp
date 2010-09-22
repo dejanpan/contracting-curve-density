@@ -16,6 +16,7 @@ CvMat imageMap(IplImage *image,
     cvZero(image_points);
     // std::cout << image->width << " " << image->height << std::endl;
     CvPoint2D32f p, tmp;
+    int count = 0;
     for (int i = 0; i < image_points->rows; ++i)
         {
             for (int j = 0; j < image_points->cols; ++j)
@@ -28,8 +29,11 @@ CvMat imageMap(IplImage *image,
                             cvmSet(image_points,i,j, 10);
                     }
                     else if(cvPointPolygonTest(contour, p, 0) == 100){
-                        if(cvmGet(image_points, i, j) == 0)
-                            cvmSet(image_points,i,j, 60);
+                      if(cvmGet(image_points, i, j) == 0)
+                      {
+                        count++;
+                        cvmSet(image_points,i,j, 60);
+                      }
                     }
                     else{
                         cvmSet(image_points,i,j, 250);
@@ -50,6 +54,7 @@ CvMat imageMap(IplImage *image,
                     }
                 }
         }
+      std::cout<< " count == " << count <<std::endl;
     cvReleaseMemStorage(&storage);
     return *image_points;
 }
@@ -73,7 +78,7 @@ void computeMean(CvMat *image_map,
                 int data[3] = {img.at<Vec3b>(i,j)[0], img.at<Vec3b>(i,j)[1], img.at<Vec3b>(i,j)[2]};
                 cvSeqPush(inputMatrix_in, data);
             }
-            else{
+            else if (cvmGet(image_map, i,j) == 10){
                 mean_out->data.db[0] += img.at<Vec3b>(i,j)[0];
                 mean_out->data.db[1] += img.at<Vec3b>(i,j)[1];
                 mean_out->data.db[2] += img.at<Vec3b>(i,j)[2];
@@ -273,34 +278,42 @@ int main (int argc, char * argv[])
 {
     int n = 25;
     int t =3;
+    n = 6;
     CvPoint2D64f *pts = new CvPoint2D64f[n+1];
-    pts[0].x=282;  pts[0].y=60;
-    pts[1].x=278;   pts[1].y=75;  
-    pts[2].x=276;  pts[2].y= 91;
-    pts[3].x=272;  pts[3].y=109;
-    pts[4].x=271;  pts[4].y=129;
-    pts[5].x=275;  pts[5].y=166;
-    pts[6].x=282;  pts[6].y=181;
-    pts[7].x=293;  pts[7].y=198;
-    pts[8].x=312;  pts[8].y=205;
-    pts[9].x=334;  pts[9].y=200;
-    pts[10].x=353;  pts[10].y=190;
-    pts[11].x=362;  pts[11].y=170;
-    pts[12].x=367;  pts[12].y=151;
-    pts[13].x=367;  pts[13].y=134;
-    pts[14].x=369;  pts[14].y=117;
-    pts[15].x=369;  pts[15].y=101;
-    pts[16].x=366;  pts[16].y=83;
-    pts[17].x=361;  pts[17].y=64;
-    pts[18].x=352;  pts[18].y=50;
-    pts[19].x=335;  pts[19].y=39;
-    pts[20].x=317;  pts[20].y=38;
-    pts[21].x=303;  pts[21].y=37;
-    pts[22].x=289;  pts[22].y=44;
-    pts[23].x=282;  pts[23].y=60;
-    pts[24].x=278;   pts[24].y=75;  
-    pts[25].x=276;  pts[25].y= 91;
-    const int resolution = 1500;
+  pts[0].x=270;  pts[0].y=390;
+  pts[1].x=470;  pts[1].y=390;
+  pts[2].x=470;  pts[2].y=190;
+  pts[3].x=270;  pts[3].y=190;
+  pts[4].x=270;  pts[4].y=390;
+  pts[5].x=470;  pts[5].y=390;
+  pts[6].x=470;  pts[6].y=190;
+    // pts[0].x=282;  pts[0].y=60;
+    // pts[1].x=278;   pts[1].y=75;  
+    // pts[2].x=276;  pts[2].y= 91;
+    // pts[3].x=272;  pts[3].y=109;
+    // pts[4].x=271;  pts[4].y=129;
+    // pts[5].x=275;  pts[5].y=166;
+    // pts[6].x=282;  pts[6].y=181;
+    // pts[7].x=293;  pts[7].y=198;
+    // pts[8].x=312;  pts[8].y=205;
+    // pts[9].x=334;  pts[9].y=200;
+    // pts[10].x=353;  pts[10].y=190;
+    // pts[11].x=362;  pts[11].y=170;
+    // pts[12].x=367;  pts[12].y=151;
+    // pts[13].x=367;  pts[13].y=134;
+    // pts[14].x=369;  pts[14].y=117;
+    // pts[15].x=369;  pts[15].y=101;
+    // pts[16].x=366;  pts[16].y=83;
+    // pts[17].x=361;  pts[17].y=64;
+    // pts[18].x=352;  pts[18].y=50;
+    // pts[19].x=335;  pts[19].y=39;
+    // pts[20].x=317;  pts[20].y=38;
+    // pts[21].x=303;  pts[21].y=37;
+    // pts[22].x=289;  pts[22].y=44;
+    // pts[23].x=282;  pts[23].y=60;
+    // pts[24].x=278;   pts[24].y=75;  
+    // pts[25].x=276;  pts[25].y= 91;
+    const int resolution = 100;
     // int n = 6;
     // int t = 3;
     // CvPoint2D64f *pts = new CvPoint2D64f[n+1];
@@ -337,8 +350,8 @@ int main (int argc, char * argv[])
     CvMat *covar_in =  cvCreateMat(3, 3, CV_64FC1);
     CvMat *covar_out =  cvCreateMat(3, 3, CV_64FC1);
     computeMean(&imap, img1, mean_in, mean_out, seq_in, seq_out);
-    std::cout << mean_in->data.db[0] << " " << mean_in->data.db[1] << " " << mean_in->data.db[2] << std::endl;
-    std::cout << mean_out->data.db[0] << " " << mean_out->data.db[1] << " " << mean_out->data.db[2] << std::endl;
+    std::cout << mean_in->data.db[0] << " " << mean_in->data.db[1] << " " << mean_in->data.db[2]    << " " << seq_in->total << std::endl; 
+    std::cout << mean_out->data.db[0] << " " << mean_out->data.db[1] << " " << mean_out->data.db[2] <<" " << seq_out->total  << std::endl;
     CvMat **arr_in = new CvMat*[seq_in->total], **arr_out = new CvMat*[seq_out->total];
     CvSeqReader reader;
     cvStartReadSeq(seq_in, &reader);
@@ -366,6 +379,12 @@ int main (int argc, char * argv[])
             std::cout << cvmGet(covar_in, i,j) << " ";
         }
         std::cout << std::endl;
+    }
+    for (int i = 0; i < 3; ++i){
+      for (int j = 0; j < 3; ++j){
+        std::cout << cvmGet(covar_out, i,j) << " ";
+      }
+      std::cout << std::endl;
     }
     cvReleaseImage(&img1);
     return 0;

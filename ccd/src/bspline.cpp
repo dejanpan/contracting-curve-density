@@ -25,8 +25,8 @@ double BSpline::basic(int i,
 {
   double temp = 0;
   double t_floor = t-floor(t);
-  // std::cout << " t_floor: " << t_floor<<std::endl;
-  if(t -i >= 2 && t- i < 3)
+  //std::cout << " t_floor: " << t_floor<<std::endl;
+  if(t -i >= 2 && t- i <= 3)
   {
     temp = 0.5*(1- t_floor)*(1-t_floor);
     *bp = t_floor - 1;
@@ -61,7 +61,7 @@ void BSpline::computeKnots()
     //     knots[j] = j-n_order + 1;
     // else if (j > n_control_points)
     //     knots[j] = n_control_points - n_order + 2;
-    std::cout << knots[j] << std::endl;
+    // std::cout << knots[j] << std::endl;
   }
 }
 
@@ -80,7 +80,7 @@ void BSpline::computePoint(
   slope->y = 0;
   for (size_t i = 0; i <= n_control_points_; i++)
   {
-    // b = basic(i, n_order, t);
+    b = basic(i, n_order_, t);
     b = basic(i, t, &bp);
     mat_ptr[i] = b;
     output->x += control[i].x * b;

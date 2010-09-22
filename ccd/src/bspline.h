@@ -3,7 +3,8 @@ public:
   BSpline(){}
   BSpline(const BSpline &bs){}
   BSpline(int m, int n, int resolution, CvPoint2D64f *control_points);
-  ~BSpline(){delete [] curve_; delete [] tangent_;}
+  /* ~BSpline(){delete [] curve_; delete [] tangent_;} */
+  /* void clear(){delete [] curve_; delete [] tangent_;} */
   CvPoint& operator[](const size_t);
   const CvPoint& operator[](const size_t) const;
   CvPoint& dt(const size_t);
