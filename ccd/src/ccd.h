@@ -199,24 +199,26 @@ cv::Mat wls(cv::Mat &jacob,
   // cv::Mat weight = Mat::zeros(3*(in_count + out_count), 3*(in_count+out_count), CV_64F);
   cv::Mat covar_in_inv = Mat::zeros(3,3 , CV_64F);
   cv::Mat covar_out_inv = Mat::zeros(3,3 , CV_64F);
-  std::cout<<"inverse: " << std::endl; 
+  std::cout<<"inverse: " << std::endl;
+  cv::Mat in_eig, out_eig;
   covar_in_inv = covar_in.inv(DECOMP_SVD);
   covar_out_inv = covar_out.inv(DECOMP_SVD);
-  for (int i = 0; i < 3; ++i){
-    for (int j = 0 ; j < 3; ++j){
-      std::cout << covar_in_inv.at<double>(i,j) << " ";
-    }
-    std::cout <<  std::endl;
+  eigen(covar_in_inv, in_eig);
+  eigen(covar_out_inv,out_eig);
+  int in_mat_type =0, out_mat_type = 0;
+  for (int i = 0; i < 3; ++i)
+  {
+    if(in_eig.at<double>(i,0) < 0)
+      in_mat_type = 1;
+    if(out_eig.at<double>(i,0) < 0)
+      out_mat_type = 1;
   }
-  std::cout <<  std::endl;
-  for (int i = 0; i < 3; ++i){
-    for (int j = 0 ; j < 3; ++j){
-      std::cout << covar_out_inv.at<double>(i,j) << " ";
-    }
-    std::cout <<  std::endl;
+  if(in_mat_type == 1 )
+  {
+    covar_in_inv.at<double>(0,0) =     covar_in_inv.at<double>(1,1) =     covar_in_inv.at<double>(2,2) = 1;
+    covar_in_inv.at<double>(0,1) =     covar_in_inv.at<double>(0,2) =     covar_in_inv.at<double>(1,0) = covar_in_inv.at<double>(1,2) =     covar_in_inv.at<double>(2,0) =     covar_in_inv.at<double>(2,1) = 0.001;
   }
-  std::cout <<  std::endl;
-  std::cout <<  std::endl;
+  else{  
   covar_in_inv.at<double>(0,0) = cvSqrt(covar_in_inv.at<double>(0,0));
   covar_in_inv.at<double>(0,1) = covar_in_inv.at<double>(1,0)/covar_in_inv.at<double>(0,0);
   covar_in_inv.at<double>(0,2) = covar_in_inv.at<double>(2,0)/covar_in_inv.at<double>(0,0);
@@ -224,7 +226,14 @@ cv::Mat wls(cv::Mat &jacob,
   covar_in_inv.at<double>(1,2) = (covar_in_inv.at<double>(2,1) - covar_in_inv.at<double>(0,2)*covar_in_inv.at<double>(0,1))/covar_in_inv.at<double>(1,1);
   covar_in_inv.at<double>(2,2) = cvSqrt(covar_in_inv.at<double>(2,2) - covar_in_inv.at<double>(1,2)*covar_in_inv.at<double>(1,2) - covar_in_inv.at<double>(0,2)*covar_in_inv.at<double>(0,2));
   covar_in_inv.at<double>(1,0) = covar_in_inv.at<double>(2,0) = covar_in_inv.at<double>(2,1) = 0.0;
-
+}
+  if(out_mat_type == 1 )
+  {
+    covar_out_inv.at<double>(0,0) =     covar_out_inv.at<double>(1,1) =     covar_out_inv.at<double>(2,2) = 1;
+    covar_out_inv.at<double>(0,1) =     covar_out_inv.at<double>(0,2) =     covar_out_inv.at<double>(1,0) =   covar_out_inv.at<double>(1,2) =     covar_out_inv.at<double>(2,0) =     covar_out_inv.at<double>(2,1) = 0.001;
+  }
+  else
+    {
     covar_out_inv.at<double>(0,0) = cvSqrt(covar_out_inv.at<double>(0,0));
   covar_out_inv.at<double>(0,1) = covar_out_inv.at<double>(1,0)/covar_out_inv.at<double>(0,0);
   covar_out_inv.at<double>(0,2) = covar_out_inv.at<double>(2,0)/covar_out_inv.at<double>(0,0);
@@ -232,26 +241,7 @@ cv::Mat wls(cv::Mat &jacob,
   covar_out_inv.at<double>(1,2) = (covar_out_inv.at<double>(2,1) - covar_out_inv.at<double>(0,2)*covar_out_inv.at<double>(0,1))/covar_out_inv.at<double>(1,1);
   covar_out_inv.at<double>(2,2) = cvSqrt(covar_out_inv.at<double>(2,2) - covar_out_inv.at<double>(1,2)*covar_out_inv.at<double>(1,2) - covar_out_inv.at<double>(0,2)*covar_out_inv.at<double>(0,2));
   covar_out_inv.at<double>(1,0) = covar_out_inv.at<double>(2,0) = covar_out_inv.at<double>(2,1) = 0.0;
-
-  
-  
-  for (int i = 0; i < 3; ++i){
-    for (int j = 0 ; j < 3; ++j){
-      std::cout << covar_in_inv.at<double>(i,j) << " ";
-    }
-    std::cout <<  std::endl;
   }
-
-  std::cout <<  std::endl;
-  for (int i = 0; i < 3; ++i){
-    for (int j = 0 ; j < 3; ++j){
-      std::cout << covar_out_inv.at<double>(i,j) << " ";
-    }
-    std::cout <<  std::endl;
-  }
-  std::cout <<  std::endl;
-
-
   //  covar_in_inv.at<double>(0,0) = cvSqrt(covar_in_inv.at<double>(0,0));
   cv::Mat tmp_mat = Mat::zeros(6, 3*(in_count+ out_count), CV_64F);
   for (int i = 0; i < 6; ++i){
@@ -280,3 +270,23 @@ cv::Mat wls(cv::Mat &jacob,
   return X;
 }
 
+
+void computeCov(cv::Mat &arr_in,
+                cv::Mat &arr_out,
+                cv::Mat &mean_in,
+                cv::Mat &mean_out,
+                cv::Mat &covar_in,
+                cv::Mat &covar_out,
+                int in_count,
+                int out_count)
+{
+  calcCovarMatrix(arr_in,  covar_in, mean_in, CV_COVAR_NORMAL|CV_COVAR_ROWS, CV_64F);
+  calcCovarMatrix(arr_out, covar_out, mean_out, CV_COVAR_NORMAL|CV_COVAR_ROWS, CV_64F);
+  for (int i = 0; i < 3; ++i){
+    for (int j = 0; j < 3; ++j){
+      covar_in.at<double>(i, j) /=  in_count - 1;
+      covar_out.at<double>(i, j) /=  out_count - 1;
+    }
+  }
+}
+// please check the boundary
