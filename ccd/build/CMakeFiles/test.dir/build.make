@@ -219,6 +219,42 @@ CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/tools/topic_tools/srv_ge
 CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/stacks/common_msgs/geometry_msgs/msg_gen/generated
 CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/stacks/common_msgs/sensor_msgs/msg_gen/generated
 CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/stacks/common_msgs/sensor_msgs/srv_gen/generated
+CMakeFiles/test.dir/src/bspline.o: ../manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/core/roslang/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/core/genmsg_cpp/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/tools/rospack/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/core/roslib/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/3rdparty/xmlrpcpp/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/core/rosconsole/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/core/roscpp/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/stacks/vision_opencv/opencv2/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/std_msgs/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/core/rospy/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/tools/rosclean/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/tools/rosgraph/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/core/rosmaster/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/core/rosout/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/tools/roslaunch/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/test/rostest/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/tools/topic_tools/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/tools/rosbag/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/tools/rosrecord/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/tools/rosbagmigration/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/stacks/common_msgs/geometry_msgs/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/stacks/common_msgs/sensor_msgs/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/stacks/vision_opencv/cv_bridge/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/stacks/common/tinyxml/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/stacks/common/pluginlib/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/core/message_filters/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/stacks/image_common/image_transport/manifest.xml
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/core/roslib/msg_gen/generated
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/core/roscpp/msg_gen/generated
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/core/roscpp/srv_gen/generated
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/std_msgs/msg_gen/generated
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/ros/tools/topic_tools/srv_gen/generated
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/stacks/common_msgs/geometry_msgs/msg_gen/generated
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/stacks/common_msgs/sensor_msgs/msg_gen/generated
+CMakeFiles/test.dir/src/bspline.o: /opt/ros/cturtle/stacks/common_msgs/sensor_msgs/srv_gen/generated
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/dimilar/ros/external/shulei/ccd/build/CMakeFiles $(CMAKE_PROGRESS_2)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/test.dir/src/bspline.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -DTIXML_USE_STL -W -Wall -Wno-unused-parameter -fno-strict-aliasing -pthread -o CMakeFiles/test.dir/src/bspline.o -c /home/dimilar/ros/external/shulei/ccd/src/bspline.cpp

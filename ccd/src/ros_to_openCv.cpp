@@ -23,7 +23,7 @@ public:
             t = 3;
             resolution_ = 1000;
             // CvPoint* contour = new CvPoint[resolution_];
-            BSPoint *pts = new BSPoint[m+1];                        
+			CvPoint2D64f *pts = new CvPoint2D64f[m+1];  
             pts[0].x=204;  pts[0].y=63;
             pts[1].x=201;   pts[1].y=90;  
             pts[2].x=200;  pts[2].y= 117;

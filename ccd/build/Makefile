@@ -151,6 +151,19 @@ ROSBUILD_gensrv_lisp/fast:
 .PHONY : ROSBUILD_gensrv_lisp/fast
 
 #=============================================================================
+# Target rules for targets named ccd
+
+# Build rule for target.
+ccd: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ccd
+.PHONY : ccd
+
+# fast build rule for target.
+ccd/fast:
+	$(MAKE) -f CMakeFiles/ccd.dir/build.make CMakeFiles/ccd.dir/build
+.PHONY : ccd/fast
+
+#=============================================================================
 # Target rules for targets named clean-test-results
 
 # Build rule for target.
@@ -321,6 +334,7 @@ tests/fast:
 
 # target to build an object file
 src/bspline.o:
+	$(MAKE) -f CMakeFiles/ccd.dir/build.make CMakeFiles/ccd.dir/src/bspline.o
 	$(MAKE) -f CMakeFiles/ros_to_openCV.dir/build.make CMakeFiles/ros_to_openCV.dir/src/bspline.o
 	$(MAKE) -f CMakeFiles/snake.dir/build.make CMakeFiles/snake.dir/src/bspline.o
 	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/bspline.o
@@ -328,6 +342,7 @@ src/bspline.o:
 
 # target to preprocess a source file
 src/bspline.i:
+	$(MAKE) -f CMakeFiles/ccd.dir/build.make CMakeFiles/ccd.dir/src/bspline.i
 	$(MAKE) -f CMakeFiles/ros_to_openCV.dir/build.make CMakeFiles/ros_to_openCV.dir/src/bspline.i
 	$(MAKE) -f CMakeFiles/snake.dir/build.make CMakeFiles/snake.dir/src/bspline.i
 	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/bspline.i
@@ -335,10 +350,26 @@ src/bspline.i:
 
 # target to generate assembly for a file
 src/bspline.s:
+	$(MAKE) -f CMakeFiles/ccd.dir/build.make CMakeFiles/ccd.dir/src/bspline.s
 	$(MAKE) -f CMakeFiles/ros_to_openCV.dir/build.make CMakeFiles/ros_to_openCV.dir/src/bspline.s
 	$(MAKE) -f CMakeFiles/snake.dir/build.make CMakeFiles/snake.dir/src/bspline.s
 	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/bspline.s
 .PHONY : src/bspline.s
+
+# target to build an object file
+src/ccd.o:
+	$(MAKE) -f CMakeFiles/ccd.dir/build.make CMakeFiles/ccd.dir/src/ccd.o
+.PHONY : src/ccd.o
+
+# target to preprocess a source file
+src/ccd.i:
+	$(MAKE) -f CMakeFiles/ccd.dir/build.make CMakeFiles/ccd.dir/src/ccd.i
+.PHONY : src/ccd.i
+
+# target to generate assembly for a file
+src/ccd.s:
+	$(MAKE) -f CMakeFiles/ccd.dir/build.make CMakeFiles/ccd.dir/src/ccd.s
+.PHONY : src/ccd.s
 
 # target to build an object file
 src/ros_to_openCv.o:
@@ -395,6 +426,7 @@ help:
 	@echo "... ROSBUILD_genmsg_lisp"
 	@echo "... ROSBUILD_gensrv_cpp"
 	@echo "... ROSBUILD_gensrv_lisp"
+	@echo "... ccd"
 	@echo "... clean-test-results"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
@@ -413,6 +445,9 @@ help:
 	@echo "... src/bspline.o"
 	@echo "... src/bspline.i"
 	@echo "... src/bspline.s"
+	@echo "... src/ccd.o"
+	@echo "... src/ccd.i"
+	@echo "... src/ccd.s"
 	@echo "... src/ros_to_openCv.o"
 	@echo "... src/ros_to_openCv.i"
 	@echo "... src/ros_to_openCv.s"

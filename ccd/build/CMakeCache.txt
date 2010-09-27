@@ -180,7 +180,7 @@ TOOLCHAINCONFIG:FILEPATH=TOOLCHAINCONFIG-NOTFOUND
 USERCONFIG:FILEPATH=USERCONFIG-NOTFOUND
 
 //Path to a file.
-_file_name:FILEPATH=/home/dimilar/ros/external/shulei/ccd/src/ros_to_openCv.cpp
+_file_name:FILEPATH=/home/dimilar/ros/external/shulei/ccd/src/ccd.cpp
 
 //Value Computed by CMake
 ccd_BINARY_DIR:STATIC=/home/dimilar/ros/external/shulei/ccd/build
