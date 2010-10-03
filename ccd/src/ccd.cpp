@@ -38,17 +38,27 @@ int main (int argc, char * argv[])
   cv::Mat arr_in, arr_out;
   cv::Mat pixel_diff;
   cv::Mat img(img1);
-  cv::Mat x = Mat::zeros(6,1, CV_64F);
-  cv::Mat x_old = x ;
-  cv::Mat X = x;
+  // dx is the result of weigted least square, corresponding the change of
+  // model parameters
+  // dx = (J'JW)^{-1}J'W(c-m)
+  // X is the model paramter, inital values is [0 0 0 0 0 0]
+  // after each iteration, we change X to X-dx
+  cv::Mat dx = Mat::zeros(6,1, CV_64F);
+  cv::Mat dx_old = dx ;
+  cv::Mat X = dx;
   std::vector<CvPoint> curve;
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////          /** \brief start iteration loop, set tolerance and iteration steps if norm(dx, dx_old) < tol and iter < 100, exit the loop
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
   while(tol > 0.01 && iter < 100)
   {
-    for (int i = 0; i < 6; ++i){
-      X.at<double>(i,0) = X.at<double>(i,0) - x.at<double>(i,0);
-    }
-    for (int i = 0; i <= n; ++i){
+    for (int i = 0; i < 6; ++i)
+      X.at<double>(i,0) = X.at<double>(i,0) - dx.at<double>(i,0);
+    // recompute the sample points in the curve through new dx, in the fist loop, X always [0 0 0 0 0 0]
+    // therefore, points have no change
+    for (int i = 0; i <= n; ++i)
+    {
       pts_tmp.x = X.at<double>(0,0) + (1+X.at<double>(2,0))*pts[i].x + X.at<double>(5,0)*pts[i].y;
       pts_tmp.y = X.at<double>(1,0) + (1+X.at<double>(3,0))*pts[i].y + X.at<double>(4,0)*pts[i].x;
       pts[i].x = round(pts_tmp.x);
@@ -58,6 +68,7 @@ int main (int argc, char * argv[])
 
     bs = BSpline(n, t , resolution, pts);
     img_map = cv::Mat::zeros(cvGetSize(img1), CV_8U);
+    // determine the location of pixels in the image ,inside , outside or on the curve
     imageMap(img1, img_map, bs, resolution);
     
     mean_in = Mat::zeros(1, 3, CV_64F);
@@ -66,7 +77,6 @@ int main (int argc, char * argv[])
     storage = cvCreateMemStorage(0);
     CvSeq *seq_in = cvCreateSeq( CV_32SC3 , sizeof(CvSeq), sizeof(int)*3 , storage);
     CvSeq *seq_out = cvCreateSeq( CV_32SC3 , sizeof(CvSeq), sizeof(int)*3, storage);
-  
     covar_in =  Mat::zeros(3, 3, CV_64F);
     covar_out =  Mat::zeros(3, 3, CV_64F);
 
@@ -80,6 +90,8 @@ std::cout << mean_out.at<double>(0,0) << " " << mean_out.at<double>(0,1) << " " 
 //   std::cout << curve[i].x << " " <<curve[i].y << std::endl;
 // }
 
+// arr_in repsents all pixels inside the curve
+// arr_out repsents all pixels outside the curve
     arr_in = Mat::zeros(seq_in->total, 3, CV_64F);
     arr_out = Mat::zeros(seq_out->total, 3, CV_64F);
     
@@ -102,6 +114,7 @@ std::cout << mean_out.at<double>(0,0) << " " << mean_out.at<double>(0,1) << " " 
     // for (int i = 10000; i < 10086; ++i){
     //   std::cout << arr_in.at<double>(i, 0 )  << " " << arr_in.at<double>(i, 1 )  << " " << arr_in.at<double>(i, 2 )  << " " << std::endl;
     // }
+    // calculate the covariance matrices of all pixels outside and inside the curve respectively
     cv::calcCovarMatrix(arr_in,  covar_in, mean_in, CV_COVAR_NORMAL|CV_COVAR_ROWS|CV_COVAR_USE_AVG, CV_64F);
     cv::calcCovarMatrix(arr_out, covar_out, mean_out, CV_COVAR_NORMAL|CV_COVAR_ROWS|CV_COVAR_USE_AVG, CV_64F);
     cvReleaseMemStorage(&storage);
@@ -119,28 +132,24 @@ std::cout << mean_out.at<double>(0,0) << " " << mean_out.at<double>(0,1) << " " 
   //   std::cout <<  std::endl;
   // }
 
-    
+
+    // pixel_diff represents the the difference between each pixel and mean value of corresponding region.
+    // pixel_diff = c - m, c is on pixel, m is the mean value of its region
     pixel_diff = Mat::zeros(6*curve.size(), 1, CV_64F);
     jacob  = Mat::zeros((curve.size())*6, 6, CV_64F);
-    // if(iter == 1) exit(-1);
+    // calculate the jacob matrix
     computeJacob(img, img_map, pixel_diff, jacob, mean_in, mean_out, curve);
 
-    // for (int i = 0; i < 1662 ; ++i){
-    //   for (int j = 0; j < 6; ++j){
-    //     std::cout << jacob.at<double>(i,j) << " ";  
-    //   }
-    //   std::cout << std::endl;
-    // }
+    // call weigted least square function to calculate dx
+    dx = wls(jacob, pixel_diff, covar_in, covar_out, curve.size());
 
-    x = wls(jacob, pixel_diff, covar_in, covar_out, curve.size());
-    // if(iter == 1) exit(-1);
-
-    for (int i = 0; i < 6; ++i) std::cout << x.at<double>(i,0) << " ";
+    for (int i = 0; i < 6; ++i) std::cout << dx.at<double>(i,0) << " ";
     std::cout << std::endl;
     std::cout << "x_old:" << std::endl;
-    for (int i = 0; i < 6; ++i) std::cout << x_old.at<double>(i,0) << " ";
+    for (int i = 0; i < 6; ++i) std::cout << dx_old.at<double>(i,0) << " ";
     std::cout << std::endl;
 
+    // this block of code is for the purpose of monitoring the change of curve
     dst_img = img_map;
     snprintf(filename, 30, "bspline%d.png", iter);
     std::cout << filename << std::endl;
@@ -163,9 +172,9 @@ std::cout << mean_out.at<double>(0,0) << " " << mean_out.at<double>(0,1) << " " 
     }
     pm_in.release();
     pm_out.release();
-    tol = norm(x, x_old);
+    tol = norm(dx, dx_old);
     std::cout << "iteration " << iter << " : "  << (double)tol << " " << cvSqrt(dis.at<double>(0,0)) << std::endl;
-    x_old = x;
+    dx_old = dx;
     iter += 1;
     
 
