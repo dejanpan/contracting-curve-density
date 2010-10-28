@@ -3,6 +3,7 @@
 #include <cv.h>
 #include "bspline.h"
 
+
 double BSpline::basic(int i,
                       int k,
                       double t)
@@ -25,18 +26,18 @@ double BSpline::basic(int i,
 {
   double temp = 0;
   double t_floor = t-floor(t);
-  //std::cout << " t_floor: " << t_floor<<std::endl;
+  // std::cout << " t_floor: " << t_floor<<std::endl;
   if(t -i >= 2 && t- i <= 3)
   {
     temp = 0.5*(1- t_floor)*(1-t_floor);
     *bp = t_floor - 1;
   }
-  else if (t - i >= 1 && t-i< 2)
+  else if (t - i >= 1 && t-i<= 2)
   {
     temp = -t_floor*t_floor + t_floor + 0.5;
     *bp = 1 - 2*t_floor;
   }
-  else if (t-i >= 0 && t-i < 1)
+  else if (t-i >= 0 && t-i <= 1)
   {
     temp = 0.5*t_floor*t_floor;
     *bp = t_floor;
@@ -66,7 +67,7 @@ void BSpline::computeKnots()
 }
 
 void BSpline::computePoint(
-    CvPoint2D64f *control,
+    std::vector<CvPoint2D64f> control,
     CvPoint2D64f *output,
     CvPoint2D64f *slope,
     double *mat_ptr,
@@ -78,9 +79,9 @@ void BSpline::computePoint(
   output->y=0;
   slope->x = 0;
   slope->y = 0;
-  for (size_t i = 0; i <= n_control_points_; i++)
+  for (size_t i = 0; i < control.size(); i++)
   {
-    b = basic(i, n_order_, t);
+    // b = basic(i, n_order_, t);
     b = basic(i, t, &bp);
     mat_ptr[i] = b;
     output->x += control[i].x * b;
@@ -89,33 +90,37 @@ void BSpline::computePoint(
     slope->y += (control[i]).y * bp;
   }
 }  
+BSpline::BSpline():curve_(NULL), tangent_(NULL){}
 
-BSpline::BSpline(int m,
-                 int n,
+BSpline::BSpline(int n,
                  int resolution,
-                 CvPoint2D64f *control)
-    :basic_mat_(cv::Mat(resolution, m+1, CV_64FC1)),
-     n_control_points_(m), n_order_(n),
-     knots(std::vector<int>(m+n+1, 0)),
-     curve_(new CvPoint[resolution]),
-     tangent_(new CvPoint[resolution])
+                 std::vector<CvPoint2D64f> control)
+    :basic_mat_(cv::Mat(resolution, control.size(), CV_64FC1)),
+     knots(std::vector<int>(control.size()+n, 0)),
+     curve_((n>0 && resolution > 0)? new CvPoint[resolution]:NULL),
+     tangent_((n>0 && resolution > 0)? new CvPoint[resolution]:NULL)
 {
   double increment, interval;
   CvPoint2D64f tmp_point, tmp_tangent;
-  int i;
+  int i = 0;
+  int m = control.size() - 1;
   computeKnots();
   increment = (double) (m - n + 1)/resolution;
   interval = 0;
-
-  for (i = 0, interval = n-1; interval <= m ; ++i){
+  // std::cout <<  "increment << " << increment << std::endl;  
+  for (interval = n-1; fabs(interval - m) > 0.000001 ; ++i){
     double *mat_ptr = basic_mat_.ptr<double>(i);
     computePoint(control, &tmp_point, &tmp_tangent, mat_ptr, interval);
     curve_[i].x = round(tmp_point.x);
     curve_[i].y = round(tmp_point.y);
+    // if(i<20)
+    //   std::cout << interval <<"i: " <<i << " x " << round(tmp_point.x) << " y "<< round(tmp_point.y) << std::endl;
+    // std::cout <<  interval << "       i: " << i << " x " << curve_[i].x << " y "<< curve_[i].y << std::endl;
     tangent_[i].x = tmp_tangent.x;
     tangent_[i].y = tmp_tangent.y;
     interval += increment;
   }
+  // std::cout << " i = " << i<<  std::endl;
   // curve_[resolution-1].x=control[m].x;
   // curve_[resolution-1].y=control[m].y;
 }
