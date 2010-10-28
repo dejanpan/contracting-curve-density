@@ -6,21 +6,25 @@ CFLAGS = -g3 -Wall -DLINUX $(EXTRA) $(INCDIR) $(LDDIR)
 LDLIBS =
 LDFLAGS = $(LDLIBS) -lm -lcv -lhighgui  
 OBJECTS=bspline.o 
-$(OBJECTS): %.o: %.cpp
+$(OBJECTS): %.o: %.cpp %.h
 	$(CC) $(INCDIR) -c $(CFLAGS) $< -o $@
-PROGRAMS=snake test ros_to_openCv ccd2
+PROGRAMS=snake test ros_to_openCv ccd2 ccd_panin
 all:$(PROGRAMS)
 clean:
-	@rm -rf $(PROGRAMS) *.o
+	@rm -rf $(PROGRAMS) *.o $(PROGRAMS) ../data/bspline*
 ros_to_openCv:ros_to_openCv.cpp
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $< $(LDFLAGS)
 snake:snake.cpp
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $< $(LDFLAGS)
 test:test.cpp $(OBJECTS)
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
+test1:test1.cpp $(OBJECTS)
+	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
 draw:draw.cpp $(OBJECTS)
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
 ccd:ccd.cpp ccd.h $(OBJECTS)
+	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
+ccd_panin:ccd_panin.cpp ccd_panin.h $(OBJECTS)
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
 ccd2:ccd2.cpp ccd2.h $(OBJECTS)
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
@@ -29,6 +33,8 @@ ccd_circle:ccd_circle.cpp ccd.h $(OBJECTS)
 poly:poly.cpp $(OBJECTS)
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
 cov:cov.cpp $(OBJECTS)
+	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
+curve:curve.cpp $(OBJECTS)
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
 
 recompile:clean all

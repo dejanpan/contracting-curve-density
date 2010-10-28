@@ -1,26 +1,36 @@
-#include "ccd.h"
+#include "ccd_panin.h"
 using namespace cv;
+IplImage *img1;
+std::vector<CvPoint2D64f> pts;
+void on_mouse( int event, int x, int y, int flags, void* param )
+{
+    if( !img1 )
+        return;
+
+    if( img1->origin )
+        y = img1->height - y;
+
+    switch( event )
+    {
+		case CV_EVENT_LBUTTONDOWN:
+			// std::cout << "Event = " << event << std::endl;
+			break;
+		case CV_EVENT_LBUTTONUP:
+			// std::cout << "Event = " << event << std::endl;
+			cvCircle(img1,cvPoint(x,y),2,cvScalar(0,0,255),2);
+			pts.push_back(cvPoint2D64f(x,y));
+			cvShowImage("Original",img1);
+			break;
+    }
+}
+
 int main (int argc, char * argv[]) 
 {
-  const int resolution = 200;
-  int n = 12;
+  const int resolution = 100;
   int t = 3;
-  CvPoint2D64f *pts = new CvPoint2D64f[n+1];  
-  pts[0].x=313;  pts[0].y=271;
-  pts[1].x=308;  pts[1].y=304;
-  pts[2].x=316;  pts[2].y=333;
-  pts[3].x=346;  pts[3].y=353;
-  pts[4].x=403;  pts[4].y=351;
-  pts[5].x=430;  pts[5].y=325;
-  pts[6].x=437;  pts[6].y=291;
-  pts[7].x=416;  pts[7].y=243;
-  pts[8].x=355;  pts[8].y=230;
-  pts[9].x=316;  pts[9].y=260;
-  pts[10].x=313;  pts[10].y=271;
-  pts[11].x=308;  pts[11].y=304;
-  pts[12].x=316;  pts[12].y=333;
-
-  IplImage dst_img, *img1= cvLoadImage(argv[1], 1);
+  IplImage dst_img;
+  img1= cvLoadImage(argv[1], 1);
+  cv::Mat img(img1);
   BSpline bs;
   int tmp[3];
   char filename[30];
@@ -29,23 +39,43 @@ int main (int argc, char * argv[])
   CvSeqReader reader;
   CvMemStorage* storage;
   CvPoint2D64f pts_tmp;
-  
+  cvNamedWindow("Original", 1);
+  cvSetMouseCallback( "Original", on_mouse, 0 );
+  cvShowImage("Original",img1);
+  char key ;
+  while (1)
+  {
+    key = cvWaitKey(10);
+    if (key == 27) break;
+  }
 
+  if(pts.size() > 3)
+  {
+    pts.push_back(pts[0]);
+    pts.push_back(pts[1]);
+    pts.push_back(pts[2]);
+  }
+  for (size_t i = 0; i < pts.size(); ++i){
+    std::cout<< pts[i].x << " " << pts[i].y << std::endl;
+  }
+  
+  // bs = BSpline(pts, t , resolution);
   cv::Mat jacob;
   cv::Mat img_map;
   cv::Mat mean_in, mean_out;
   cv::Mat covar_in ,covar_out;
   cv::Mat arr_in, arr_out;
   cv::Mat pixel_diff;
-  cv::Mat img(img1);
   // dx is the result of weigted least square, corresponding the change of
   // model parameters
   // dx = (J'JW)^{-1}J'W(c-m)
   // X is the model paramter, inital values is [0 0 0 0 0 0]
   // after each iteration, we change X to X-dx
   cv::Mat dx = Mat::zeros(6,1, CV_64F);
-  cv::Mat dx_old = dx ;
-  cv::Mat X = dx;
+  cv::Mat dx_old = Mat::zeros(6,1, CV_64F);
+  cv::Mat X = Mat::zeros(6,1, CV_64F);
+  // X.at<double>(2,0) = -0.5;
+  // X.at<double>(3,0) = -0.5;
   std::vector<CvPoint> curve;
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////          /** \brief start iteration loop, set tolerance and iteration steps if norm(dx, dx_old) < tol and iter < 100, exit the loop
@@ -57,16 +87,26 @@ int main (int argc, char * argv[])
       X.at<double>(i,0) = X.at<double>(i,0) - dx.at<double>(i,0);
     // recompute the sample points in the curve through new dx, in the fist loop, X always [0 0 0 0 0 0]
     // therefore, points have no change
-    for (int i = 0; i <= n; ++i)
+    for (size_t i = 0; i < pts.size(); ++i)
     {
       pts_tmp.x = X.at<double>(0,0) + (1+X.at<double>(2,0))*pts[i].x + X.at<double>(5,0)*pts[i].y;
       pts_tmp.y = X.at<double>(1,0) + (1+X.at<double>(3,0))*pts[i].y + X.at<double>(4,0)*pts[i].x;
       pts[i].x = round(pts_tmp.x);
       pts[i].y = round(pts_tmp.y);
-      // std::cout << " i : "  << pts[i].x << " " <<pts[i].y << std::endl;
+      for (int j = 0; j < 6; ++j){
+        std::cout << X.at<double>(j,0) << " ";
+      }
+      std::cout << std::endl;
+      std::cout << " i : "  << pts[i].x << " " <<pts[i].y << std::endl;
     }
+    std::cout << "before " << std::endl;
+    BSpline bs(t , resolution, pts);
+    // for (int i = 0; i < resolution; ++i){
+    //   std::cout << bs[i].x  << " " << bs[i].y << std::endl;
+    // }
+    // if(iter == 0) exit(-1);
+    std::cout << "after " << std::endl;
 
-    bs = BSpline(n, t , resolution, pts);
     img_map = cv::Mat::zeros(cvGetSize(img1), CV_8U);
     // determine the location of pixels in the image ,inside , outside or on the curve
     imageMap(img1, img_map, bs, resolution);
@@ -152,10 +192,14 @@ std::cout << mean_out.at<double>(0,0) << " " << mean_out.at<double>(0,1) << " " 
 
     // this block of code is for the purpose of monitoring the change of curve
     dst_img = img_map;
-    snprintf(filename, 30, "bspline%d.png", iter);
-    std::cout << filename << std::endl;
+    snprintf(filename, 250, "../data/bspline%d.png", iter);
+    std::cout << filename <<" hello" << std::endl;
     cvSaveImage(filename, &dst_img);
-    
+
+    // caculate the cost function
+    // E = sum_i{(c_i-m_in)'(C_in)^{-1}(c_i - m_i)}
+    //   + sum_i{(c_i-m_out)'(C_out)^{-1}(c_i - m_out)}
+    // theoretically, E should decrease in the process of iteration
     cv::Mat pm_in, pm_out, dis;
     pm_in.create(1,3,CV_64F);
     pm_out.create(1,3,CV_64F);
@@ -171,14 +215,20 @@ std::cout << mean_out.at<double>(0,0) << " " << mean_out.at<double>(0,1) << " " 
       dis += pm_in*covar_in.inv(DECOMP_SVD)*pm_in.t();
       dis += pm_out*covar_out.inv(DECOMP_SVD)*pm_out.t();
     }
+    
     pm_in.release();
     pm_out.release();
     tol = norm(dx, dx_old);
     std::cout << "iteration " << iter << " : "  << (double)tol << " " << cvSqrt(dis.at<double>(0,0)) << std::endl;
     dx_old = dx;
     iter += 1;
-    
 
+    for (int i = 0; i < resolution; ++i){
+        int j = (i+1)%resolution;
+        cvLine( img1, bs[i],bs[j],CV_RGB( 0, 0, 255 ),1,8,0 ); 
+    }
+    cvShowImage("Original",img1);
+    
     arr_in.release();
     arr_out.release();
     mean_in.release();
@@ -188,8 +238,12 @@ std::cout << mean_out.at<double>(0,0) << " " << mean_out.at<double>(0,1) << " " 
     pixel_diff.release();
     jacob.release();
     img_map.release();
+    bs.release();
   }
-  delete [] pts;
+  // delete [] points;
   cvReleaseImage(&img1);
+  X.release();
+  dx.release();
+  dx_old.release();
   return 0;
 }
