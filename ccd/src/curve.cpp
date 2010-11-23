@@ -1,10 +1,4 @@
-#include "opencv/cv.h"
-#include "opencv/highgui.h"
-#include "bspline.h"
-#include <iostream>
-#include <string>
-#include <cstdio>
-#include <algorithm>
+#include "curve.h"
 using namespace cv;
 IplImage *img1;
 inline double ccd_det(uchar *ptr, int offset)
@@ -75,7 +69,8 @@ int main (int argc, char * argv[])
     pts.push_back(pts[2]);
   }
   
-  for (size_t i = 0; i < pts.size(); ++i){
+  for (size_t i = 0; i < pts.size(); ++i)
+  {
     std::cout<< pts[i].x << " " << pts[i].y << std::endl;
   }
   
@@ -147,7 +142,8 @@ int main (int argc, char * argv[])
   
   std::vector< std::vector<CvPoint2D64f> > dis(resolution);
   std::vector<double> normalized_param(resolution);
-  for(int i=0;i < resolution;i++){
+  for(int i=0;i < resolution;i++)
+  {
     cvCircle( img1, bs[i], 2, CV_RGB(0,0, 255),2);
     // normal vector (n_x, n_y)
     // tagent vector (ny, -n_x)
@@ -164,14 +160,14 @@ int main (int argc, char * argv[])
       tmp_dis1.y = (tmp1.x-bs[i].x)*ny - (tmp1.y-bs[i].y)*nx;
       vic.at<double>(i,9*k + 0) = tmp1.x;
       vic.at<double>(i,9*k + 1) = tmp1.y;
-      vic.at<double>(i,9*k + 2) = tmp_dis1.x;
-      vic.at<double>(i,9*k + 3) = tmp_dis1.y;
+      vic.at<double>(i,9*k + 2) = tmp_dis1.x;// distance along the normal direction
+      vic.at<double>(i,9*k + 3) = tmp_dis1.y;// distance along the tangent direction
       vic.at<double>(i,9*k + 4) = 0.5*(erf((tmp_dis1.x)/(sqrt(2)*sigma)) + 1);
       double wp1 = (vic.at<double>(i,9*k + 4) - gamma_1)/(1-gamma_1);
-      vic.at<double>(i,9*k + 5) = max(0.0, wp1*wp1*wp1*wp1*wp1*wp1);
+      vic.at<double>(i,9*k + 5) = wp1*wp1*wp1*wp1*wp1*wp1;
       double wp2 = (1-vic.at<double>(i,9*k + 4) - gamma_1)/(1-gamma_1);
-      vic.at<double>(i,9*k + 6) = max(0.0, wp2*wp2*wp2*wp2*wp2*wp2);
-      vic.at<double>(i,9*k + 7) = max((exp(-vic.at<double>(i,9*k + 2)*vic.at<double>(i,9*k + 2)/(2*sigma_t*sigma_t)) - exp(-gamma_2)), 0.0);
+      vic.at<double>(i,9*k + 6) = wp2*wp2*wp2*wp2*wp2*wp2;
+      vic.at<double>(i,9*k + 7) = max((exp(-0.5*vic.at<double>(i,9*k + 2)*vic.at<double>(i,9*k + 2)/(sigma_t*sigma_t)) - exp(-gamma_2)), 0.0);
       vic.at<double>(i, 9*k + 8) = 0.5*exp(-abs(tmp_dis1.y)/alpha)/alpha;
       // calculate the normalization parameter c 
       normalized_sum += vic.at<double>(i, 9*k + 7);
@@ -195,10 +191,10 @@ int main (int argc, char * argv[])
       vic.at<double>(i,9*negative_normal + 3) = tmp_dis2.y;
       vic.at<double>(i,9*negative_normal + 4) = 0.5*(erf(tmp_dis2.x/(cvSqrt(2)*sigma)) + 1);
       wp1 = (vic.at<double>(i,9*negative_normal + 4) - gamma_1)/(1-gamma_1);
-      vic.at<double>(i,9*negative_normal + 5) = max(0.0, wp1*wp1*wp1*wp1*wp1*wp1);
+      vic.at<double>(i,9*negative_normal + 5) = wp1*wp1*wp1*wp1*wp1*wp1;
       wp2 = (1-vic.at<double>(i,9*negative_normal + 4) - gamma_1)/(1-gamma_1);
-      vic.at<double>(i,9*negative_normal + 6) = max(0.0, wp2*wp2*wp2*wp2*wp2*wp2);
-      vic.at<double>(i,9*negative_normal + 7) = max((exp(-vic.at<double>(i,9*negative_normal + 2)*vic.at<double>(i,9*negative_normal + 2)/(2*sigma_t*sigma_t)) - exp(-gamma_2)), 0.0);
+      vic.at<double>(i,9*negative_normal + 6) = wp2*wp2*wp2*wp2*wp2*wp2;
+      vic.at<double>(i,9*negative_normal + 7) = max((exp(-0.5*vic.at<double>(i,9*negative_normal + 2)*vic.at<double>(i,9*negative_normal + 2)/(sigma_t*sigma_t)) - exp(-gamma_2)), 0.0);
       vic.at<double>(i, 9*k + 8) = 0.5*exp(-abs(tmp_dis2.y)/alpha)/alpha;
       normalized_sum += vic.at<double>(i, 9*negative_normal + 7);
       cvCircle(img1, tmp2, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
@@ -324,16 +320,15 @@ int main (int argc, char * argv[])
       }
     }
   }
-
-  
-
-
-
-
-
   img_map = cv::Mat::zeros(cvGetSize(img1), CV_8U);
   // determine the location of pixels in the image ,inside , outside or on the curve
-    
+
+  cv::Mat pixel_diff, jacob;
+  pixel_diff = Mat::zeros(6*curve.size(), 1, CV_64F);
+  jacob  = Mat::zeros((curve.size())*6, 6, CV_64F);
+    // if(iter == 1) exit(-1);
+  computeJacob(img, pixel_diff, jacob);
+  
   img_map.release();
   bs.release();
   // bs1.release();
