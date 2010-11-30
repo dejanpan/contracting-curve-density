@@ -1,44 +1,78 @@
 #include "ccd_panin.h"
 using namespace cv;
+/** 
+ * compute the determinate  of a 3x3 matrix
+ * 
+ * @param ptr 
+ * @param offset 
+ * 
+ * @return 
+ */
+inline double ccd_det(uchar *ptr, int offset)
+{
+  return ptr[offset+0]*(ptr[offset+4]*ptr[offset+8] - ptr[offset+5]*ptr[offset+7])
+      *ptr[offset+1]*(ptr[offset+5]*ptr[offset+6] - ptr[offset+3]*ptr[offset+8])
+      *ptr[offset+2]*(ptr[offset+3]*ptr[offset+7] - ptr[offset+4]*ptr[offset+6]);
+}
+
+// input image
 IplImage *img1;
+
+// control points initialized mannually
 std::vector<CvPoint2D64f> pts;
+
+/** 
+ * draw control points manually
+ * 
+ * @param event 
+ * @param x 
+ * @param y 
+ * @param flags 
+ * @param param 
+ */
 void on_mouse( int event, int x, int y, int flags, void* param )
 {
-    if( !img1 )
-        return;
+  if( !img1 )
+    return;
 
-    if( img1->origin )
-        y = img1->height - y;
+  if( img1->origin )
+    y = img1->height - y;
 
-    switch( event )
-    {
-		case CV_EVENT_LBUTTONDOWN:
-			// std::cout << "Event = " << event << std::endl;
-			break;
-		case CV_EVENT_LBUTTONUP:
-			// std::cout << "Event = " << event << std::endl;
-			cvCircle(img1,cvPoint(x,y),2,cvScalar(0,0,255),2);
-			pts.push_back(cvPoint2D64f(x,y));
-			cvShowImage("Original",img1);
-			break;
-    }
+  switch( event )
+  {
+    case CV_EVENT_LBUTTONDOWN:
+      // std::cout << "Event = " << event << std::endl;
+      break;
+    case CV_EVENT_LBUTTONUP:
+      // std::cout << "Event = " << event << std::endl;
+      cvCircle(img1,cvPoint(x,y),2,cvScalar(0,0,255),2);
+      pts.push_back(cvPoint2D64f(x,y));
+      cvShowImage("Original",img1);
+      break;
+  }
 }
+
 
 int main (int argc, char * argv[]) 
 {
-  const int resolution = 100;
+  // the count of points on curve, equidistant distributed
+  const int resolution = 50;
+  
+  // the degree of B-Spline curve
   int t = 3;
-  IplImage dst_img;
+  
+  // load image from a specified file
   img1= cvLoadImage(argv[1], 1);
+
+  // convert the image into Mat fortmat
   cv::Mat img(img1);
-  BSpline bs;
-  int tmp[3];
-  char filename[30];
-  int iter = 0 ;
-  double tol = 1.0;
-  CvSeqReader reader;
-  CvMemStorage* storage;
+
+  // store the control points trasformed in the shape space
   CvPoint2D64f pts_tmp;
+
+  ////////////////////////////////////////////////////////////////
+  // mannaully initialize the control points
+  ///////////////////////////////////////////////////////////////
   cvNamedWindow("Original", 1);
   cvSetMouseCallback( "Original", on_mouse, 0 );
   cvShowImage("Original",img1);
@@ -48,202 +82,521 @@ int main (int argc, char * argv[])
     key = cvWaitKey(10);
     if (key == 27) break;
   }
+  ////////////////////////////////////////////////////////////////
 
+  
+  // for closed curves, we have to append 3 more points
+  // to the end, these 3 new points are the three one
+  // located in the head of the array
   if(pts.size() > 3)
   {
     pts.push_back(pts[0]);
     pts.push_back(pts[1]);
     pts.push_back(pts[2]);
   }
-  for (size_t i = 0; i < pts.size(); ++i){
+
+  // for debug
+  for (size_t i = 0; i < pts.size(); ++i)
+  {
     std::cout<< pts[i].x << " " << pts[i].y << std::endl;
   }
+
+  // model parameters, it is a 6x1 matrix
+  cv::Mat Phi(6,1, CV_64F);
   
-  // bs = BSpline(pts, t , resolution);
-  cv::Mat jacob;
-  cv::Mat img_map;
-  cv::Mat mean_in, mean_out;
-  cv::Mat covar_in ,covar_out;
-  cv::Mat arr_in, arr_out;
-  cv::Mat pixel_diff;
-  // dx is the result of weigted least square, corresponding the change of
-  // model parameters
-  // dx = (J'JW)^{-1}J'W(c-m)
-  // X is the model paramter, inital values is [0 0 0 0 0 0]
-  // after each iteration, we change X to X-dx
-  cv::Mat dx = Mat::zeros(6,1, CV_64F);
-  cv::Mat dx_old = Mat::zeros(6,1, CV_64F);
-  cv::Mat X = Mat::zeros(6,1, CV_64F);
-  // X.at<double>(2,0) = -0.5;
-  // X.at<double>(3,0) = -0.5;
-  std::vector<CvPoint> curve;
+  // \delta_Phi: the difference of model parameters
+  // between two iteration steps
+  cv::Mat delta_Phi(6,1, CV_64F);
+  delta_Phi.zeros(6,1, CV_64F);
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////          /** \brief start iteration loop, set tolerance and iteration steps if norm(dx, dx_old) < tol and iter < 100, exit the loop
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
-  while(tol > 0.01 && iter < 100)
-  {
-    for (int i = 0; i < 6; ++i)
-      X.at<double>(i,0) = X.at<double>(i,0) - dx.at<double>(i,0);
-    // recompute the sample points in the curve through new dx, in the fist loop, X always [0 0 0 0 0 0]
-    // therefore, points have no change
-    for (size_t i = 0; i < pts.size(); ++i)
-    {
-      pts_tmp.x = X.at<double>(0,0) + (1+X.at<double>(2,0))*pts[i].x + X.at<double>(5,0)*pts[i].y;
-      pts_tmp.y = X.at<double>(1,0) + (1+X.at<double>(3,0))*pts[i].y + X.at<double>(4,0)*pts[i].x;
-      pts[i].x = round(pts_tmp.x);
-      pts[i].y = round(pts_tmp.y);
-      for (int j = 0; j < 6; ++j){
-        std::cout << X.at<double>(j,0) << " ";
-      }
-      std::cout << std::endl;
-      std::cout << " i : "  << pts[i].x << " " <<pts[i].y << std::endl;
-    }
-    std::cout << "before " << std::endl;
-    BSpline bs(t , resolution, pts);
-    // for (int i = 0; i < resolution; ++i){
-    //   std::cout << bs[i].x  << " " << bs[i].y << std::endl;
-    // }
-    // if(iter == 0) exit(-1);
-    std::cout << "after " << std::endl;
+  // covariance matrix of model parameters
+  // dimension: 6x6
+  cv::Mat Sigma_Phi(6,6, CV_64F);
 
-    img_map = cv::Mat::zeros(cvGetSize(img1), CV_8U);
-    // determine the location of pixels in the image ,inside , outside or on the curve
-    imageMap(img1, img_map, bs, resolution);
-    
-    mean_in = Mat::zeros(1, 3, CV_64F);
-    mean_out = Mat::zeros(1,3, CV_64F);
+  // mean value of vicinity regions of points on the curve
+  // dimension: resolution x 6
+  // the first 3 are r,g,b mean values outside the curve
+  // the last 3 are r,g,b mean values inside the curve
+  cv::Mat mean_vic(resolution, 6, CV_64F);
 
-    storage = cvCreateMemStorage(0);
-    CvSeq *seq_in = cvCreateSeq( CV_32SC3 , sizeof(CvSeq), sizeof(int)*3 , storage);
-    CvSeq *seq_out = cvCreateSeq( CV_32SC3 , sizeof(CvSeq), sizeof(int)*3, storage);
-    covar_in =  Mat::zeros(3, 3, CV_64F);
-    covar_out =  Mat::zeros(3, 3, CV_64F);
+  // covariance matrix of vicinity regions of points on the curve
+  // dimension: resolution x 18
+  // the first 9 (3x3) are values outside the curve
+  // the last 9 (3x3) are values in -n direction
+  cv::Mat cov_vic(resolution, 18, CV_64F);
 
-    curve.clear();
-    computeMean(img_map, img,  mean_in, mean_out, curve, seq_in, seq_out);
-
-    std::cout << mean_in.at<double>(0,0) << " " << mean_in.at<double>(0,1) << " " << mean_in.at<double>(0,2)    << " " << seq_in->total << " "<< curve.size() <<std::endl;
-std::cout << mean_out.at<double>(0,0) << " " << mean_out.at<double>(0,1) << " " << mean_out.at<double>(0,2) <<" " << seq_out->total << " "<< curve.size() << std::endl;
-
-// for (int i = 0; i < (int)curve.size(); ++i){
-//   std::cout << curve[i].x << " " <<curve[i].y << std::endl;
-// }
-
-// arr_in repsents all pixels inside the curve
-// arr_out repsents all pixels outside the curve
-    arr_in = Mat::zeros(seq_in->total, 3, CV_64F);
-    arr_out = Mat::zeros(seq_out->total, 3, CV_64F);
-    
-    cvStartReadSeq(seq_in, &reader);
-    for (int i = 0 ; i < seq_in->total; ++i)
-        {
-      CV_READ_SEQ_ELEM(tmp,reader);
-      arr_in.at<double>(i,0) = tmp[0];
-      arr_in.at<double>(i,1) = tmp[1];
-      arr_in.at<double>(i,2) = tmp[2];
-    }
+  //\nabla_E = \nabla_E_1 + \nabla_E_2
+  //         = 2*(\Sigma_\Phi^*)^{-1}*\Phi
+  //         - \sum_{k,l}J_{a_1} \hat{\Sigma_{k,l}^{-1}} (I_{k,l} - \hat{I}_{k,l}) 
+  cv::Mat nabla_E(6,1, CV_64F);
   
-    cvStartReadSeq(seq_out, &reader);
-    for (int i= 0; i < seq_out->total; ++i){
-      CV_READ_SEQ_ELEM(tmp,reader);
-      arr_out.at<double>(i,0) = tmp[0];
-      arr_out.at<double>(i,1) = tmp[1];
-      arr_out.at<double>(i,2) = tmp[2];
-    }
+  //\hessian_E = hessian_E_1 + hessian_E_2
+  //           = (\Sigma_\Phi^*)^{-1} +
+  //           \sum_{k,l} J_{a_1} \hat{\Sigma_{k,l}^{-1}} J_{a_1}
+  cv::Mat hessian_E(6,6, CV_64F);
+  
+  // \hat{\Sigma_{k,l}}
+  cv::Mat tmp_cov(3, 3, CV_64F);
+  
+  // \hat{\Sigma_{k,l}}^{-1}
+  cv::Mat tmp_cov_inv(3,3, CV_64F);
+  
+  // J_{a_1} \hat{\Sigma_{k,l}}
+  cv::Mat tmp_jacobian(6,3,CV_64F);
+  cv::Mat tmp_pixel_diff(3,1,CV_64F);
 
-    // for (int i = 10000; i < 10086; ++i){
-    //   std::cout << arr_in.at<double>(i, 0 )  << " " << arr_in.at<double>(i, 1 )  << " " << arr_in.at<double>(i, 2 )  << " " << std::endl;
-    // }
-    // calculate the covariance matrices of all pixels outside and inside the curve respectively
-    cv::calcCovarMatrix(arr_in,  covar_in, mean_in, CV_COVAR_NORMAL|CV_COVAR_ROWS|CV_COVAR_USE_AVG, CV_64F);
-    cv::calcCovarMatrix(arr_out, covar_out, mean_out, CV_COVAR_NORMAL|CV_COVAR_ROWS|CV_COVAR_USE_AVG, CV_64F);
-    cvReleaseMemStorage(&storage);
-    for (int i = 0; i < 3; ++i){
-      for (int j = 0; j < 3; ++j){
-        covar_in.at<double>(i, j) /=  seq_in->total - 1;
-        covar_out.at<double>(i, j) /=  seq_out->total - 1;
-      }
-    }
+  // temporary points used to store those points in the
+  // normal direction as well as negative normal direction
+  CvPoint tmp1, tmp2;
 
-  //   for (int i = 0; i < 3; ++i){
-  //   for (int j = 0 ; j < 3; ++j){
-  //     std::cout << covar_in.at<double>(i,j) << " ";
-  //   }
-  //   std::cout <<  std::endl;
+  // store the distance from a point in normal(negative norml) direction
+  // to the point on the curve
+  CvPoint2D64f tmp_dis1, tmp_dis2;
+
+  // double *basic_ptr = bs.basic_mat_.ptr<double>(0);
+  // for (size_t i = 0; i < pts.size(); ++i){
+  //   std::cout << basic_ptr[i] << " ";
   // }
+  // std::cout << std::endl;
+
+  // h: search radius in the normal direction
+  // delta_h: distance step in the normal direction
+  int h = 40, delta_h = 4;
+
+  // sigma_hat = gamma_3 * sigma
+  //  double sigma_hat = max(h/sqrt(2*gamma_2), gamma_4);
+  double sigma_hat = h/2.5;
+
+  // some useful parameters, give in hanek's paper 
+  double gamma_1 = 0.5, gamma_2 = 4, gamma_3 = 4;
+
+  //double sigma_t = max(double(h/cvSqrt(2*gamma_2)), gamma_4);
+  double sigma = sigma_hat/gamma_3;
+  
+  // locate covariance formula:
+  // Sigma_v,s =  M_s^2(d^=) / omega_(d_v^=) - m_v,s * (m_v,s)^t + kappa*I
+  // here, I is a identy matrix, to avoid signular
+  double kappa = 0.5;
 
 
-    // pixel_diff represents the the difference between each pixel and mean value of corresponding region.
-    // pixel_diff = c - m, c is on pixel, m is the mean value of its region
-    pixel_diff = Mat::zeros(6*curve.size(), 1, CV_64F);
-    jacob  = Mat::zeros((curve.size())*6, 6, CV_64F);
-    // calculate the jacob matrix
-    computeJacob(img, img_map, pixel_diff, jacob, mean_in, mean_out, curve);
+  // parameter used to update model covariance matrix
+  // an exponential decay rule
+  // \Sigma_{\Phi}^{new} = c * \Sigma_{\Phi} + (1 -c)(H_{\Phi}E)^{-1}
+  double c = 0.25;
 
-    // call weigted least square function to calculate dx
-    dx = wls(jacob, pixel_diff, covar_in, covar_out, curve.size());
+  // set the size of dimension2 for Mat::vic
+  // 8 represents x,y, delta_Phi(distance to curve), dy(distance to curve)
 
-    for (int i = 0; i < 6; ++i) std::cout << dx.at<double>(i,0) << " ";
-    std::cout << std::endl;
-    std::cout << "x_old:" << std::endl;
-    for (int i = 0; i < 6; ++i) std::cout << dx_old.at<double>(i,0) << " ";
-    std::cout << std::endl;
+  // count the points in normal direction(only one side)
+  int normal_points_number = floor(h/delta_h);
 
-    // this block of code is for the purpose of monitoring the change of curve
-    dst_img = img_map;
-    snprintf(filename, 250, "../data/bspline%d.png", iter);
-    std::cout << filename <<" hello" << std::endl;
-    cvSaveImage(filename, &dst_img);
 
-    // caculate the cost function
-    // E = sum_i{(c_i-m_in)'(C_in)^{-1}(c_i - m_i)}
-    //   + sum_i{(c_i-m_out)'(C_out)^{-1}(c_i - m_out)}
-    // theoretically, E should decrease in the process of iteration
-    cv::Mat pm_in, pm_out, dis;
-    pm_in.create(1,3,CV_64F);
-    pm_out.create(1,3,CV_64F);
-    for (int i = 0; i < (int)curve.size(); ++i){
-      pm_in.zeros(1, 3 , CV_64F);
-      pm_out.zeros(1, 3 , CV_64F);
-      pm_in.at<double>(0,0) = img.at<Vec3b>(curve[i].x, curve[i].y)[0] - mean_in.at<double>(0, 0);
-      pm_in.at<double>(0,1) = img.at<Vec3b>(curve[i].x, curve[i].y)[1] - mean_in.at<double>(0, 1);
-      pm_in.at<double>(0,2) = img.at<Vec3b>(curve[i].x, curve[i].y)[2] - mean_in.at<double>(0, 2);
-      pm_out.at<double>(0,0) = img.at<Vec3b>(curve[i].x, curve[i].y)[0] - mean_out.at<double>(0, 0);
-      pm_out.at<double>(0,1) = img.at<Vec3b>(curve[i].x, curve[i].y)[1] - mean_out.at<double>(0, 1);
-      pm_out.at<double>(0,2) = img.at<Vec3b>(curve[i].x, curve[i].y)[2] - mean_out.at<double>(0, 2);
-      dis += pm_in*covar_in.inv(DECOMP_SVD)*pm_in.t();
-      dis += pm_out*covar_out.inv(DECOMP_SVD)*pm_out.t();
-    }
-    
-    pm_in.release();
-    pm_out.release();
-    tol = norm(dx, dx_old);
-    std::cout << "iteration " << iter << " : "  << (double)tol << " " << cvSqrt(dis.at<double>(0,0)) << std::endl;
-    dx_old = dx;
-    iter += 1;
+  // the normal vector
+  double nx, ny;
 
-    for (int i = 0; i < resolution; ++i){
-        int j = (i+1)%resolution;
-        cvLine( img1, bs[i],bs[j],CV_RGB( 0, 0, 255 ),1,8,0 ); 
-    }
-    cvShowImage("Original",img1);
-    
-    arr_in.release();
-    arr_out.release();
-    mean_in.release();
-    mean_out.release();
-    covar_in.release();
-    covar_out.release();
-    pixel_diff.release();
-    jacob.release();
-    img_map.release();
-    bs.release();
+  //vicinity matrix ,in cluding plenty amount of information
+  // dimension-2: count(normal_points) * 10*2
+  // col_1, col_2: coordinates of x and y
+  // col_3, col_4: the distance between a normal points and the point on the curve d_v(x), d_v(y)
+  // col_5: the probability P_v,1(x, m_phi, sigma_hat) = 0.5*erf(d_v(x)/(sqrt(2)*sigma_hat))
+  // TODO: how to calculate sigma_v
+  // col_6: the probability of pixel p to belong to the desired side s.
+  //        W_s(p) = max(0, [a-gamm1)/(1-gamma1)]^4)
+  // col_7, col_8 : evaluates the proximity of pixel p to the curve
+  //        W_p(d_p, simga_p) = c*max[0, exp(-d_p^2/2*sigma_p'^2) - exp(-gamma_2))]
+  //        sigma_p' = gamma_3*sigma_p + gamma_4
+  //        W_sp = W_s * W_p
+  // col_9:  access the distance |d_v= - d_p=| between pixel p and pixel v along the curve
+  //       W' = 0.5*exp(-|d_v= - d_p=|/alpha)/alpha
+  // col_10: the derivative of col_5: 1/(sqrt(2*PI)*sigma)*exp{-d_{k,l}^2/(2*sigma_hat*sigma_hat)}
+  // so last omega_ps = W_s * W' 
+  cv::Mat vic(resolution, 20*normal_points_number, CV_64F);
+
+  // to save the normalized parameters of vic[i,8]
+  // dimension: resolution x 2
+  // the first column save the normalized coefficient outside the curve
+  // the second column store the one inside the curve
+  cv::Mat normalized_param(resolution, 2, CV_64F);
+
+  ////////////////////////////////////////////////////////////////////////////
+  //main loop starts from here
+  ////////////////////////////////////////////////////////////////////////////
+
+  //while()
+  //{
+  // update model parameters
+  for (int i = 0; i < 6; ++i)
+    Phi.at<double>(i,0) = Phi.at<double>(i,0) - delta_Phi.at<double>(i,0);
+
+  // update the control points in terms of the change of
+  // model parameters
+  for (size_t i = 0; i < pts.size(); ++i)
+  {
+    // C = W*\Phi + C_0
+    //           1  0  x_0  0  0  y_0
+    //     C = [                       ][\phi_0 \phi_1 \phi_2 \phi_3 \phi_4 \phi_5 ]^T + C_0
+    //           0  1  0   y_0 x_0  0
+    //
+    pts_tmp.x = Phi.at<double>(0,0) + (1+Phi.at<double>(2,0))*pts[i].x + Phi.at<double>(5,0)*pts[i].y;
+    pts_tmp.y = Phi.at<double>(1,0) + (1+Phi.at<double>(3,0))*pts[i].y + Phi.at<double>(4,0)*pts[i].x;
+    pts[i].x = round(pts_tmp.x);
+    pts[i].y = round(pts_tmp.y);
   }
-  // delete [] points;
+
+
+  mean_vic.zeros(resolution, 6, CV_64F);
+  cov_vic.zeros(resolution, 18, CV_64F);
+  nabla_E.zeros(6,1, CV_64F);
+  hessian_E.zeros(6,6, CV_64F);
+
+  
+  // create a new B-spline curve: degree =2
+  BSpline bs(t , resolution, pts);
+
+  
+  for(int i=0;i < resolution;i++)
+  {
+    
+    cvCircle( img1, bs[i], 2, CV_RGB(0,0, 255),2);
+    std::cout << bs[i].x  << " " << bs[i].y << std::endl;
+
+    // normal vector (n_x, n_y)
+    // tagent vector (ny, -n_x)
+    nx = -bs.dt(i).y/cvSqrt(bs.dt(i).x*bs.dt(i).x + bs.dt(i).y*bs.dt(i).y);
+    ny = bs.dt(i).x/cvSqrt(bs.dt(i).x*bs.dt(i).x + bs.dt(i).y*bs.dt(i).y);
+    
+    int k = 0;
+    double alpha = 0.5;
+    for (int j = delta_h; j <= h; j+=delta_h, k++)
+    {
+      ///////////////////////////////////////////////////////////////////////////////////////////
+      // calculate in the direction +n: (n_x, n_y)
+      /////////////////////////////////////////////////////////////////////////////////////////
+
+      // x_{k,l}
+      tmp1.x = round(bs[i].x + j*nx);
+
+      // y_{k,l}
+      tmp1.y = round(bs[i].y + j*ny);
+
+      // distance between x_{k,l} and x_{k,0} in the normal direction
+      // appoximately it is l*h, l = {1,2,3,.....}
+      tmp_dis1.x = (tmp1.x-bs[i].x)*nx + (tmp1.y-bs[i].y)*ny;
+
+      // distance between y_{k,l} and y_{k,0} along the curve
+      // it approximates 0
+      tmp_dis1.y = (tmp1.x-bs[i].x)*ny - (tmp1.y-bs[i].y)*nx;
+      
+      vic.at<double>(i,10*k + 0) = tmp1.x;
+      vic.at<double>(i,10*k + 1) = tmp1.y;
+      vic.at<double>(i,10*k + 2) = tmp_dis1.x;
+      vic.at<double>(i,10*k + 3) = tmp_dis1.y;
+
+      // fuzzy assignment a(d_{k,l}) = 1/2*(erf(d_{kl})/\sqrt(2)*sigma) + 1/2
+      vic.at<double>(i,10*k + 4) = 0.5*(erf((tmp_dis1.x)/(sqrt(2)*sigma)) + 1);
+
+      // wp1 = (a_{d,l} - gamm_1) /(1-gamma_1)
+      double wp1 = (vic.at<double>(i,10*k + 4) - gamma_1)/(1-gamma_1);
+
+      // wp1^4, why? if a_{d,l} \approx 0.5, do not count the point
+      vic.at<double>(i,10*k + 5) = wp1*wp1*wp1*wp1;
+
+      // wp1 = (1-a_{d,l} - gamm_1) /(1-gamma_1)
+      double wp2 = (1-vic.at<double>(i,10*k + 4) - gamma_1)/(1-gamma_1);
+      vic.at<double>(i,10*k + 6) = wp2*wp2*wp2*wp2;
+
+      // W_p(d_p, simga_p) = c*max[0, exp(-d_p^2/2*sigma_p'^2) - exp(-gamma_2))]
+      vic.at<double>(i,10*k + 7) = max((exp(-0.5*tmp_dis1.x*tmp_dis1.x/(sigma_hat*sigma_hat)) - exp(-gamma_2)), 0.0);
+
+      // W' = 0.5*exp(-|d_v= - d_p=|/alpha)/alpha
+      vic.at<double>(i, 10*k + 8) = 0.5*exp(-abs(tmp_dis1.y)/alpha)/alpha;
+      
+      // the derivative of col_5: 1/(sqrt(2*PI)*sigma)*exp{-d_{k,l}^2/(2*sigma_hat*sigma_hat)}
+      vic.at<double>(i, 10*k + 9) = 1/(sqrt(2*CV_PI)*sigma_hat)*exp(-tmp_dis1.x*tmp_dis1.x/(2*sigma_hat*sigma_hat));
+      
+      // calculate the normalization parameter c 
+      normalized_param.at<double>(i, 0) += vic.at<double>(i, 10*k + 7);
+      
+      if(i == 0)
+        std::cout << "tmp1 " << tmp1.x  << " " << tmp1.y << std::endl;
+      
+      cvCircle(img1, tmp1, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
+
+      ///////////////////////////////////////////////////////////////////////////////////////////
+      // calculate in the direction -n: (-n_x, -n_y)
+      /////////////////////////////////////////////////////////////////////////////////////////      
+      tmp2.x = round(bs[i].x - j*nx);
+      tmp2.y = round(bs[i].y - j*ny);
+      
+      if(i == 0)
+        std::cout << "tmp2 " << tmp2.x  << " " << tmp2.y << std::endl;
+
+      // start compute the size in the direction of -(n_x, n_y)
+      tmp_dis2.x = (tmp2.x-bs[i].x)*nx + (tmp2.y-bs[i].y)*ny;
+      tmp_dis2.y = (tmp2.x-bs[i].x)*ny - (tmp2.y-bs[i].y)*nx;
+      int negative_normal = k+normal_points_number;
+      vic.at<double>(i,10*negative_normal + 0) = tmp2.x;
+      vic.at<double>(i,10*negative_normal + 1) = tmp2.y;
+      vic.at<double>(i,10*negative_normal + 2) = tmp_dis2.x;
+      vic.at<double>(i,10*negative_normal + 3) = tmp_dis2.y;
+      vic.at<double>(i,10*negative_normal + 4) = 0.5*(erf(tmp_dis2.x/(cvSqrt(2)*sigma)) + 1);
+      wp1 = (vic.at<double>(i,10*negative_normal + 4) - gamma_1)/(1-gamma_1);
+      vic.at<double>(i,10*negative_normal + 5) = wp1*wp1*wp1*wp1;
+      wp2 = (1-vic.at<double>(i,10*negative_normal + 4) - gamma_1)/(1-gamma_1);
+      vic.at<double>(i,10*negative_normal + 6) = wp2*wp2*wp2*wp2;
+      vic.at<double>(i,10*negative_normal + 7) = max((exp(-0.5*vic.at<double>(i,10*negative_normal + 2)*vic.at<double>(i,10*negative_normal + 2)/(sigma_hat*sigma_hat)) - exp(-gamma_2)), 0.0);
+      vic.at<double>(i, 10*negative_normal + 8) = 0.5*exp(-abs(tmp_dis2.x)/alpha)/alpha;
+      vic.at<double>(i, 10*negative_normal + 9) = 1/(sqrt(2*CV_PI)*sigma_hat)*exp(-tmp_dis2.x*tmp_dis2.x/(2*sigma_hat*sigma_hat));
+      //      vic.at<double>(i, 10*k + 10) = ;
+      normalized_param.at<double>(i, 1) += vic.at<double>(i, 10*negative_normal + 7);
+      cvCircle(img1, tmp2, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
+    }
+  }
+  
+  
+  for (int  i = 0; i < 2*normal_points_number; ++i)
+  {
+    std::cout << vic.at<double>(0,10*i+0) << " "
+              << vic.at<double>(0,10*i+1) << " "
+              << vic.at<double>(0,10*i+2) << " "
+              << vic.at<double>(0,10*i+3) << " "
+              << vic.at<double>(0,10*i+4) << " "
+              << vic.at<double>(0,10*i+5) << " "
+              << vic.at<double>(0,10*i+6) << " "
+              << vic.at<double>(0,10*i+7) << " "
+              << vic.at<double>(0,10*i+8) << " "
+              << vic.at<double>(0,10*i+9) << " "
+              << vic.at<double>(0,10*i+10) << " "
+              << vic.at<double>(0,10*i+11) << " "
+              << vic.at<double>(0,10*i+12) << " "
+              << vic.at<double>(0,10*i+13) << " "
+              << vic.at<double>(0,10*i+14) << " "
+              << vic.at<double>(0,10*i+15) << " "
+              << vic.at<double>(0,10*i+16) << " "
+              << vic.at<double>(0,10*i+17) << " "
+              << vic.at<double>(0,10*i+18) << " "
+              << vic.at<double>(0,10*i+19) << " "
+              <<std::endl;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////
+  cvShowImage("Original",img1);
+  
+  while (1)
+  {
+    key = cvWaitKey(10);
+    if (key == 27) break;
+  }
+  ///////////////////////////////////////////////////////////////////////////////
+  
+  // cv::Mat sigma_phi(6,6, CV_64F);
+
+  // calculate the local statistics: mean and covariance
+  // mean_vic = M_s(d_v=)/omega_s(d_v=)
+  // cov_vic = M_s(d_v=)^2/omega_s(d_v=) - m_v,s * (m_v,s)' + kappa*I
+  // a_vic[0] = c*Sigma_x(p_v,s(x, m_phi, sigma_phi)); a_vic[1] = 1-a_vic[0]
+  // where:
+  // omega_s(d_v=) = Simage(omega_p,s(d_v=))
+  // M_s(d_v=) = Simga(omega_p,s(d_v=) * I_p), I_p is the pixel value in the point (x,y)
+  // M_s(d_v=)^2 = Simga(omega_p,s(d_v=) * I_p*I_p'), I_p is the pixel value in the point (x,y)
+  // here s = 1 or 2, where the 2rd dimesion is 3*3 and 10*3
+  // we use last 3 or 10 elments to save the result
+
+  for (int i = 0; i < resolution; ++i)
+  {
+    int k = 0;
+    // w1 = \sum wp_1, w2 = \sum wp_2
+    double w1 =0.0 , w2 = 0.0;
+
+    // store mean value near the curve
+    vector<double> m1(3,0.0), m2(3,0.0);
+    
+    // store the second mean vlaue near the curve
+    vector<double> m1_o2(9,0.0), m2_o2(9,0.0);
+
+    ////////////////////////////////////////////////////////////////////////
+    // compute local statistics
+    // ////////////////////////////////////////////////////////////////////
+    // start search the points in the +n direction as well as -n direction
+    for (int j = delta_h; j <= h; j+=delta_h, k++)
+    {
+      double wp1 = 0.0, wp2 = 0.0;
+      
+      int negative_normal = k + normal_points_number;
+      
+      // wp1 = w(a_{k,l})*w(d_{k,l})*w(d)
+      wp1 = vic.at<double>(i, 10*k+ 5)*vic.at<double>(i, 10*k+ 7)*vic.at<double>(i, 10*k+ 8) / normalized_param.at<double>(i,0);
+
+      // wp2 = w(a_{k,l})*w(d_{k,l})*w(d)
+      wp2 = vic.at<double>(i, 10*k+ 6)*vic.at<double>(i, 10*k+ 7)*vic.at<double>(i, 10*k+ 8) / normalized_param.at<double>(i,1);
+
+      //w1 = \sum{wp1}
+      w1 += wp1;
+
+      //w2 = \sum{wp2}
+      w2 += wp2;
+
+      // compute the mean value in the vicinity of a point
+      // m_{ks} = I{k}^{s} = \sum_{l} w_{kls}{I_{kl}} : s = 1 or 2
+      m1[0] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[0];
+      m1[1] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[1];
+      m1[2] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[2];
+      m2[0] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[0];
+      m2[1] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[1];
+      m2[2] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[2];
+
+      // compute second order local statistics
+      // m_{k,s} = \sum_{l} w_{kls} I_{kl}*I_{kl}^T
+
+      for (int m = 0; m < 3; ++m)
+      {
+        for (int n =0; n < 3; ++n)
+        {
+          m1_o2[m*3+n] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[m]
+                          *img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[n];
+          m2_o2[m*3+n] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[m]
+                          *img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[n];
+        }
+      }
+
+      wp1 = vic.at<double>(i, 10*negative_normal+ 5)*vic.at<double>(i, 10*negative_normal+ 7)*vic.at<double>(i, 10*negative_normal+ 8);
+      wp2 = vic.at<double>(i, 10*negative_normal+ 6)*vic.at<double>(i, 10*negative_normal+ 7)*vic.at<double>(i, 10*negative_normal+ 8);
+      
+      w1 += wp1;
+      w2 += wp2;
+      
+      m1[0] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[0];
+      m1[1] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[1];
+      m1[2] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[2];
+      m2[0] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[0];
+      m2[1] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[1];
+      m2[2] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[2];
+      
+      for (int m = 0; m < 3; ++m)
+      {
+        for (int n =0; n < 3; ++n)
+        {
+          m1_o2[m*3+n] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[m]
+                          *img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[n];
+          m2_o2[m*3+n] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[m]
+                          *img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[n];
+        }
+      }
+    }
+    
+    mean_vic.at<double>(i, 0) = m1[0]/w1;
+    mean_vic.at<double>(i, 1) = m1[1]/w1;
+    mean_vic.at<double>(i, 2) = m1[2]/w1;
+    mean_vic.at<double>(i, 3) = m2[0]/w2;
+    mean_vic.at<double>(i, 4) = m2[1]/w2;
+    mean_vic.at<double>(i, 5) = m2[2]/w2;
+    
+    for (int m = 0; m < 3; ++m)
+    {
+      for (int n = 0 ; n < 3; ++n)
+      {
+        cov_vic.at<double>(i, m*3+n) = m1_o2[m*3+n]/w1 -m1[m]*m1[n]/(w1*w1);
+        cov_vic.at<double>(i, 9+m*3+n) = m2_o2[m*3+n]/w2 -m2[m]*m2[n]/(w2*w2);
+        if(m == n)
+        {
+          cov_vic.at<double>(i, m*3+n) += kappa;
+          cov_vic.at<double>(i, 9+m*3+n) += kappa;
+        }
+      }
+    }
+  }
+
+  //debug
+  for (int i = 0; i < resolution; ++i)
+  {
+    std::cout << mean_vic.at<double>(i, 0) << " "
+              << mean_vic.at<double>(i, 1) << " "
+              << mean_vic.at<double>(i, 2) << " "
+              << mean_vic.at<double>(i, 3) << " "
+              << mean_vic.at<double>(i, 4) << " "
+              << mean_vic.at<double>(i, 5) << " "
+              << std::endl;
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////
+  //end to compute local statistics
+  ///////////////////////////////////////////////////////////////////////////////
+
+  
+  for (int i = 0; i < resolution; ++i)
+  {
+    for (int j = 0; j < 2*normal_points_number; ++j)
+    {
+      tmp_cov.zeros(3,3,CV_64F);
+      tmp_cov_inv.zeros(3,3,CV_64F);
+      
+      // \hat{}\Sigma_{kl}} = a_{kl}\Sigma_{k}^{1} + (1 - a_{kl})\Sigma_{k}^{2}
+      for (int m = 0; m < 3; ++m)
+      {
+        for (int n = 0; n < 3; ++n)
+        {
+          tmp_cov.at<double>(m, n) = vic.at<double>(i,10*j+4) * cov_vic.at<double>(i,m*3+n)
+                                     +(1-vic.at<double>(i,10*j+4))* cov_vic.at<double>(i,m*3+n+9);
+        }
+      }
+      
+      tmp_cov_inv = tmp_cov.inv(DECOMP_SVD);
+      
+      tmp_pixel_diff.zeros(3, 1, CV_64F);
+      
+      //compute the difference between I_{kl} and \hat{I_{kl}}
+      for (int m = 0; m < 3; ++m)
+      {
+        tmp_pixel_diff.at<double>(m,0) += img.at<Vec3b>(vic.at<double>(i,10*j+0), vic.at<double>(i,10*j+1))[m]- vic.at<double>(i,10*j+4) * mean_vic.at<double>(i,m)- (1-vic.at<double>(i,10*j+4))* mean_vic.at<double>(i,m+3);
+      }
+
+      //compute jacobian matrix
+      tmp_jacobian.zeros(6,3,CV_64F); 
+      for (int n = 0; n < 3; ++n)
+      {
+        tmp_jacobian.at<double>(0,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nx;
+        tmp_jacobian.at<double>(1,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*ny;
+        tmp_jacobian.at<double>(2,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nx*bs[i].x;
+        tmp_jacobian.at<double>(3,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*ny*bs[i].y;
+        tmp_jacobian.at<double>(4,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*ny*bs[i].x;
+        tmp_jacobian.at<double>(5,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nx*bs[i].y;
+      }
+      //\nabla{E_2} = \sum J * \Sigma_{kl}^{-1} * (I_{kl} - \hat{I_{kl}})
+      nabla_E += tmp_jacobian*tmp_cov_inv*tmp_pixel_diff;
+      //Hessian{E_2} = \sum J * \Sigma_{kl}^{-1} * J
+      hessian_E += tmp_jacobian*tmp_cov_inv*tmp_jacobian.t();
+    }
+  }
+  std::cout << nabla_E.at<double>(0,0) << " "
+            << nabla_E.at<double>(1,0) << " " 
+            << nabla_E.at<double>(2,0) << " " 
+            << nabla_E.at<double>(3,0) << " " 
+            << nabla_E.at<double>(4,0) << " " 
+            << nabla_E.at<double>(5,0) << " " 
+            << std::endl;
+  
+  hessian_E += Sigma_Phi.inv();
+  nabla_E += 2*Sigma_Phi.inv()*Phi;
+  
+  delta_Phi = hessian_E.inv()*nabla_E;
+  Phi -= delta_Phi;
+  Sigma_Phi = c*Sigma_Phi + (1-c)*hessian_E.inv();
+  
+  bs.release();
+  //  }
+  //main loop ended here
+
+  Phi.release();
+  delta_Phi.release();
+  Sigma_Phi.release();
+  mean_vic.release();
+  cov_vic.release();
+  nabla_E.release();
+  hessian_E.release();
+  tmp_cov.release();
+  tmp_cov_inv.release();
+  tmp_jacobian.release();
+  tmp_pixel_diff.release();
   cvReleaseImage(&img1);
-  X.release();
-  dx.release();
-  dx_old.release();
   return 0;
 }
