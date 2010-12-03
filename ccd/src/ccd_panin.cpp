@@ -55,6 +55,11 @@ void on_mouse( int event, int x, int y, int flags, void* param )
 
 int main (int argc, char * argv[]) 
 {
+  if (argc < 2)
+    {
+      printf("Usage %s image.png \n", argv[0]);
+      exit(0);
+    }
   // the count of points on curve, equidistant distributed
   const int resolution = 50;
   
