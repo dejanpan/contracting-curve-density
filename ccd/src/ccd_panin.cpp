@@ -561,6 +561,14 @@ int main (int argc, char * argv[])
         tmp_jacobian.at<double>(4,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*ny*bs[i].x;
         tmp_jacobian.at<double>(5,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nx*bs[i].y;
       }
+      for (int m = 0; m < 3; ++m){
+        for (int n = 0; n < 3; ++n){
+          std::cout << tmp_cov_inv.at<double>(m,n) << " ";
+        }
+        std::cout << std::endl;
+      }
+      std::cout << std::endl;
+
       //\nabla{E_2} = \sum J * \Sigma_{kl}^{-1} * (I_{kl} - \hat{I_{kl}})
       nabla_E += tmp_jacobian*tmp_cov_inv*tmp_pixel_diff;
       //Hessian{E_2} = \sum J * \Sigma_{kl}^{-1} * J
