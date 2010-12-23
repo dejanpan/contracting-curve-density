@@ -1,3 +1,4 @@
+
 #include "ccd_panin.h"
 using namespace cv;
 /** 
@@ -195,7 +196,7 @@ int main (int argc, char * argv[])
 
   // h: search radius in the normal direction
   // delta_h: distance step in the normal direction
-  int h = 20, delta_h = 2;
+  int h = 20, delta_h = 1;
 
   // sigma_hat = gamma_3 * sigma
   //  double sigma_hat = max(h/sqrt(2*gamma_2), gamma_4);
@@ -412,8 +413,8 @@ int main (int argc, char * argv[])
         wp1 = (vic.at<double>(i,10*negative_normal + 4) - gamma_1)/(1-gamma_1);
         vic.at<double>(i,10*negative_normal + 5) = wp1*wp1*wp1*wp1;
         // wp2 = (1-vic.at<double>(i,10*negative_normal + 4) - gamma_1)/(1-gamma_1);
-        wp2 = (1-vic.at<double>(i,10*negative_normal + 4) - 0.25);
-        vic.at<double>(i,10*negative_normal + 6) = -64*wp2*wp2*wp2*wp2 + 0.25;
+        wp1 = (1-vic.at<double>(i,10*negative_normal + 4) - 0.25);
+        vic.at<double>(i,10*negative_normal + 6) = -64*wp1*wp1*wp1*wp1 + 0.25;
         vic.at<double>(i,10*negative_normal + 7) = max((exp(-0.5*vic.at<double>(i,10*negative_normal + 2)*vic.at<double>(i,10*negative_normal + 2)/(sigma_hat*sigma_hat)) - exp(-gamma_2)), 0.0);
         vic.at<double>(i, 10*negative_normal + 8) = 0.5*exp(-abs(tmp_dis2.x)/alpha)/alpha;
         vic.at<double>(i, 10*negative_normal + 9) = 1/(sqrt(2*CV_PI)*sigma_hat)*exp(-tmp_dis2.x*tmp_dis2.x/(2*sigma_hat*sigma_hat));
@@ -425,9 +426,13 @@ int main (int argc, char * argv[])
   
 
 // #ifdef DEBUG
+    printf("%-5s  %-5s  %-5s  %-5s  %-5s  %-5s  %-5s  %-5s  %-5s  %-5s\n",
+           "x", "y", "dist_x", "dist_y", "a", "w1^4", "w2^4", "prox", "edf", "erf'"
+           );
     for (int  i = 0; i < 20*normal_points_number; ++i)
     {
-      std::cout << vic.at<double>(0,i) << " ";
+      // std::cout << vic.at<double>(0,i) << "    ";
+      printf("%-5f   ", vic.at<double>(0,i));
       if((i+1)%10 == 0)
         std::cout << std::endl;
     }
