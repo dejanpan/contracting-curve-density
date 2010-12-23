@@ -16,8 +16,8 @@ inline double ccd_det(uchar *ptr, int offset)
 }
 inline double double_rand(double d_min, double d_max)
 {
-    double d = (double)rand() / RAND_MAX;
-    return d_min + d * (d_max - d_min);
+  double d = (double)rand() / RAND_MAX;
+  return d_min + d * (d_max - d_min);
 }
 
 // input image
@@ -64,10 +64,10 @@ void on_mouse( int event, int x, int y, int flags, void* param )
 int main (int argc, char * argv[]) 
 {
   if (argc < 2)
-    {
-      printf("Usage %s image.png \n", argv[0]);
-      exit(0);
-    }
+  {
+    printf("Usage %s image.png \n", argv[0]);
+    exit(0);
+  }
   // the count of points on curve, equidistant distributed
   const int resolution = 50;
   
@@ -112,12 +112,12 @@ int main (int argc, char * argv[])
   }
 
   // for debug
-  #ifdef DEBUG
+#ifdef DEBUG
   for (size_t i = 0; i < pts.size(); ++i)
   {
     std::cout<< pts[i].x << " " << pts[i].y << std::endl;
   }
-  #endif
+#endif
 
   
   // model parameters, it is a 6x1 matrix
@@ -261,439 +261,425 @@ int main (int argc, char * argv[])
 
   while(iter <20)
   {
-  // update model parameters
-  for (int i = 0; i < 6; ++i)
-    Phi.at<double>(i,0) = Phi.at<double>(i,0) - delta_Phi.at<double>(i,0);
+    // update model parameters
+    for (int i = 0; i < 6; ++i)
+      Phi.at<double>(i,0) = Phi.at<double>(i,0) - delta_Phi.at<double>(i,0);
 
-  // update the control points in terms of the change of
-  // model parameters
-  for (size_t i = 0; i < pts.size(); ++i)
-  {
-    // C = W*\Phi + C_0
-    //           1  0  x_0  0  0  y_0
-    //     C = [                       ][\phi_0 \phi_1 \phi_2 \phi_3 \phi_4 \phi_5 ]^T + C_0
-    //           0  1  0   y_0 x_0  0
-    //
-    pts_tmp.x = Phi.at<double>(0,0) + (1+Phi.at<double>(2,0))*pts[i].x + Phi.at<double>(5,0)*pts[i].y;
-    pts_tmp.y = Phi.at<double>(1,0) + (1+Phi.at<double>(3,0))*pts[i].y + Phi.at<double>(4,0)*pts[i].x;
-    pts[i].x = round(pts_tmp.x);
-    pts[i].y = round(pts_tmp.y);
-  }
-  
-  nv.zeros(resolution, 2, CV_64F);
-  mean_vic.zeros(resolution, 6, CV_64F);
-  cov_vic.zeros(resolution, 18, CV_64F);
-  nabla_E.zeros(6,1, CV_64F);
-  hessian_E.zeros(6,6, CV_64F);
-
-  
-  // create a new B-spline curve: degree =2
-  BSpline bs(t , resolution, pts);
-
-
-  // converge condition
-  // tol = \int (r - r_f)*n
-  tol = 0;
-  if(iter > 0)
-  {
-    for (int k = 0; k < resolution; ++k)
+    // update the control points in terms of the change of
+    // model parameters
+    for (size_t i = 0; i < pts.size(); ++i)
     {
-      tol += (bs[k].x - bs_old.at<double>(k, 0))*bs_old.at<double>(k, 2) +
-             (bs[k].y - bs_old.at<double>(k, 1))*bs_old.at<double>(k, 3);
+      // C = W*\Phi + C_0
+      //           1  0  x_0  0  0  y_0
+      //     C = [                       ][\phi_0 \phi_1 \phi_2 \phi_3 \phi_4 \phi_5 ]^T + C_0
+      //           0  1  0   y_0 x_0  0
+      //
+      pts_tmp.x = Phi.at<double>(0,0) + (1+Phi.at<double>(2,0))*pts[i].x + Phi.at<double>(5,0)*pts[i].y;
+      pts_tmp.y = Phi.at<double>(1,0) + (1+Phi.at<double>(3,0))*pts[i].y + Phi.at<double>(4,0)*pts[i].x;
+      pts[i].x = round(pts_tmp.x);
+      pts[i].y = round(pts_tmp.y);
     }
-  }
+  
+    nv.zeros(resolution, 2, CV_64F);
+    mean_vic.zeros(resolution, 6, CV_64F);
+    cov_vic.zeros(resolution, 18, CV_64F);
+    nabla_E.zeros(6,1, CV_64F);
+    hessian_E.zeros(6,6, CV_64F);
 
   
-  for(int i=0;i < resolution;i++)
-  {
-    
-    cv::circle( img1, bs[i], 2, CV_RGB(0,0, 255),2);
-    
-    #ifdef DEBUG
-        std::cout << bs[i].x  << " " << bs[i].y << std::endl;
-    //ROS_DEBUG_STREAM(bs[i].x  << " " << bs[i].y);
-    #endif
-    
-    // normal vector (n_x, n_y)
-    // tagent vector (nv.at<double>(i,1), -n_x)
-    nv.at<double>(i,0) = -bs.dt(i).y/cvSqrt(bs.dt(i).x*bs.dt(i).x + bs.dt(i).y*bs.dt(i).y);
-    nv.at<double>(i,1) = bs.dt(i).x/cvSqrt(bs.dt(i).x*bs.dt(i).x + bs.dt(i).y*bs.dt(i).y);
+    // create a new B-spline curve: degree =2
+    BSpline bs(t , resolution, pts);
 
-    bs_old.at<double>(i,0) = bs[i].x;
-    bs_old.at<double>(i,1) = bs[i].x;
-    bs_old.at<double>(i,2) = nv.at<double>(i,0);
-    bs_old.at<double>(i,3) = nv.at<double>(i,1);
-    
 
-    // std::cout << nv.at<double>(i,0) << " " << nv.at<double>(i,1) << std::endl;
-    int k = 0;
-    double alpha = 0.5;
-    for (int j = delta_h; j <= h; j+=delta_h, k++)
+    // converge condition
+    // tol = \int (r - r_f)*n
+    tol = 0;
+    if(iter > 0)
     {
-      ///////////////////////////////////////////////////////////////////////////////////////////
-      // calculate in the direction +n: (n_x, n_y)
-      /////////////////////////////////////////////////////////////////////////////////////////
-
-      // x_{k,l}
-      tmp1.x = round(bs[i].x + j*nv.at<double>(i,0));
-
-      // y_{k,l}
-      tmp1.y = round(bs[i].y + j*nv.at<double>(i,1));
-
-      // distance between x_{k,l} and x_{k,0} in the normal direction
-      // appoximately it is l*h, l = {1,2,3,.....}
-      tmp_dis1.x = (tmp1.x-bs[i].x)*nv.at<double>(i,0) + (tmp1.y-bs[i].y)*nv.at<double>(i,1);
-
-      // distance between y_{k,l} and y_{k,0} along the curve
-      // it approximates 0
-      tmp_dis1.y = (tmp1.x-bs[i].x)*nv.at<double>(i,1) - (tmp1.y-bs[i].y)*nv.at<double>(i,0);
-      
-      vic.at<double>(i,10*k + 0) = tmp1.x;
-      vic.at<double>(i,10*k + 1) = tmp1.y;
-      vic.at<double>(i,10*k + 2) = tmp_dis1.x;
-      vic.at<double>(i,10*k + 3) = tmp_dis1.y;
-
-      // fuzzy assignment a(d_{k,l}) = 1/2*(erf(d_{kl})/\sqrt(2)*sigma) + 1/2
-      vic.at<double>(i,10*k + 4) = 0.5*(erf((tmp_dis1.x)/(sqrt(2)*sigma)) + 1);
-
-      // wp1 = (a_{d,l} - gamm_1) /(1-gamma_1)
-      double wp1 = (vic.at<double>(i,10*k + 4) - gamma_1)/(1-gamma_1);
-
-      // wp1^4, why? if a_{d,l} \approx 0.5, do not count the point
-      vic.at<double>(i,10*k + 5) = wp1*wp1*wp1*wp1;
-
-      // wp1 = (1-a_{d,l} - gamm_1) /(1-gamma_1)
-      // double wp2 = (1-vic.at<double>(i,10*k + 4) - gamma_1)/(1-gamma_1);
-      double wp2 = (1-vic.at<double>(i,10*k + 4) - 0.25);
-      vic.at<double>(i,10*k + 6) = -wp2*wp2*wp2*wp2 + 0.25;
-
-      // W_p(d_p, simga_p) = c*max[0, exp(-d_p^2/2*sigma_p'^2) - exp(-gamma_2))]
-      vic.at<double>(i,10*k + 7) = max((exp(-0.5*tmp_dis1.x*tmp_dis1.x/(sigma_hat*sigma_hat)) - exp(-gamma_2)), 0.0);
-
-      // W' = 0.5*exp(-|d_v= - d_p=|/alpha)/alpha
-      vic.at<double>(i, 10*k + 8) = 0.5*exp(-abs(tmp_dis1.y)/alpha)/alpha;
-      
-      // the derivative of col_5: 1/(sqrt(2*PI)*sigma)*exp{-d_{k,l}^2/(2*sigma_hat*sigma_hat)}
-      vic.at<double>(i, 10*k + 9) = 1/(sqrt(2*CV_PI)*sigma_hat)*exp(-tmp_dis1.x*tmp_dis1.x/(2*sigma_hat*sigma_hat));
-      
-      // calculate the normalization parameter c 
-      normalized_param.at<double>(i, 0) += vic.at<double>(i, 10*k + 7);
-
-      #ifdef DEBUG
-      if(i == 0)
-        std::cout << "tmp1 " << tmp1.x  << " " << tmp1.y << std::endl;
-      #endif
-      
-      cv::circle(img1, tmp1, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
-
-      ///////////////////////////////////////////////////////////////////////////////////////////
-      // calculate in the direction -n: (-n_x, -n_y)
-      /////////////////////////////////////////////////////////////////////////////////////////      
-      tmp2.x = round(bs[i].x - j*nv.at<double>(i,0));
-      tmp2.y = round(bs[i].y - j*nv.at<double>(i,1));
-
-      #ifdef DEBUG
-      if(i == 0)
-        std::cout << "tmp2 " << tmp2.x  << " " << tmp2.y << std::endl;
-      #endif
-
-      // start compute the size in the direction of -(n_x, n_y)
-      tmp_dis2.x = (tmp2.x-bs[i].x)*nv.at<double>(i,0) + (tmp2.y-bs[i].y)*nv.at<double>(i,1);
-      tmp_dis2.y = (tmp2.x-bs[i].x)*nv.at<double>(i,1) - (tmp2.y-bs[i].y)*nv.at<double>(i,0);
-      int negative_normal = k+normal_points_number;
-      vic.at<double>(i,10*negative_normal + 0) = tmp2.x;
-      vic.at<double>(i,10*negative_normal + 1) = tmp2.y;
-      vic.at<double>(i,10*negative_normal + 2) = tmp_dis2.x;
-      vic.at<double>(i,10*negative_normal + 3) = tmp_dis2.y;
-      vic.at<double>(i,10*negative_normal + 4) = 0.5*(erf(tmp_dis2.x/(cvSqrt(2)*sigma)) + 1);
-      wp1 = (vic.at<double>(i,10*negative_normal + 4) - gamma_1)/(1-gamma_1);
-      vic.at<double>(i,10*negative_normal + 5) = wp1*wp1*wp1*wp1;
-      // wp2 = (1-vic.at<double>(i,10*negative_normal + 4) - gamma_1)/(1-gamma_1);
-      wp2 = (1-vic.at<double>(i,10*negative_normal + 4) - 0.25);
-      vic.at<double>(i,10*negative_normal + 6) = -wp2*wp2*wp2*wp2 + 0.25;
-      vic.at<double>(i,10*negative_normal + 7) = max((exp(-0.5*vic.at<double>(i,10*negative_normal + 2)*vic.at<double>(i,10*negative_normal + 2)/(sigma_hat*sigma_hat)) - exp(-gamma_2)), 0.0);
-      vic.at<double>(i, 10*negative_normal + 8) = 0.5*exp(-abs(tmp_dis2.x)/alpha)/alpha;
-      vic.at<double>(i, 10*negative_normal + 9) = 1/(sqrt(2*CV_PI)*sigma_hat)*exp(-tmp_dis2.x*tmp_dis2.x/(2*sigma_hat*sigma_hat));
-      //      vic.at<double>(i, 10*k + 10) = ;
-      normalized_param.at<double>(i, 1) += vic.at<double>(i, 10*negative_normal + 7);
-      cv::circle(img1, tmp2, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
+      for (int k = 0; k < resolution; ++k)
+      {
+        tol += (bs[k].x - bs_old.at<double>(k, 0))*bs_old.at<double>(k, 2) +
+               (bs[k].y - bs_old.at<double>(k, 1))*bs_old.at<double>(k, 3);
+      }
     }
-  }
-  
-
-  #ifdef DEBUG
-  for (int  i = 0; i < 2*normal_points_number; ++i)
-  {
-    std::cout << vic.at<double>(0,10*i+0) << " "
-              << vic.at<double>(0,10*i+1) << " "
-              << vic.at<double>(0,10*i+2) << " "
-              << vic.at<double>(0,10*i+3) << " "
-              << vic.at<double>(0,10*i+4) << " "
-              << vic.at<double>(0,10*i+5) << " "
-              << vic.at<double>(0,10*i+6) << " "
-              << vic.at<double>(0,10*i+7) << " "
-              << vic.at<double>(0,10*i+8) << " "
-              << vic.at<double>(0,10*i+9) << " "
-              << vic.at<double>(0,10*i+10) << " "
-              << vic.at<double>(0,10*i+11) << " "
-              << vic.at<double>(0,10*i+12) << " "
-              << vic.at<double>(0,10*i+13) << " "
-              << vic.at<double>(0,10*i+14) << " "
-              << vic.at<double>(0,10*i+15) << " "
-              << vic.at<double>(0,10*i+16) << " "
-              << vic.at<double>(0,10*i+17) << " "
-              << vic.at<double>(0,10*i+18) << " "
-              << vic.at<double>(0,10*i+19) << " "
-              <<std::endl;
-  }
-  #endif
-  
-  ///////////////////////////////////////////////////////////////////////////////////
-  // cvShowImage("Original",img1);
-  cv::imshow("Original", img1);
-  
-  
-  while (1)
-  {
-    key = cvWaitKey(10);
-    if (key == 27) break;
-  }
-  ///////////////////////////////////////////////////////////////////////////////
-  
-  // cv::Mat sigma_phi(6,6, CV_64F);
-
-  // calculate the local statistics: mean and covariance
-  // mean_vic = M_s(d_v=)/omega_s(d_v=)
-  // cov_vic = M_s(d_v=)^2/omega_s(d_v=) - m_v,s * (m_v,s)' + kappa*I
-  // a_vic[0] = c*Sigma_x(p_v,s(x, m_phi, sigma_phi)); a_vic[1] = 1-a_vic[0]
-  // where:
-  // omega_s(d_v=) = Simage(omega_p,s(d_v=))
-  // M_s(d_v=) = Simga(omega_p,s(d_v=) * I_p), I_p is the pixel value in the point (x,y)
-  // M_s(d_v=)^2 = Simga(omega_p,s(d_v=) * I_p*I_p'), I_p is the pixel value in the point (x,y)
-  // here s = 1 or 2, where the 2rd dimesion is 3*3 and 10*3
-  // we use last 3 or 10 elments to save the result
 
   
-  for (int i = 0; i < resolution; ++i)
-  {
-    int k = 0;
-    // w1 = \sum wp_1, w2 = \sum wp_2
-    double w1 =0.0 , w2 = 0.0;
-
-    // store mean value near the curve
-    vector<double> m1(3,0.0), m2(3,0.0);
-    
-    // store the second mean vlaue near the curve
-    vector<double> m1_o2(9,0.0), m2_o2(9,0.0);
-
-    ////////////////////////////////////////////////////////////////////////
-    // compute local statistics
-    // ////////////////////////////////////////////////////////////////////
-    // start search the points in the +n direction as well as -n direction
-    for (int j = delta_h; j <= h; j+=delta_h, k++)
+    for(int i=0;i < resolution;i++)
     {
-      double wp1 = 0.0, wp2 = 0.0;
+    
+      cv::circle( img1, bs[i], 2, CV_RGB(0,0, 255),2);
+    
+#ifdef DEBUG
+      std::cout << bs[i].x  << " " << bs[i].y << std::endl;
+      //ROS_DEBUG_STREAM(bs[i].x  << " " << bs[i].y);
+#endif
+    
+      // normal vector (n_x, n_y)
+      // tagent vector (nv.at<double>(i,1), -n_x)
+      nv.at<double>(i,0) = -bs.dt(i).y/cvSqrt(bs.dt(i).x*bs.dt(i).x + bs.dt(i).y*bs.dt(i).y);
+      nv.at<double>(i,1) = bs.dt(i).x/cvSqrt(bs.dt(i).x*bs.dt(i).x + bs.dt(i).y*bs.dt(i).y);
+
+      // save the old value of bspline
+      bs_old.at<double>(i,0) = bs[i].x;
+      bs_old.at<double>(i,1) = bs[i].y;
+
+      // save the old normal vector of bspline
+      bs_old.at<double>(i,2) = nv.at<double>(i,0);
+      bs_old.at<double>(i,3) = nv.at<double>(i,1);
+    
+
+      // std::cout << nv.at<double>(i,0) << " " << nv.at<double>(i,1) << std::endl;
+      int k = 0;
+      double alpha = 0.5;
+      for (int j = delta_h; j <= h; j+=delta_h, k++)
+      {
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // calculate in the direction +n: (n_x, n_y)
+        /////////////////////////////////////////////////////////////////////////////////////////
+
+        // x_{k,l}
+        tmp1.x = round(bs[i].x + j*nv.at<double>(i,0));
+
+        // y_{k,l}
+        tmp1.y = round(bs[i].y + j*nv.at<double>(i,1));
+
+        // distance between x_{k,l} and x_{k,0} in the normal direction
+        // appoximately it is l*h, l = {1,2,3,.....}
+        tmp_dis1.x = (tmp1.x-bs[i].x)*nv.at<double>(i,0) + (tmp1.y-bs[i].y)*nv.at<double>(i,1);
+
+        // distance between y_{k,l} and y_{k,0} along the curve
+        // it approximates 0
+        tmp_dis1.y = (tmp1.x-bs[i].x)*nv.at<double>(i,1) - (tmp1.y-bs[i].y)*nv.at<double>(i,0);
       
-      int negative_normal = k + normal_points_number;
+        vic.at<double>(i,10*k + 0) = tmp1.x;
+        vic.at<double>(i,10*k + 1) = tmp1.y;
+        vic.at<double>(i,10*k + 2) = tmp_dis1.x;
+        vic.at<double>(i,10*k + 3) = tmp_dis1.y;
+
+        // fuzzy assignment a(d_{k,l}) = 1/2*(erf(d_{kl})/\sqrt(2)*sigma) + 1/2
+        vic.at<double>(i,10*k + 4) = 0.5*(erf((tmp_dis1.x)/(sqrt(2)*sigma)) + 1);
+
+        // wp1 = (a_{d,l} - gamm_1) /(1-gamma_1)
+        double wp1 = (vic.at<double>(i,10*k + 4) - gamma_1)/(1-gamma_1);
+
+        // wp1^4, why? if a_{d,l} \approx 0.5, do not count the point
+        vic.at<double>(i,10*k + 5) = wp1*wp1*wp1*wp1;
+
+        // wp1 = (1-a_{d,l} - gamm_1) /(1-gamma_1)
+        // double wp2 = (1-vic.at<double>(i,10*k + 4) - gamma_1)/(1-gamma_1);
+        double wp2 = (1-vic.at<double>(i,10*k + 4) - 0.25);
+        vic.at<double>(i,10*k + 6) = -64*wp2*wp2*wp2*wp2 + 0.25;
+
+        // W_p(d_p, simga_p) = c*max[0, exp(-d_p^2/2*sigma_p'^2) - exp(-gamma_2))]
+        vic.at<double>(i,10*k + 7) = max((exp(-0.5*tmp_dis1.x*tmp_dis1.x/(sigma_hat*sigma_hat)) - exp(-gamma_2)), 0.0);
+
+        // W' = 0.5*exp(-|d_v= - d_p=|/alpha)/alpha
+        vic.at<double>(i, 10*k + 8) = 0.5*exp(-abs(tmp_dis1.y)/alpha)/alpha;
       
-      // wp1 = w(a_{k,l})*w(d_{k,l})*w(d)
-      wp1 = vic.at<double>(i, 10*k+ 5)*vic.at<double>(i, 10*k+ 7)*vic.at<double>(i, 10*k+ 8) / normalized_param.at<double>(i,0);
+        // the derivative of col_5: 1/(sqrt(2*PI)*sigma)*exp{-d_{k,l}^2/(2*sigma_hat*sigma_hat)}
+        vic.at<double>(i, 10*k + 9) = 1/(sqrt(2*CV_PI)*sigma_hat)*exp(-tmp_dis1.x*tmp_dis1.x/(2*sigma_hat*sigma_hat));
+      
+        // calculate the normalization parameter c 
+        normalized_param.at<double>(i, 0) += vic.at<double>(i, 10*k + 7);
 
-      // wp2 = w(a_{k,l})*w(d_{k,l})*w(d)
-      wp2 = vic.at<double>(i, 10*k+ 6)*vic.at<double>(i, 10*k+ 7)*vic.at<double>(i, 10*k+ 8) / normalized_param.at<double>(i,1);
+#ifdef DEBUG
+        if(i == 0)
+          std::cout << "tmp1 " << tmp1.x  << " " << tmp1.y << std::endl;
+#endif
+      
+        cv::circle(img1, tmp1, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
 
-      //w1 = \sum{wp1}
-      w1 += wp1;
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // calculate in the direction -n: (-n_x, -n_y)
+        /////////////////////////////////////////////////////////////////////////////////////////      
+        tmp2.x = round(bs[i].x - j*nv.at<double>(i,0));
+        tmp2.y = round(bs[i].y - j*nv.at<double>(i,1));
 
-      //w2 = \sum{wp2}
-      w2 += wp2;
+#ifdef DEBUG
+        if(i == 0)
+          std::cout << "tmp2 " << tmp2.x  << " " << tmp2.y << std::endl;
+#endif
 
-      // compute the mean value in the vicinity of a point
-      // m_{ks} = I{k}^{s} = \sum_{l} w_{kls}{I_{kl}} : s = 1 or 2
-      m1[0] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[0];
-      m1[1] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[1];
-      m1[2] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[2];
-      m2[0] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[0];
-      m2[1] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[1];
-      m2[2] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[2];
+        // start compute the size in the direction of -(n_x, n_y)
+        tmp_dis2.x = (tmp2.x-bs[i].x)*nv.at<double>(i,0) + (tmp2.y-bs[i].y)*nv.at<double>(i,1);
+        tmp_dis2.y = (tmp2.x-bs[i].x)*nv.at<double>(i,1) - (tmp2.y-bs[i].y)*nv.at<double>(i,0);
+        int negative_normal = k+normal_points_number;
+        vic.at<double>(i,10*negative_normal + 0) = tmp2.x;
+        vic.at<double>(i,10*negative_normal + 1) = tmp2.y;
+        vic.at<double>(i,10*negative_normal + 2) = tmp_dis2.x;
+        vic.at<double>(i,10*negative_normal + 3) = tmp_dis2.y;
+        vic.at<double>(i,10*negative_normal + 4) = 0.5*(erf(tmp_dis2.x/(cvSqrt(2)*sigma)) + 1);
+        wp1 = (vic.at<double>(i,10*negative_normal + 4) - gamma_1)/(1-gamma_1);
+        vic.at<double>(i,10*negative_normal + 5) = wp1*wp1*wp1*wp1;
+        // wp2 = (1-vic.at<double>(i,10*negative_normal + 4) - gamma_1)/(1-gamma_1);
+        wp2 = (1-vic.at<double>(i,10*negative_normal + 4) - 0.25);
+        vic.at<double>(i,10*negative_normal + 6) = -64*wp2*wp2*wp2*wp2 + 0.25;
+        vic.at<double>(i,10*negative_normal + 7) = max((exp(-0.5*vic.at<double>(i,10*negative_normal + 2)*vic.at<double>(i,10*negative_normal + 2)/(sigma_hat*sigma_hat)) - exp(-gamma_2)), 0.0);
+        vic.at<double>(i, 10*negative_normal + 8) = 0.5*exp(-abs(tmp_dis2.x)/alpha)/alpha;
+        vic.at<double>(i, 10*negative_normal + 9) = 1/(sqrt(2*CV_PI)*sigma_hat)*exp(-tmp_dis2.x*tmp_dis2.x/(2*sigma_hat*sigma_hat));
+        //      vic.at<double>(i, 10*k + 10) = ;
+        normalized_param.at<double>(i, 1) += vic.at<double>(i, 10*negative_normal + 7);
+        cv::circle(img1, tmp2, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
+      }
+    }
+  
 
-      // compute second order local statistics
-      // m_{k,s} = \sum_{l} w_{kls} I_{kl}*I_{kl}^T
+// #ifdef DEBUG
+    for (int  i = 0; i < 20*normal_points_number; ++i)
+    {
+      std::cout << vic.at<double>(0,i) << " ";
+      if((i+1)%10 == 0)
+        std::cout << std::endl;
+    }
+// #endif
+  
+    ///////////////////////////////////////////////////////////////////////////////////
+    // cvShowImage("Original",img1);
+    cv::imshow("Original", img1);
+  
+  
+    while (1)
+    {
+      key = cvWaitKey(10);
+      if (key == 27) break;
+    }
+    ///////////////////////////////////////////////////////////////////////////////
+  
+    // cv::Mat sigma_phi(6,6, CV_64F);
 
+    // calculate the local statistics: mean and covariance
+    // mean_vic = M_s(d_v=)/omega_s(d_v=)
+    // cov_vic = M_s(d_v=)^2/omega_s(d_v=) - m_v,s * (m_v,s)' + kappa*I
+    // a_vic[0] = c*Sigma_x(p_v,s(x, m_phi, sigma_phi)); a_vic[1] = 1-a_vic[0]
+    // where:
+    // omega_s(d_v=) = Simage(omega_p,s(d_v=))
+    // M_s(d_v=) = Simga(omega_p,s(d_v=) * I_p), I_p is the pixel value in the point (x,y)
+    // M_s(d_v=)^2 = Simga(omega_p,s(d_v=) * I_p*I_p'), I_p is the pixel value in the point (x,y)
+    // here s = 1 or 2, where the 2rd dimesion is 3*3 and 10*3
+    // we use last 3 or 10 elments to save the result
+
+  
+    for (int i = 0; i < resolution; ++i)
+    {
+      int k = 0;
+      // w1 = \sum wp_1, w2 = \sum wp_2
+      double w1 =0.0 , w2 = 0.0;
+
+      // store mean value near the curve
+      vector<double> m1(3,0.0), m2(3,0.0);
+    
+      // store the second mean vlaue near the curve
+      vector<double> m1_o2(9,0.0), m2_o2(9,0.0);
+
+      ////////////////////////////////////////////////////////////////////////
+      // compute local statistics
+      // ////////////////////////////////////////////////////////////////////
+      // start search the points in the +n direction as well as -n direction
+      for (int j = delta_h; j <= h; j+=delta_h, k++)
+      {
+        double wp1 = 0.0, wp2 = 0.0;
+      
+        int negative_normal = k + normal_points_number;
+      
+        // wp1 = w(a_{k,l})*w(d_{k,l})*w(d)
+        wp1 = vic.at<double>(i, 10*k+ 5)*vic.at<double>(i, 10*k+ 7)*vic.at<double>(i, 10*k+ 8) / normalized_param.at<double>(i,0);
+
+        // wp2 = w(a_{k,l})*w(d_{k,l})*w(d)
+        wp2 = vic.at<double>(i, 10*k+ 6)*vic.at<double>(i, 10*k+ 7)*vic.at<double>(i, 10*k+ 8) / normalized_param.at<double>(i,1);
+
+        //w1 = \sum{wp1}
+        w1 += wp1;
+
+        //w2 = \sum{wp2}
+        w2 += wp2;
+
+        // compute the mean value in the vicinity of a point
+        // m_{ks} = I{k}^{s} = \sum_{l} w_{kls}{I_{kl}} : s = 1 or 2
+        m1[0] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[0];
+        m1[1] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[1];
+        m1[2] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[2];
+        m2[0] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[0];
+        m2[1] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[1];
+        m2[2] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[2];
+
+        // compute second order local statistics
+        // m_{k,s} = \sum_{l} w_{kls} I_{kl}*I_{kl}^T
+
+        for (int m = 0; m < 3; ++m)
+        {
+          for (int n =0; n < 3; ++n)
+          {
+            m1_o2[m*3+n] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[m]
+                            *img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[n];
+            m2_o2[m*3+n] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[m]
+                            *img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[n];
+          }
+        }
+
+        wp2 = vic.at<double>(i, 10*negative_normal+ 5)*vic.at<double>(i, 10*negative_normal+ 7)*vic.at<double>(i, 10*negative_normal+ 8);
+        wp1 = vic.at<double>(i, 10*negative_normal+ 6)*vic.at<double>(i, 10*negative_normal+ 7)*vic.at<double>(i, 10*negative_normal+ 8);
+      
+        w1 += wp1;
+        w2 += wp2;
+      
+        m1[0] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[0];
+        m1[1] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[1];
+        m1[2] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[2];
+        m2[0] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[0];
+        m2[1] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[1];
+        m2[2] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[2];
+      
+        for (int m = 0; m < 3; ++m)
+        {
+          for (int n =0; n < 3; ++n)
+          {
+            m1_o2[m*3+n] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[m]
+                            *img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[n];
+            m2_o2[m*3+n] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[m]
+                            *img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[n];
+          }
+        }
+      }
+    
+      mean_vic.at<double>(i, 0) = m1[0]/w1;
+      mean_vic.at<double>(i, 1) = m1[1]/w1;
+      mean_vic.at<double>(i, 2) = m1[2]/w1;
+      mean_vic.at<double>(i, 3) = m2[0]/w2;
+      mean_vic.at<double>(i, 4) = m2[1]/w2;
+      mean_vic.at<double>(i, 5) = m2[2]/w2;
+    
       for (int m = 0; m < 3; ++m)
       {
-        for (int n =0; n < 3; ++n)
+        for (int n = 0 ; n < 3; ++n)
         {
-          m1_o2[m*3+n] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[m]
-                          *img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[n];
-          m2_o2[m*3+n] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[m]
-                          *img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[n];
+          cov_vic.at<double>(i, m*3+n) = m1_o2[m*3+n]/w1 -m1[m]*m1[n]/(w1*w1);
+          cov_vic.at<double>(i, 9+m*3+n) = m2_o2[m*3+n]/w2 -m2[m]*m2[n]/(w2*w2);
+          if(m == n)
+          {
+            cov_vic.at<double>(i, m*3+n) += kappa;
+            cov_vic.at<double>(i, 9+m*3+n) += kappa;
+          }
         }
       }
-
-      wp2 = vic.at<double>(i, 10*negative_normal+ 5)*vic.at<double>(i, 10*negative_normal+ 7)*vic.at<double>(i, 10*negative_normal+ 8);
-      wp1 = vic.at<double>(i, 10*negative_normal+ 6)*vic.at<double>(i, 10*negative_normal+ 7)*vic.at<double>(i, 10*negative_normal+ 8);
-      
-      w1 += wp1;
-      w2 += wp2;
-      
-      m1[0] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[0];
-      m1[1] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[1];
-      m1[2] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[2];
-      m2[0] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[0];
-      m2[1] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[1];
-      m2[2] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[2];
-      
-      for (int m = 0; m < 3; ++m)
-      {
-        for (int n =0; n < 3; ++n)
-        {
-          m1_o2[m*3+n] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[m]
-                          *img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[n];
-          m2_o2[m*3+n] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[m]
-                          *img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[n];
-        }
-      }
+    
     }
-    
-    mean_vic.at<double>(i, 0) = m1[0]/w1;
-    mean_vic.at<double>(i, 1) = m1[1]/w1;
-    mean_vic.at<double>(i, 2) = m1[2]/w1;
-    mean_vic.at<double>(i, 3) = m2[0]/w2;
-    mean_vic.at<double>(i, 4) = m2[1]/w2;
-    mean_vic.at<double>(i, 5) = m2[2]/w2;
-    
-    for (int m = 0; m < 3; ++m)
+
+    //debug
+#ifdef DEBUG
+    for (int i = 0; i < resolution; ++i)
     {
-      for (int n = 0 ; n < 3; ++n)
+      std::cout << mean_vic.at<double>(i, 0) << " "
+                << mean_vic.at<double>(i, 1) << " "
+                << mean_vic.at<double>(i, 2) << " "
+                << mean_vic.at<double>(i, 3) << " "
+                << mean_vic.at<double>(i, 4) << " "
+                << mean_vic.at<double>(i, 5) << " "
+                << std::endl;
+    }
+#endif
+
+    ////////////////////////////////////////////////////////////////////////////////
+    //end to compute local statistics
+    ///////////////////////////////////////////////////////////////////////////////
+
+  
+    for (int i = 0; i < resolution; ++i)
+    {
+      for (int j = 0; j < 2*normal_points_number; ++j)
       {
-        cov_vic.at<double>(i, m*3+n) = m1_o2[m*3+n]/w1 -m1[m]*m1[n]/(w1*w1);
-        cov_vic.at<double>(i, 9+m*3+n) = m2_o2[m*3+n]/w2 -m2[m]*m2[n]/(w2*w2);
-        if(m == n)
+        tmp_cov.zeros(3,3,CV_64F);
+        tmp_cov_inv.zeros(3,3,CV_64F);
+      
+        // \hat{}\Sigma_{kl}} = a_{kl}\Sigma_{k}^{1} + (1 - a_{kl})\Sigma_{k}^{2}
+        for (int m = 0; m < 3; ++m)
         {
-          cov_vic.at<double>(i, m*3+n) += kappa;
-          cov_vic.at<double>(i, 9+m*3+n) += kappa;
+          for (int n = 0; n < 3; ++n)
+          {
+            tmp_cov.at<double>(m, n) = vic.at<double>(i,10*j+4) * cov_vic.at<double>(i,m*3+n)
+                                       +(1-vic.at<double>(i,10*j+4))* cov_vic.at<double>(i,m*3+n+9);
+          }
         }
+      
+        tmp_cov_inv = tmp_cov.inv(DECOMP_SVD);
+      
+        tmp_pixel_diff.zeros(3, 1, CV_64F);
+
+        // std::cout << " pixel_diff: " ;
+        //compute the difference between I_{kl} and \hat{I_{kl}}
+        for (int m = 0; m < 3; ++m)
+        {
+          tmp_pixel_diff.at<double>(m,0) = img.at<Vec3b>(vic.at<double>(i,10*j+0), vic.at<double>(i,10*j+1))[m]- vic.at<double>(i,10*j+4) * mean_vic.at<double>(i,m)- (1-vic.at<double>(i,10*j+4))* mean_vic.at<double>(i,m+3);
+          // std::cout << tmp_pixel_diff.at<double>(m,0) << " ";
+        }
+        // std::cout << std::endl;
+
+
+
+        //compute jacobian matrix
+        tmp_jacobian.zeros(6,3,CV_64F); 
+        for (int n = 0; n < 3; ++n)
+        {
+          tmp_jacobian.at<double>(0,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv.at<double>(i,0);
+          tmp_jacobian.at<double>(1,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv.at<double>(i,1);
+          tmp_jacobian.at<double>(2,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv.at<double>(i,0)*bs[i].x;
+          tmp_jacobian.at<double>(3,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv.at<double>(i,1)*bs[i].y;
+          tmp_jacobian.at<double>(4,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv.at<double>(i,1)*bs[i].x;
+          tmp_jacobian.at<double>(5,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv.at<double>(i,0)*bs[i].y;
+          // std::cout << mean_vic.at<double>(i,n) << " " << mean_vic.at<double>(i,n+3) << std::endl;
+        }
+
+
+#ifdef DEBUG
+        for (int m = 0; m < 6; ++m)
+        {
+          for (int n = 0; n < 3; ++n)
+          {
+            std::cout << tmp_jacobian.at<double>(m,n) << " ";
+          }
+          std::cout << std::endl;
+        }
+        std::cout << std::endl;
+      
+        for (int m = 0; m < 3; ++m)
+        {
+          for (int n = 0; n < 3; ++n)
+          {
+            std::cout << tmp_cov_inv.at<double>(m,n) << " ";
+          }
+          std::cout << std::endl;
+        }
+        std::cout << std::endl;
+#endif
+
+        //\nabla{E_2} = \sum J * \Sigma_{kl}^{-1} * (I_{kl} - \hat{I_{kl}})
+        nabla_E += tmp_jacobian*tmp_cov_inv*tmp_pixel_diff;
+        //Hessian{E_2} = \sum J * \Sigma_{kl}^{-1} * J
+        hessian_E += tmp_jacobian*tmp_cov_inv*tmp_jacobian.t();
       }
     }
-    
-  }
 
-  //debug
-  #ifdef DEBUG
-  for (int i = 0; i < resolution; ++i)
-  {
-    std::cout << mean_vic.at<double>(i, 0) << " "
-              << mean_vic.at<double>(i, 1) << " "
-              << mean_vic.at<double>(i, 2) << " "
-              << mean_vic.at<double>(i, 3) << " "
-              << mean_vic.at<double>(i, 4) << " "
-              << mean_vic.at<double>(i, 5) << " "
+  
+    hessian_E += Sigma_Phi.inv();
+    nabla_E += 2*Sigma_Phi.inv()*Phi;
+  
+    delta_Phi = hessian_E.inv()*nabla_E;
+    Phi -= delta_Phi;
+    Sigma_Phi = c*Sigma_Phi + (1-c)*hessian_E.inv();
+
+    // #ifdef DEBUG
+    std::cout << delta_Phi.at<double>(0,0) << " "
+              << delta_Phi.at<double>(1,0) << " " 
+              << delta_Phi.at<double>(2,0) << " " 
+              << delta_Phi.at<double>(3,0) << " " 
+              << delta_Phi.at<double>(4,0) << " " 
+              << delta_Phi.at<double>(5,0) << " " 
               << std::endl;
-  }
-  #endif
+    // #endif
 
-  ////////////////////////////////////////////////////////////////////////////////
-  //end to compute local statistics
-  ///////////////////////////////////////////////////////////////////////////////
-
-  
-  for (int i = 0; i < resolution; ++i)
-  {
-    for (int j = 0; j < 2*normal_points_number; ++j)
-    {
-      tmp_cov.zeros(3,3,CV_64F);
-      tmp_cov_inv.zeros(3,3,CV_64F);
-      
-      // \hat{}\Sigma_{kl}} = a_{kl}\Sigma_{k}^{1} + (1 - a_{kl})\Sigma_{k}^{2}
-      for (int m = 0; m < 3; ++m)
-      {
-        for (int n = 0; n < 3; ++n)
-        {
-          tmp_cov.at<double>(m, n) = vic.at<double>(i,10*j+4) * cov_vic.at<double>(i,m*3+n)
-                                     +(1-vic.at<double>(i,10*j+4))* cov_vic.at<double>(i,m*3+n+9);
-        }
-      }
-      
-      tmp_cov_inv = tmp_cov.inv(DECOMP_SVD);
-      
-      tmp_pixel_diff.zeros(3, 1, CV_64F);
-
-      // std::cout << " pixel_diff: " ;
-      //compute the difference between I_{kl} and \hat{I_{kl}}
-      for (int m = 0; m < 3; ++m)
-      {
-        tmp_pixel_diff.at<double>(m,0) = img.at<Vec3b>(vic.at<double>(i,10*j+0), vic.at<double>(i,10*j+1))[m]- vic.at<double>(i,10*j+4) * mean_vic.at<double>(i,m)- (1-vic.at<double>(i,10*j+4))* mean_vic.at<double>(i,m+3);
-        // std::cout << tmp_pixel_diff.at<double>(m,0) << " ";
-      }
-      // std::cout << std::endl;
-
-
-
-      //compute jacobian matrix
-      tmp_jacobian.zeros(6,3,CV_64F); 
-      for (int n = 0; n < 3; ++n)
-      {
-        tmp_jacobian.at<double>(0,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv.at<double>(i,0);
-        tmp_jacobian.at<double>(1,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv.at<double>(i,1);
-        tmp_jacobian.at<double>(2,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv.at<double>(i,0)*bs[i].x;
-        tmp_jacobian.at<double>(3,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv.at<double>(i,1)*bs[i].y;
-        tmp_jacobian.at<double>(4,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv.at<double>(i,1)*bs[i].x;
-        tmp_jacobian.at<double>(5,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv.at<double>(i,0)*bs[i].y;
-        // std::cout << mean_vic.at<double>(i,n) << " " << mean_vic.at<double>(i,n+3) << std::endl;
-      }
-
-
-      #ifdef DEBUG
-      for (int m = 0; m < 6; ++m)
-      {
-        for (int n = 0; n < 3; ++n)
-        {
-          std::cout << tmp_jacobian.at<double>(m,n) << " ";
-        }
-        std::cout << std::endl;
-      }
-      std::cout << std::endl;
-      
-      for (int m = 0; m < 3; ++m)
-      {
-        for (int n = 0; n < 3; ++n)
-        {
-          std::cout << tmp_cov_inv.at<double>(m,n) << " ";
-        }
-        std::cout << std::endl;
-      }
-      std::cout << std::endl;
-      #endif
-
-      //\nabla{E_2} = \sum J * \Sigma_{kl}^{-1} * (I_{kl} - \hat{I_{kl}})
-      nabla_E += tmp_jacobian*tmp_cov_inv*tmp_pixel_diff;
-      //Hessian{E_2} = \sum J * \Sigma_{kl}^{-1} * J
-      hessian_E += tmp_jacobian*tmp_cov_inv*tmp_jacobian.t();
-    }
-  }
-
-  // #ifdef DEBUG
-  std::cout << nabla_E.at<double>(0,0) << " "
-            << nabla_E.at<double>(1,0) << " " 
-            << nabla_E.at<double>(2,0) << " " 
-            << nabla_E.at<double>(3,0) << " " 
-            << nabla_E.at<double>(4,0) << " " 
-            << nabla_E.at<double>(5,0) << " " 
-            << std::endl;
-  // #endif
-  
-  hessian_E += Sigma_Phi.inv();
-  nabla_E += 2*Sigma_Phi.inv()*Phi;
-  
-  delta_Phi = hessian_E.inv()*nabla_E;
-  Phi -= delta_Phi;
-  Sigma_Phi = c*Sigma_Phi + (1-c)*hessian_E.inv();
-
-  std::cout << "tol : " << tol << std::endl;
-  bs.release();
-  iter += 1;
-  cv::imwrite("res1.png", img);
+    std::cout << "tol : " << tol << std::endl;
+    bs.release();
+    iter += 1;
+    cv::imwrite("res1.png", img);
   }
   //main loop ended here
 
