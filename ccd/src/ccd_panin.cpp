@@ -1,4 +1,5 @@
 #include "ccd_panin.h"
+
 using namespace cv;
 /** 
  * compute the determinate  of a 3x3 matrix
@@ -63,11 +64,12 @@ void on_mouse( int event, int x, int y, int flags, void* param )
 
 int main (int argc, char * argv[]) 
 {
-  if (argc < 2)
-  {
-    printf("Usage %s image.png \n", argv[0]);
-    exit(0);
-  }
+  // if (argc < 2)
+  // {
+  //   printf("Usage %s image.png \n", argv[0]);
+  //   exit(0);
+  // }
+  // 
   // the count of points on curve, equidistant distributed
   const int resolution = 50;
   
@@ -76,9 +78,11 @@ int main (int argc, char * argv[])
   
   // load image from a specified file
   //img1= cvLoadImage(argv[1], 1);
-  img1 = imread(argv[1], 1);
-  cv::Mat img = imread(argv[1], 1);  
-  
+  // img1 = imread(argv[1], 1);
+  // cv::Mat img = imread(argv[1], 1);  
+
+  img1 = imread("../data/ball.png", 1);
+  cv::Mat img = imread("../data/ball.png", 1);
   // convert the image into Mat fortmat
   //cv::Mat img(img1);
 
@@ -195,7 +199,7 @@ int main (int argc, char * argv[])
 
   // h: search radius in the normal direction
   // delta_h: distance step in the normal direction
-  int h = 20, delta_h = 2;
+  int h = 20, delta_h = 1;
 
   // sigma_hat = gamma_3 * sigma
   //  double sigma_hat = max(h/sqrt(2*gamma_2), gamma_4);
@@ -409,11 +413,11 @@ int main (int argc, char * argv[])
         vic.at<double>(i,10*negative_normal + 2) = tmp_dis2.x;
         vic.at<double>(i,10*negative_normal + 3) = tmp_dis2.y;
         vic.at<double>(i,10*negative_normal + 4) = 0.5*(erf(tmp_dis2.x/(cvSqrt(2)*sigma)) + 1);
-        wp1 = (vic.at<double>(i,10*negative_normal + 4) - gamma_1)/(1-gamma_1);
-        vic.at<double>(i,10*negative_normal + 5) = wp1*wp1*wp1*wp1;
+        wp1 = (vic.at<double>(i,10*negative_normal + 4) - 0.25);
+        vic.at<double>(i,10*negative_normal + 5) = -64*wp1*wp1*wp1*wp1 + 0.25;
         // wp2 = (1-vic.at<double>(i,10*negative_normal + 4) - gamma_1)/(1-gamma_1);
-        wp2 = (1-vic.at<double>(i,10*negative_normal + 4) - 0.25);
-        vic.at<double>(i,10*negative_normal + 6) = -64*wp2*wp2*wp2*wp2 + 0.25;
+        wp2 = (1 - vic.at<double>(i,10*negative_normal + 4) - gamma_1)/(1-gamma_1);
+        vic.at<double>(i,10*negative_normal + 6) = wp2*wp2*wp2*wp2;
         vic.at<double>(i,10*negative_normal + 7) = max((exp(-0.5*vic.at<double>(i,10*negative_normal + 2)*vic.at<double>(i,10*negative_normal + 2)/(sigma_hat*sigma_hat)) - exp(-gamma_2)), 0.0);
         vic.at<double>(i, 10*negative_normal + 8) = 0.5*exp(-abs(tmp_dis2.x)/alpha)/alpha;
         vic.at<double>(i, 10*negative_normal + 9) = 1/(sqrt(2*CV_PI)*sigma_hat)*exp(-tmp_dis2.x*tmp_dis2.x/(2*sigma_hat*sigma_hat));
@@ -425,9 +429,13 @@ int main (int argc, char * argv[])
   
 
 // #ifdef DEBUG
+    printf("%-5s  %-5s  %-5s  %-5s  %-5s  %-5s  %-5s  %-5s  %-5s  %-5s\n",
+           "x", "y", "dist_x", "dist_y", "a", "w1^4", "w2^4", "prox", "edf", "erf'"
+           );
     for (int  i = 0; i < 20*normal_points_number; ++i)
     {
-      std::cout << vic.at<double>(0,i) << " ";
+      // std::cout << vic.at<double>(0,i) << "    ";
+      printf("%-5f   ", vic.at<double>(0,i));
       if((i+1)%10 == 0)
         std::cout << std::endl;
     }
@@ -599,10 +607,13 @@ int main (int argc, char * argv[])
                                        +(1-vic.at<double>(i,10*j+4))* cov_vic.at<double>(i,m*3+n+9);
           }
         }
-      
+
         tmp_cov_inv = tmp_cov.inv(DECOMP_SVD);
+        std::cout << "debug " << std::endl;
+        
       
         tmp_pixel_diff.zeros(3, 1, CV_64F);
+
 
         // std::cout << " pixel_diff: " ;
         //compute the difference between I_{kl} and \hat{I_{kl}}
