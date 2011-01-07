@@ -229,7 +229,6 @@ int main (int argc, char * argv[])
   int normal_points_number = floor(h/delta_h);
 
 
-
   //vicinity matrix ,in cluding plenty amount of information
   // dimension-2: count(normal_points) * 10*2
   // col_1, col_2: coordinates of x and y
@@ -630,13 +629,10 @@ int main (int argc, char * argv[])
         for (int m = 0; m < 3; ++m)
         {
           tmp_pixel_diff.at<double>(m,0) = img.at<Vec3b>(vic.at<double>(i,10*j+0), vic.at<double>(i,10*j+1))[m]- vic.at<double>(i,10*j+4) * mean_vic.at<double>(i,m)- (1-vic.at<double>(i,10*j+4))* mean_vic.at<double>(i,m+3);
-          // std::cout << tmp_pixel_diff.at<double>(m,0) << " ";
         }
         // std::cout << std::endl;
-
-
-
         //compute jacobian matrix
+        
         tmp_jacobian.zeros(6,3,CV_64F); 
         for (int n = 0; n < 3; ++n)
         {
@@ -684,13 +680,13 @@ int main (int argc, char * argv[])
     nabla_E += 2*Sigma_Phi.inv(DECOMP_SVD)*Phi;
   
     delta_Phi = hessian_E.inv(DECOMP_SVD)*nabla_E;
-    for (int i = 1; i < 6; ++i){
-      delta_Phi.at<double>(i,1) = 0;
-    }
 
-    Phi -= delta_Phi;
-    Sigma_Phi = c*Sigma_Phi + (1-c)*hessian_E.inv(DECOMP_SVD);
-
+    // delta_Phi.at<double>(0,0) = 0.0;
+    // delta_Phi.at<double>(1,0) = 0.0;
+    // delta_Phi.at<double>(2,0) = 0.0;
+    // delta_Phi.at<double>(3,0) = 0.0;
+    // delta_Phi.at<double>(4,0) = 0.0;
+    // delta_Phi.at<double>(5,0) = 0.0;
     // #ifdef DEBUG
     std::cout << delta_Phi.at<double>(0,0) << " "
               << delta_Phi.at<double>(1,0) << " " 
@@ -700,6 +696,10 @@ int main (int argc, char * argv[])
               << delta_Phi.at<double>(5,0) << " " 
               << std::endl;
     // #endif
+
+    Phi -= delta_Phi;
+    Sigma_Phi = c*Sigma_Phi + (1-c)*hessian_E.inv(DECOMP_SVD);
+
 
     std::cout << "tol : " << tol << std::endl;
     bs.release();
