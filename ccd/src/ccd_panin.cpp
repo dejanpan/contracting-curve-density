@@ -1,6 +1,4 @@
-
 #include "ccd_panin.h"
-
 using namespace cv;
 /** 
  * compute the determinate  of a 3x3 matrix
@@ -127,6 +125,7 @@ int main (int argc, char * argv[])
   
   // model parameters, it is a 6x1 matrix
   cv::Mat Phi(6,1, CV_64F);
+  // Phi.at<double>(3,0) = 0.25;
   
   // \delta_Phi: the difference of model parameters
   // between two iteration steps
@@ -144,7 +143,7 @@ int main (int argc, char * argv[])
     for (int n = 0; n < 6; ++n)
     {
       if(m == n)
-        Sigma_Phi.at<double>(m,n) = double_rand(0.1, 5.0);
+        Sigma_Phi.at<double>(m,n) = double_rand(0.1, 3.0);
       std::cout << Sigma_Phi.at<double>(m,n) << " ";
     }
     std::cout << std::endl;
@@ -200,7 +199,7 @@ int main (int argc, char * argv[])
 
   // h: search radius in the normal direction
   // delta_h: distance step in the normal direction
-  int h = 20, delta_h = 1;
+  int h = 40, delta_h = 2;
 
   // sigma_hat = gamma_3 * sigma
   //  double sigma_hat = max(h/sqrt(2*gamma_2), gamma_4);
@@ -256,19 +255,28 @@ int main (int argc, char * argv[])
   cv::Mat normalized_param(resolution, 2, CV_64F);
 
 
+  // dimension = 4
+  // 0 - x value
+  // 1 - y value
+  // 2 - normal vector x
+  // 3 - normal vector y
   cv::Mat bs_old(resolution, 4, CV_64F);
 
+  // tolerance
   double tol = 0;
+  
+  //iteration count
   double iter = 0;
+  
   ////////////////////////////////////////////////////////////////////////////
   //main loop starts from here
   ////////////////////////////////////////////////////////////////////////////
-
-  while(iter <20)
+  
+  while(iter < 100)
   {
     // update model parameters
-    for (int i = 0; i < 6; ++i)
-      Phi.at<double>(i,0) = Phi.at<double>(i,0) - delta_Phi.at<double>(i,0);
+    // for (int i = 0; i < 6; ++i)
+    //   Phi.at<double>(i,0) = Phi.at<double>(i,0) - delta_Phi.at<double>(i,0);
 
     // update the control points in terms of the change of
     // model parameters
@@ -290,6 +298,9 @@ int main (int argc, char * argv[])
     cov_vic.zeros(resolution, 18, CV_64F);
     nabla_E.zeros(6,1, CV_64F);
     hessian_E.zeros(6,6, CV_64F);
+
+    // Phi.zeros(6,1,CV_64F);
+
 
   
     // create a new B-spline curve: degree =2
@@ -381,8 +392,8 @@ int main (int argc, char * argv[])
         // W' = 0.5*exp(-|d_v= - d_p=|/alpha)/alpha
         vic.at<double>(i, 10*k + 8) = 0.5*exp(-abs(tmp_dis1.y)/alpha)/alpha;
       
-        // the derivative of col_5: 1/(sqrt(2*PI)*sigma)*exp{-d_{k,l}^2/(2*sigma_hat*sigma_hat)}
-        vic.at<double>(i, 10*k + 9) = 1/(sqrt(2*CV_PI)*sigma_hat)*exp(-tmp_dis1.x*tmp_dis1.x/(2*sigma_hat*sigma_hat));
+        // the derivative of col_5: 1/(sqrt(2*PI)*sigma)*exp{-d_{k,l}^2/(2*sigma*sigma)}
+        vic.at<double>(i, 10*k + 9) = exp(-tmp_dis1.x*tmp_dis1.x/(2*sigma*sigma))/(sqrt(2*CV_PI)*sigma);
       
         // calculate the normalization parameter c 
         normalized_param.at<double>(i, 0) += vic.at<double>(i, 10*k + 7);
@@ -420,7 +431,7 @@ int main (int argc, char * argv[])
         vic.at<double>(i,10*negative_normal + 6) = wp2*wp2*wp2*wp2;
         vic.at<double>(i,10*negative_normal + 7) = max((exp(-0.5*vic.at<double>(i,10*negative_normal + 2)*vic.at<double>(i,10*negative_normal + 2)/(sigma_hat*sigma_hat)) - exp(-gamma_2)), 0.0);
         vic.at<double>(i, 10*negative_normal + 8) = 0.5*exp(-abs(tmp_dis2.x)/alpha)/alpha;
-        vic.at<double>(i, 10*negative_normal + 9) = 1/(sqrt(2*CV_PI)*sigma_hat)*exp(-tmp_dis2.x*tmp_dis2.x/(2*sigma_hat*sigma_hat));
+        vic.at<double>(i, 10*negative_normal + 9) = exp(-tmp_dis2.x*tmp_dis2.x/(2*sigma*sigma))/(sqrt(2*CV_PI)*sigma);
         //      vic.at<double>(i, 10*k + 10) = ;
         normalized_param.at<double>(i, 1) += vic.at<double>(i, 10*negative_normal + 7);
         cv::circle(img1, tmp2, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
@@ -476,7 +487,7 @@ int main (int argc, char * argv[])
       // store mean value near the curve
       vector<double> m1(3,0.0), m2(3,0.0);
     
-      // store the second mean vlaue near the curve
+      // store the second mean value near the curve
       vector<double> m1_o2(9,0.0), m2_o2(9,0.0);
 
       ////////////////////////////////////////////////////////////////////////
@@ -569,7 +580,6 @@ int main (int argc, char * argv[])
           }
         }
       }
-    
     }
 
     //debug
@@ -609,7 +619,7 @@ int main (int argc, char * argv[])
         }
 
         tmp_cov_inv = tmp_cov.inv(DECOMP_SVD);
-        std::cout << "debug " << std::endl;
+        // std::cout << "debug " << std::endl;
         
       
         tmp_pixel_diff.zeros(3, 1, CV_64F);
@@ -670,12 +680,16 @@ int main (int argc, char * argv[])
     }
 
   
-    hessian_E += Sigma_Phi.inv();
-    nabla_E += 2*Sigma_Phi.inv()*Phi;
+    hessian_E += Sigma_Phi.inv(DECOMP_SVD);
+    nabla_E += 2*Sigma_Phi.inv(DECOMP_SVD)*Phi;
   
-    delta_Phi = hessian_E.inv()*nabla_E;
+    delta_Phi = hessian_E.inv(DECOMP_SVD)*nabla_E;
+    for (int i = 1; i < 6; ++i){
+      delta_Phi.at<double>(i,1) = 0;
+    }
+
     Phi -= delta_Phi;
-    Sigma_Phi = c*Sigma_Phi + (1-c)*hessian_E.inv();
+    Sigma_Phi = c*Sigma_Phi + (1-c)*hessian_E.inv(DECOMP_SVD);
 
     // #ifdef DEBUG
     std::cout << delta_Phi.at<double>(0,0) << " "
