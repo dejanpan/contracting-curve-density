@@ -36,6 +36,8 @@ cov:cov.cpp $(OBJECTS)
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
 curve:curve.cpp $(OBJECTS)
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
+matrix:matrix.cpp $(OBJECTS)
+	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
 
 recompile:clean all
 

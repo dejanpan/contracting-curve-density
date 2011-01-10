@@ -108,7 +108,7 @@ BSpline::BSpline(int n,
   increment = (double) (m - n + 1)/resolution;
   interval = 0;
   // std::cout <<  "increment << " << increment << std::endl;  
-  for (interval = n-1; fabs(interval - m) > 0.000001 ; ++i){
+  for (interval = n-1; fabs(interval - m) > 0.0000001 ; ++i){
     double *mat_ptr = basic_mat_.ptr<double>(i);
     computePoint(control, &tmp_point, &tmp_tangent, mat_ptr, interval);
     curve_[i].x = round(tmp_point.x);

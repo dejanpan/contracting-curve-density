@@ -115,12 +115,13 @@ int main (int argc, char * argv[])
   }
 
   // for debug
-#ifdef DEBUG
+  //#ifdef DEBUG
   for (size_t i = 0; i < pts.size(); ++i)
+    
   {
     std::cout<< pts[i].x << " " << pts[i].y << std::endl;
   }
-#endif
+  //#endif
 
   
   // model parameters, it is a 6x1 matrix
@@ -129,22 +130,23 @@ int main (int argc, char * argv[])
   
   // \delta_Phi: the difference of model parameters
   // between two iteration steps
-  cv::Mat delta_Phi(6,1, CV_64F);
-  delta_Phi.zeros(6,1, CV_64F);
+  cv::Mat delta_Phi;
+  delta_Phi = Mat::zeros(6,1, CV_64F);
 
   // covariance matrix of model parameters
   // dimension: 6x6
-  cv::Mat Sigma_Phi(6,6, CV_64F);
+  cv::Mat Sigma_Phi;
+  Sigma_Phi = Mat::zeros(6,6, CV_64F);
 
   srand(time(0));
-  Sigma_Phi.zeros(6,6,CV_64F);
   for (int m = 0; m < 6; ++m)
   {
     for (int n = 0; n < 6; ++n)
     {
       if(m == n)
-        Sigma_Phi.at<double>(m,n) = double_rand(0.1, 3.0);
-      std::cout << Sigma_Phi.at<double>(m,n) << " ";
+        // Sigma_Phi.at<double>(m,n) = double_rand(0.1, 3.0);
+        Sigma_Phi.at<double>(m,n) = 1.0;
+      printf("%-5f ", Sigma_Phi.at<double>(m,n));
     }
     std::cout << std::endl;
   }
@@ -292,11 +294,11 @@ int main (int argc, char * argv[])
       pts[i].y = round(pts_tmp.y);
     }
   
-    nv.zeros(resolution, 2, CV_64F);
-    mean_vic.zeros(resolution, 6, CV_64F);
-    cov_vic.zeros(resolution, 18, CV_64F);
-    nabla_E.zeros(6,1, CV_64F);
-    hessian_E.zeros(6,6, CV_64F);
+    nv = Mat::zeros(resolution, 2, CV_64F);
+    mean_vic = Mat::zeros(resolution, 6, CV_64F);
+    cov_vic = Mat::zeros(resolution, 18, CV_64F);
+    nabla_E = Mat::zeros(6,1, CV_64F);
+    hessian_E = Mat::zeros(6,6, CV_64F);
 
     // Phi.zeros(6,1,CV_64F);
 
@@ -438,7 +440,7 @@ int main (int argc, char * argv[])
     }
   
 
-// #ifdef DEBUG
+#ifdef DEBUG
     printf("%-5s  %-5s  %-5s  %-5s  %-5s  %-5s  %-5s  %-5s  %-5s  %-5s\n",
            "x", "y", "dist_x", "dist_y", "a", "w1^4", "w2^4", "prox", "edf", "erf'"
            );
@@ -449,7 +451,7 @@ int main (int argc, char * argv[])
       if((i+1)%10 == 0)
         std::cout << std::endl;
     }
-// #endif
+#endif
   
     ///////////////////////////////////////////////////////////////////////////////////
     // cvShowImage("Original",img1);
@@ -604,8 +606,8 @@ int main (int argc, char * argv[])
     {
       for (int j = 0; j < 2*normal_points_number; ++j)
       {
-        tmp_cov.zeros(3,3,CV_64F);
-        tmp_cov_inv.zeros(3,3,CV_64F);
+        tmp_cov = Mat::zeros(3,3,CV_64F);
+        tmp_cov_inv = Mat::zeros(3,3,CV_64F);
       
         // \hat{}\Sigma_{kl}} = a_{kl}\Sigma_{k}^{1} + (1 - a_{kl})\Sigma_{k}^{2}
         for (int m = 0; m < 3; ++m)
@@ -621,7 +623,7 @@ int main (int argc, char * argv[])
         // std::cout << "debug " << std::endl;
         
       
-        tmp_pixel_diff.zeros(3, 1, CV_64F);
+        tmp_pixel_diff = Mat::zeros(3, 1, CV_64F);
 
 
         // std::cout << " pixel_diff: " ;
@@ -633,7 +635,7 @@ int main (int argc, char * argv[])
         // std::cout << std::endl;
         //compute jacobian matrix
         
-        tmp_jacobian.zeros(6,3,CV_64F); 
+        tmp_jacobian = Mat::zeros(6,3,CV_64F); 
         for (int n = 0; n < 3; ++n)
         {
           tmp_jacobian.at<double>(0,n) = vic.at<double>(i, 10*j + 9)*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv.at<double>(i,0);
