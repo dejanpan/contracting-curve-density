@@ -60,6 +60,52 @@ void on_mouse( int event, int x, int y, int flags, void* param )
   }
 }
 
+void cov_init(cv::Mat &cov, BSpline &bs, int resolution, std::vector<CvPoint2D64f> &pts, int degree)
+{
+  int n_dim = (int)pts.size() - 3;
+  cv::Mat W = Mat::zeros(2*n_dim,6, CV_64F);
+  cv::Mat U = Mat::zeros(2*n_dim, 2*n_dim, CV_64F);
+  for (int i = 0; i < n_dim; ++i)
+  {
+    W.at<double>(i,0) = 1;
+    W.at<double>(i,1) = 0;
+    W.at<double>(i,2) = pts[i].x;
+    W.at<double>(i,3) = 0;
+    W.at<double>(i,4) = 0;
+    W.at<double>(i,5) = pts[i].y;
+    W.at<double>(i+resolution,0) = 0;
+    W.at<double>(i+resolution,1) = 1;
+    W.at<double>(i+resolution,2) = 0;
+    W.at<double>(i+resolution,3) = pts[i].y;
+    W.at<double>(i+resolution,4) = pts[i].x;
+    W.at<double>(i+resolution,5) = 0;
+  }
+  cv::Mat tmp_mat = Mat::zeros(n_dim, n_dim, CV_64F);
+  int interval = resolution/(pts.size() - degree);
+  for (int i = 0; i < n_dim; ++i)
+  {
+        for (int m = 0; m < n_dim; ++m)
+        {
+          for (int n = 0; n < n_dim; ++n)
+          {
+            tmp_mat.at<double>(m,n) += bs.basic_mat_.at<double>(i*interval,m)*bs.basic_mat_.at<double>(i*interval,n);
+          }
+        }
+  }
+  for (int i = 0; i < n_dim; ++i)
+  {
+    for (int j = 0; j < n_dim; ++j)
+    {
+      U.at<double>(i,j) = tmp_mat.at<double>(i,j)/n_dim;
+      U.at<double>(i+n_dim, j+n_dim) = tmp_mat.at<double>(i,j)/n_dim;
+    }
+  }
+  cov = 6/(100*100)*W.t()*U*W;
+  // cov = Nx/rou_0^2 * H
+  // cov = 6/25*cov;
+  W.release();
+  U.release();
+}
 
 int main (int argc, char * argv[]) 
 {
@@ -138,18 +184,18 @@ int main (int argc, char * argv[])
   cv::Mat Sigma_Phi;
   Sigma_Phi = Mat::zeros(6,6, CV_64F);
 
-  srand(time(0));
-  for (int m = 0; m < 6; ++m)
-  {
-    for (int n = 0; n < 6; ++n)
-    {
-      if(m == n)
-        // Sigma_Phi.at<double>(m,n) = double_rand(0.1, 3.0);
-        Sigma_Phi.at<double>(m,n) = 1.0;
-      printf("%-5f ", Sigma_Phi.at<double>(m,n));
-    }
-    std::cout << std::endl;
-  }
+  // srand(time(0));
+  // for (int m = 0; m < 6; ++m)
+  // {
+  //   for (int n = 0; n < 6; ++n)
+  //   {
+  //     if(m == n)
+  //       Sigma_Phi.at<double>(m,n) = double_rand(0.1, 3.0);
+  //       // Sigma_Phi.at<double>(m,n) = 1.0;
+  //     printf("%-5f ", Sigma_Phi.at<double>(m,n));
+  //   }
+  //   std::cout << std::endl;
+  // }
 
   // mean value of vicinity regions of points on the curve
   // dimension: resolution x 6
@@ -308,6 +354,21 @@ int main (int argc, char * argv[])
     BSpline bs(t , resolution, pts);
 
 
+    if(iter == 0)
+    {
+      cov_init(Sigma_Phi, bs, resolution, pts, t);
+      std::cout << " sigma: " << endl;
+      for (int m = 0 ; m < 6; ++m)
+      {
+        for (int n = 0; n < 6; ++n)
+        {
+          printf("%-5f ", Sigma_Phi.at<double>(m,n));
+        }
+      }
+
+    }
+
+
     // converge condition
     // tol = \int (r - r_f)*n
     tol = 0;
@@ -440,7 +501,7 @@ int main (int argc, char * argv[])
     }
   
 
-#ifdef DEBUG
+    //#ifdef DEBUG
     printf("%-5s  %-5s  %-5s  %-5s  %-5s  %-5s  %-5s  %-5s  %-5s  %-5s\n",
            "x", "y", "dist_x", "dist_y", "a", "w1^4", "w2^4", "prox", "edf", "erf'"
            );
@@ -451,7 +512,7 @@ int main (int argc, char * argv[])
       if((i+1)%10 == 0)
         std::cout << std::endl;
     }
-#endif
+    //#endif
   
     ///////////////////////////////////////////////////////////////////////////////////
     // cvShowImage("Original",img1);
