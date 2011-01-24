@@ -357,7 +357,7 @@ int main (int argc, char * argv[])
     if(iter == 0)
     {
       cov_init(Sigma_Phi, bs, resolution, pts, t);
-      std::cout << " sigma: " << endl;
+      std::cout << " sigma: " << std::endl;
       for (int m = 0 ; m < 6; ++m)
       {
         for (int n = 0; n < 6; ++n)
