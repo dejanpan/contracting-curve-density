@@ -2,6 +2,13 @@
 using namespace cv;
 cv::Mat img1;
 
+inline double ccd_det(uchar *ptr, int offset)
+{
+  return ptr[offset+0]*(ptr[offset+4]*ptr[offset+8] - ptr[offset+5]*ptr[offset+7])
+      *ptr[offset+1]*(ptr[offset+5]*ptr[offset+6] - ptr[offset+3]*ptr[offset+8])
+      *ptr[offset+2]*(ptr[offset+3]*ptr[offset+7] - ptr[offset+4]*ptr[offset+6]);
+}
+
 int main (int argc, char * argv[]) 
 {
   // if (argc < 2)
@@ -250,8 +257,8 @@ int main (int argc, char * argv[])
   delta_Phi.at<double>(1,0) = -15.0;
   delta_Phi.at<double>(2,0) = 0.05;
   delta_Phi.at<double>(3,0) = 0.05;
-  // delta_Phi.at<double>(4,0) = -0.01;
-  // delta_Phi.at<double>(5,0) = -0.01;
+  // delta_Phi.at<double>(4,0) = -0.1;
+  delta_Phi.at<double>(5,0) = 0.2;
   // delta_Phi.at<double>(2,0) = -0.26;
   // delta_Phi.at<double>(5,0) = 0.22;
 
@@ -599,14 +606,41 @@ int main (int argc, char * argv[])
     //#endif
     ///////////////////////////////////////////////////////////////////////////////
 
-    // for (int i = 0; i < resolution; ++i)
-    // {
-    //   for (int j = 0; j < ; ++i){
-        
-    //   }
+    double cost1 = 0.0, cost2 = 0.0;
+    for (int i = 0; i < resolution; ++i)
+    {
+      for (int j = 0; j < 2*normal_points_number; ++j)
+      {
+        tmp_cov = Mat::zeros(3,3,CV_64F);
+        tmp_cov_inv = Mat::zeros(3,3,CV_64F);
+      
+        // \hat{}\Sigma_{kl}} = a_{kl}\Sigma_{k}^{1} + (1 - a_{kl})\Sigma_{k}^{2}
+        for (int m = 0; m < 3; ++m)
+        {
+          for (int n = 0; n < 3; ++n)
+          {
+            tmp_cov.at<double>(m, n) = vic.at<double>(i,10*j+4) * cov_vic.at<double>(i,m*3+n)
+                                       +(1-vic.at<double>(i,10*j+4))* cov_vic.at<double>(i,m*3+n+9);
+          }
+        }
 
-    // }
+        tmp_cov_inv = tmp_cov.inv(DECOMP_SVD);
+                tmp_pixel_diff = Mat::zeros(3, 1, CV_64F);
+                
+        // std::cout << " pixel_diff: " ;
+        //compute the difference between I_{kl} and \hat{I_{kl}}
+        for (int m = 0; m < 3; ++m)
+        {
+          tmp_pixel_diff.at<double>(m,0) = img.at<Vec3b>(vic.at<double>(i,10*j+0), vic.at<double>(i,10*j+1))[m]- vic.at<double>(i,10*j+4) * mean_vic.at<double>(i,m)- (1-vic.at<double>(i,10*j+4))* mean_vic.at<double>(i,m+3);
+        }
+        // std::cout << "debug " << std::endl;
+        cv::Mat tmp_res = Mat::zeros(1,1, CV_64F);
+        tmp_res = tmp_pixel_diff.t()*tmp_cov_inv*tmp_pixel_diff;
+        cost2 += exp(-0.5*tmp_res.at<double>(0,0))/cv::determinant(tmp_cov);
+      }
+    }
 
+    std::cout << "cost 2 : " << cost2 << std::endl;
 
   Phi.release();
   delta_Phi.release();

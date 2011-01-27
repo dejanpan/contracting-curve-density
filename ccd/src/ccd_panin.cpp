@@ -319,6 +319,9 @@ int main (int argc, char * argv[])
   //main loop starts from here
   ////////////////////////////////////////////////////////////////////////////
   
+  IplImage* local_pixels = cvCreateImage(cvSize(2*normal_points_number,resolution), IPL_DEPTH_8U, 3);
+  cv::Mat vic_pixels(local_pixels);
+  std::cout << "col :" << vic_pixels.cols <<  " rows: " << vic_pixels.rows <<  std::endl;
   while(iter < 100)
   {
     // update model parameters
@@ -460,12 +463,18 @@ int main (int argc, char * argv[])
         // calculate the normalization parameter c 
         normalized_param.at<double>(i, 0) += vic.at<double>(i, 10*k + 7);
 
+        
 #ifdef DEBUG
         if(i == 0)
           std::cout << "tmp1 " << tmp1.x  << " " << tmp1.y << std::endl;
 #endif
       
         cv::circle(img1, tmp1, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
+
+        for (int m = 0; m < 3; ++m)
+        {
+          vic_pixels.at<Vec3b>(i, k)[m] = img.at<Vec3b>(tmp1.x, tmp1.y)[m];          
+        }
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // calculate in the direction -n: (-n_x, -n_y)
@@ -497,6 +506,10 @@ int main (int argc, char * argv[])
         //      vic.at<double>(i, 10*k + 10) = ;
         normalized_param.at<double>(i, 1) += vic.at<double>(i, 10*negative_normal + 7);
         cv::circle(img1, tmp2, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
+        for (int m = 0; m < 3; ++m)
+        {
+          vic_pixels.at<Vec3b>(i, negative_normal)[m] = img.at<Vec3b>(tmp2.x, tmp2.y)[m];          
+        }        
       }
     }
   
@@ -665,6 +678,11 @@ int main (int argc, char * argv[])
   
     for (int i = 0; i < resolution; ++i)
     {
+
+      // vic_pixels.at<Vec3b>(i,normal_points_number)[0] = img.at<Vec3b>(bs[i].x, bs[i].y)[0];
+      // vic_pixels.at<Vec3b>(i,normal_points_number)[1] = img.at<Vec3b>(bs[i].x, bs[i].y)[1];
+      // vic_pixels.at<Vec3b>(i,normal_points_number)[2] = img.at<Vec3b>(bs[i].x, bs[i].y)[2];
+      
       for (int j = 0; j < 2*normal_points_number; ++j)
       {
         tmp_cov = Mat::zeros(3,3,CV_64F);
@@ -686,11 +704,20 @@ int main (int argc, char * argv[])
       
         tmp_pixel_diff = Mat::zeros(3, 1, CV_64F);
 
-
         // std::cout << " pixel_diff: " ;
         //compute the difference between I_{kl} and \hat{I_{kl}}
         for (int m = 0; m < 3; ++m)
         {
+          // if(j < normal_points_number)
+          //   vic_pixels.at<Vec3b>(i, j)[m] = img.at<Vec3b>(vic.at<double>(i,10*j+0), vic.at<double>(i,10*j+1))[m];
+          // else if(j >= normal_points_number)
+          // {
+          //   vic_pixels.at<Vec3b>(i, j+1)[m] = img.at<Vec3b>(vic.at<double>(i,10*j+0), vic.at<double>(i,10*j+1))[m];
+          //   if ( m ==0 )
+          //     std::cout << "i = " << i << " bs.x " << bs[i].x << " bs.y " << bs[i].y << " vic.x "<<  vic.at<double>(i,10*j+0)<< " vic.y " << vic.at<double>(i,10*j+1) <<std::endl;
+          // }
+
+          
           tmp_pixel_diff.at<double>(m,0) = img.at<Vec3b>(vic.at<double>(i,10*j+0), vic.at<double>(i,10*j+1))[m]- vic.at<double>(i,10*j+4) * mean_vic.at<double>(i,m)- (1-vic.at<double>(i,10*j+4))* mean_vic.at<double>(i,m+3);
         }
         // std::cout << std::endl;
@@ -766,6 +793,10 @@ int main (int argc, char * argv[])
 
     std::cout << "tol : " << tol << std::endl;
     bs.release();
+    char buffer[20];
+    snprintf(buffer, 20, "local%g.png",iter );
+    cv::imwrite(buffer, vic_pixels);
+
     iter += 1;
     cv::imwrite("res1.png", img);
   }
