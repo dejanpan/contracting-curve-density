@@ -100,7 +100,7 @@ void cov_init(cv::Mat &cov, BSpline &bs, int resolution, std::vector<CvPoint2D64
       U.at<double>(i+n_dim, j+n_dim) = tmp_mat.at<double>(i,j)/n_dim;
     }
   }
-  cov = 6/(100*100)*W.t()*U*W;
+  cov = 6/(10*10)*W.t()*U*W;
   // cov = Nx/rou_0^2 * H
   // cov = 6/25*cov;
   W.release();
@@ -645,7 +645,7 @@ int main (int argc, char * argv[])
     }
 
     //debug
-#ifdef DEBUG
+    //#ifdef DEBUG
     for (int i = 0; i < resolution; ++i)
     {
       std::cout << mean_vic.at<double>(i, 0) << " "
@@ -656,7 +656,7 @@ int main (int argc, char * argv[])
                 << mean_vic.at<double>(i, 5) << " "
                 << std::endl;
     }
-#endif
+    //#endif
 
     ////////////////////////////////////////////////////////////////////////////////
     //end to compute local statistics

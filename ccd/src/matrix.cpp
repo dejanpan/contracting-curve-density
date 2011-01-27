@@ -113,14 +113,14 @@ int main (int argc, char * argv[])
   // between two iteration steps
   cv::Mat delta_Phi = Mat::zeros(6,1, CV_64F);
   delta_Phi.zeros(6,1, CV_64F);
-  // delta_Phi.at<double>(0,0) = -13.0;
-  // delta_Phi.at<double>(1,0) = -15.0;
-  // delta_Phi.at<double>(2,0) = 0.05;
-  // delta_Phi.at<double>(3,0) = 0.05;
-  // delta_Phi.at<double>(4,0) = -0.16;
-  // delta_Phi.at<double>(5,0) = -0.16;
-  delta_Phi.at<double>(2,0) = -0.26;
-  delta_Phi.at<double>(5,0) = 0.22;
+  delta_Phi.at<double>(0,0) = -13.0;
+  delta_Phi.at<double>(1,0) = -15.0;
+  delta_Phi.at<double>(2,0) = 0.05;
+  delta_Phi.at<double>(3,0) = 0.05;
+  // delta_Phi.at<double>(4,0) = -0.01;
+  // delta_Phi.at<double>(5,0) = -0.01;
+  // delta_Phi.at<double>(2,0) = -0.26;
+  // delta_Phi.at<double>(5,0) = 0.22;
 
   // covariance matrix of model parameters
   // dimension: 6x6

@@ -118,6 +118,14 @@ BSpline::BSpline(int n,
     // std::cout <<  interval << "       i: " << i << " x " << curve_[i].x << " y "<< curve_[i].y << std::endl;
     tangent_[i].x = tmp_tangent.x;
     tangent_[i].y = tmp_tangent.y;
+    // double min = (double)(100%((int)round(increment*100)))/100.0;
+    // std::cout <<"increment: " << (int)round(increment*100) <<  " min = " << min << " interval - round(interval) : " << abs(interval - round(interval))<< std::endl;
+
+    // if(abs(interval - round(interval)) <= min )
+    // {
+    //   std::cout << "interval: " << interval << std::endl;
+    // }
+
     interval += increment;
   }
   // std::cout << " i = " << i<<  std::endl;
