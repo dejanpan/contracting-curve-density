@@ -252,13 +252,13 @@ int main (int argc, char * argv[])
   // \delta_Phi: the difference of model parameters
   // between two iteration steps
   cv::Mat delta_Phi = Mat::zeros(6,1, CV_64F);
-  delta_Phi.zeros(6,1, CV_64F);
-  delta_Phi.at<double>(0,0) = -13.0;
-  delta_Phi.at<double>(1,0) = -15.0;
-  delta_Phi.at<double>(2,0) = 0.05;
-  delta_Phi.at<double>(3,0) = 0.05;
+  // delta_Phi.zeros(6,1, CV_64F);
+  // delta_Phi.at<double>(0,0) = -13.0;
+  // delta_Phi.at<double>(1,0) = -15.0;
+  // delta_Phi.at<double>(2,0) = 0.05;
+  // delta_Phi.at<double>(3,0) = 0.05;
   // delta_Phi.at<double>(4,0) = -0.1;
-  delta_Phi.at<double>(5,0) = 0.2;
+  // delta_Phi.at<double>(5,0) = 0.2;
   // delta_Phi.at<double>(2,0) = -0.26;
   // delta_Phi.at<double>(5,0) = 0.22;
 
@@ -376,8 +376,8 @@ int main (int argc, char * argv[])
         // it approximates 0
         tmp_dis1.y = (tmp1.x-bs[i].x)*nv.at<double>(i,1) - (tmp1.y-bs[i].y)*nv.at<double>(i,0);
       
-        vic.at<double>(i,10*k + 0) = tmp1.x;
-        vic.at<double>(i,10*k + 1) = tmp1.y;
+        vic.at<double>(i,10*k + 0) = tmp1.y;
+        vic.at<double>(i,10*k + 1) = tmp1.x;
         vic.at<double>(i,10*k + 2) = tmp_dis1.x;
         vic.at<double>(i,10*k + 3) = tmp_dis1.y;
 
@@ -412,7 +412,7 @@ int main (int argc, char * argv[])
           std::cout << "tmp1 " << tmp1.x  << " " << tmp1.y << std::endl;
 #endif
       
-        cv::circle(img1, tmp1, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
+        // cv::circle(img1, tmp1, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // calculate in the direction -n: (-n_x, -n_y)
@@ -429,8 +429,8 @@ int main (int argc, char * argv[])
         tmp_dis2.x = (tmp2.x-bs[i].x)*nv.at<double>(i,0) + (tmp2.y-bs[i].y)*nv.at<double>(i,1);
         tmp_dis2.y = (tmp2.x-bs[i].x)*nv.at<double>(i,1) - (tmp2.y-bs[i].y)*nv.at<double>(i,0);
         int negative_normal = k+normal_points_number;
-        vic.at<double>(i,10*negative_normal + 0) = tmp2.x;
-        vic.at<double>(i,10*negative_normal + 1) = tmp2.y;
+        vic.at<double>(i,10*negative_normal + 0) = tmp2.y;
+        vic.at<double>(i,10*negative_normal + 1) = tmp2.x;
         vic.at<double>(i,10*negative_normal + 2) = tmp_dis2.x;
         vic.at<double>(i,10*negative_normal + 3) = tmp_dis2.y;
         vic.at<double>(i,10*negative_normal + 4) = 0.5*(erf(tmp_dis2.x/(cvSqrt(2)*sigma)) + 1);
@@ -443,7 +443,7 @@ int main (int argc, char * argv[])
         vic.at<double>(i, 10*negative_normal + 9) = exp(-tmp_dis2.x*tmp_dis2.x/(2*sigma*sigma))/(sqrt(2*CV_PI)*sigma);
         //      vic.at<double>(i, 10*k + 10) = ;
         normalized_param.at<double>(i, 1) += vic.at<double>(i, 10*negative_normal + 7);
-        cv::circle(img1, tmp2, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
+        // cv::circle(img1, tmp2, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
       }
     }
   

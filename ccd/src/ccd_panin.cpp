@@ -319,8 +319,7 @@ int main (int argc, char * argv[])
   //main loop starts from here
   ////////////////////////////////////////////////////////////////////////////
   
-  IplImage* local_pixels = cvCreateImage(cvSize(2*normal_points_number,resolution), IPL_DEPTH_8U, 3);
-  cv::Mat vic_pixels(local_pixels);
+  cv::Mat vic_pixels= Mat::zeros(resolution, 2*normal_points_number, CV_8UC3);
   std::cout << "col :" << vic_pixels.cols <<  " rows: " << vic_pixels.rows <<  std::endl;
   while(iter < 100)
   {
@@ -432,8 +431,8 @@ int main (int argc, char * argv[])
         // it approximates 0
         tmp_dis1.y = (tmp1.x-bs[i].x)*nv.at<double>(i,1) - (tmp1.y-bs[i].y)*nv.at<double>(i,0);
       
-        vic.at<double>(i,10*k + 0) = tmp1.x;
-        vic.at<double>(i,10*k + 1) = tmp1.y;
+        vic.at<double>(i,10*k + 0) = tmp1.y;
+        vic.at<double>(i,10*k + 1) = tmp1.x;
         vic.at<double>(i,10*k + 2) = tmp_dis1.x;
         vic.at<double>(i,10*k + 3) = tmp_dis1.y;
 
@@ -469,11 +468,11 @@ int main (int argc, char * argv[])
           std::cout << "tmp1 " << tmp1.x  << " " << tmp1.y << std::endl;
 #endif
       
-        cv::circle(img1, tmp1, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
+        // cv::circle(img1, tmp1, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
 
         for (int m = 0; m < 3; ++m)
         {
-          vic_pixels.at<Vec3b>(i, k)[m] = img.at<Vec3b>(tmp1.x, tmp1.y)[m];          
+          vic_pixels.at<Vec3b>(i, k)[m] = img.at<Vec3b>(tmp1.y, tmp1.x)[m];          
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////
@@ -491,8 +490,8 @@ int main (int argc, char * argv[])
         tmp_dis2.x = (tmp2.x-bs[i].x)*nv.at<double>(i,0) + (tmp2.y-bs[i].y)*nv.at<double>(i,1);
         tmp_dis2.y = (tmp2.x-bs[i].x)*nv.at<double>(i,1) - (tmp2.y-bs[i].y)*nv.at<double>(i,0);
         int negative_normal = k+normal_points_number;
-        vic.at<double>(i,10*negative_normal + 0) = tmp2.x;
-        vic.at<double>(i,10*negative_normal + 1) = tmp2.y;
+        vic.at<double>(i,10*negative_normal + 0) = tmp2.y;
+        vic.at<double>(i,10*negative_normal + 1) = tmp2.x;
         vic.at<double>(i,10*negative_normal + 2) = tmp_dis2.x;
         vic.at<double>(i,10*negative_normal + 3) = tmp_dis2.y;
         vic.at<double>(i,10*negative_normal + 4) = 0.5*(erf(tmp_dis2.x/(cvSqrt(2)*sigma)) + 1);
@@ -505,10 +504,10 @@ int main (int argc, char * argv[])
         vic.at<double>(i, 10*negative_normal + 9) = exp(-tmp_dis2.x*tmp_dis2.x/(2*sigma*sigma))/(sqrt(2*CV_PI)*sigma);
         //      vic.at<double>(i, 10*k + 10) = ;
         normalized_param.at<double>(i, 1) += vic.at<double>(i, 10*negative_normal + 7);
-        cv::circle(img1, tmp2, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
+        // cv::circle(img1, tmp2, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
         for (int m = 0; m < 3; ++m)
         {
-          vic_pixels.at<Vec3b>(i, negative_normal)[m] = img.at<Vec3b>(tmp2.x, tmp2.y)[m];          
+          vic_pixels.at<Vec3b>(i, negative_normal)[m] = img.at<Vec3b>(tmp2.y, tmp2.x)[m];          
         }        
       }
     }
@@ -529,14 +528,36 @@ int main (int argc, char * argv[])
   
     ///////////////////////////////////////////////////////////////////////////////////
     // cvShowImage("Original",img1);
-    cv::imshow("Original", img1);
+    
   
-  
+
+    int show_width = max(vic_pixels.cols, img1.cols);
+    int show_height = vic_pixels.rows + img1.rows;
+    cv::Mat image_show = Mat::zeros(show_height, show_width, CV_8UC3);
+    for (int i = 0; i < vic_pixels.rows; ++i)
+    {
+      for (int j = 0; j < vic_pixels.cols; ++j)
+      {
+        image_show.at<Vec3b>(i,j) = vic_pixels.at<Vec3b>(i,j);
+      }
+    }
+    for (int i = vic_pixels.rows; i < img1.rows + vic_pixels.rows ; ++i)
+    {
+      for (int j = 0; j < img1.cols; ++j)
+      {
+        image_show.at<Vec3b>(i,j) = img1.at<Vec3b>(i,j);
+      }
+    }
+
+    cv::imshow("Original", image_show);
+    
     while (1)
     {
       key = cvWaitKey(10);
       if (key == 27) break;
     }
+    
+    image_show.release();
     ///////////////////////////////////////////////////////////////////////////////
   
     // cv::Mat sigma_phi(6,6, CV_64F);
@@ -759,7 +780,7 @@ int main (int argc, char * argv[])
 #endif
 
         //\nabla{E_2} = \sum J * \Sigma_{kl}^{-1} * (I_{kl} - \hat{I_{kl}})
-        nabla_E += tmp_jacobian*tmp_cov_inv*tmp_pixel_diff;
+        nabla_E -= tmp_jacobian*tmp_cov_inv*tmp_pixel_diff;
         //Hessian{E_2} = \sum J * \Sigma_{kl}^{-1} * J
         hessian_E += tmp_jacobian*tmp_cov_inv*tmp_jacobian.t();
       }
