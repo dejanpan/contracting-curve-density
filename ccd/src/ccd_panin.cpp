@@ -203,6 +203,7 @@ int main (int argc, char * argv[])
   // the last 3 are r,g,b mean values inside the curve
   cv::Mat mean_vic(resolution, 6, CV_64F);
 
+
   // covariance matrix of vicinity regions of points on the curve
   // dimension: resolution x 18
   // the first 9 (3x3) are values outside the curve
@@ -251,7 +252,7 @@ int main (int argc, char * argv[])
 
   // sigma_hat = gamma_3 * sigma
   //  double sigma_hat = max(h/sqrt(2*gamma_2), gamma_4);
-  double sigma_hat = h/2.5;
+  double sigma_hat = h/4.5;
 
   // some useful parameters, give in hanek's paper 
   double gamma_1 = 0.5, gamma_2 = 4, gamma_3 = 4;
@@ -314,7 +315,10 @@ int main (int argc, char * argv[])
   
   //iteration count
   double iter = 0;
-  
+
+
+  vector<double> m1_debug(3,0.0), m2_debug(3,0.0);
+        
   ////////////////////////////////////////////////////////////////////////////
   //main loop starts from here
   ////////////////////////////////////////////////////////////////////////////
@@ -378,16 +382,23 @@ int main (int argc, char * argv[])
     {
       for (int k = 0; k < resolution; ++k)
       {
-        tol += (bs[k].x - bs_old.at<double>(k, 0))*bs_old.at<double>(k, 2) +
-               (bs[k].y - bs_old.at<double>(k, 1))*bs_old.at<double>(k, 3);
+        tol += pow((bs[k].x - bs_old.at<double>(k, 0))*bs_old.at<double>(k, 2) +
+                   (bs[k].y - bs_old.at<double>(k, 1))*bs_old.at<double>(k, 3), 2);
       }
     }
 
   
     for(int i=0;i < resolution;i++)
     {
-    
-      cv::circle( img1, bs[i], 2, CV_RGB(0,0, 255),2);
+
+      m1_debug[0] = 0.0;
+        m1_debug[1] = 0.0;
+        m1_debug[2] = 0.0;
+        m2_debug[0] = 0.0;
+        m2_debug[1] = 0.0;
+        m2_debug[2] = 0.0;
+
+      cv::circle( img1, bs[i], 1, CV_RGB(0,0, 255),1);
     
 #ifdef DEBUG
       std::cout << bs[i].x  << " " << bs[i].y << std::endl;
@@ -458,7 +469,10 @@ int main (int argc, char * argv[])
       
         // the derivative of col_5: 1/(sqrt(2*PI)*sigma)*exp{-d_{k,l}^2/(2*sigma*sigma)}
         vic.at<double>(i, 10*k + 9) = exp(-tmp_dis1.x*tmp_dis1.x/(2*sigma*sigma))/(sqrt(2*CV_PI)*sigma);
-      
+
+        m1_debug[0] += img.at<Vec3b>(tmp1.y, tmp1.x)[0];
+        m1_debug[1] += img.at<Vec3b>(tmp1.y, tmp1.x)[1];
+        m1_debug[2] += img.at<Vec3b>(tmp1.y, tmp1.x)[2];
         // calculate the normalization parameter c 
         normalized_param.at<double>(i, 0) += vic.at<double>(i, 10*k + 7);
 
@@ -502,14 +516,26 @@ int main (int argc, char * argv[])
         vic.at<double>(i,10*negative_normal + 7) = max((exp(-0.5*vic.at<double>(i,10*negative_normal + 2)*vic.at<double>(i,10*negative_normal + 2)/(sigma_hat*sigma_hat)) - exp(-gamma_2)), 0.0);
         vic.at<double>(i, 10*negative_normal + 8) = 0.5*exp(-abs(tmp_dis2.x)/alpha)/alpha;
         vic.at<double>(i, 10*negative_normal + 9) = exp(-tmp_dis2.x*tmp_dis2.x/(2*sigma*sigma))/(sqrt(2*CV_PI)*sigma);
+        m2_debug[0] += img.at<Vec3b>(tmp2.y, tmp2.x)[0];
+        m2_debug[1] += img.at<Vec3b>(tmp2.y, tmp2.x)[1];
+        m2_debug[2] += img.at<Vec3b>(tmp2.y, tmp2.x)[2];
+        
         //      vic.at<double>(i, 10*k + 10) = ;
         normalized_param.at<double>(i, 1) += vic.at<double>(i, 10*negative_normal + 7);
         // cv::circle(img1, tmp2, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
         for (int m = 0; m < 3; ++m)
         {
           vic_pixels.at<Vec3b>(i, negative_normal)[m] = img.at<Vec3b>(tmp2.y, tmp2.x)[m];          
-        }        
+        }
       }
+      std::cout
+          << m1_debug[0]/normal_points_number << " " 
+          << m1_debug[1]/normal_points_number << " " 
+          << m1_debug[2]/normal_points_number << " " 
+          << m2_debug[0]/normal_points_number << " " 
+          << m2_debug[1]/normal_points_number << " " 
+          << m2_debug[2]/normal_points_number << " " 
+          << std::endl;
     }
   
 
@@ -597,10 +623,10 @@ int main (int argc, char * argv[])
         int negative_normal = k + normal_points_number;
       
         // wp1 = w(a_{k,l})*w(d_{k,l})*w(d)
-        wp1 = vic.at<double>(i, 10*k+ 5)*vic.at<double>(i, 10*k+ 7)*vic.at<double>(i, 10*k+ 8) / normalized_param.at<double>(i,0);
+        wp1 = vic.at<double>(i, 10*k+ 5)*vic.at<double>(i, 10*k+ 7)/ normalized_param.at<double>(i,0);
 
         // wp2 = w(a_{k,l})*w(d_{k,l})*w(d)
-        wp2 = vic.at<double>(i, 10*k+ 6)*vic.at<double>(i, 10*k+ 7)*vic.at<double>(i, 10*k+ 8) / normalized_param.at<double>(i,1);
+        wp2 = vic.at<double>(i, 10*k+ 6)*vic.at<double>(i, 10*k+ 7)/ normalized_param.at<double>(i,1);
 
         //w1 = \sum{wp1}
         w1 += wp1;
@@ -631,8 +657,8 @@ int main (int argc, char * argv[])
           }
         }
 
-        wp2 = vic.at<double>(i, 10*negative_normal+ 5)*vic.at<double>(i, 10*negative_normal+ 7)*vic.at<double>(i, 10*negative_normal+ 8);
-        wp1 = vic.at<double>(i, 10*negative_normal+ 6)*vic.at<double>(i, 10*negative_normal+ 7)*vic.at<double>(i, 10*negative_normal+ 8);
+        wp2 = vic.at<double>(i, 10*negative_normal+ 5)*vic.at<double>(i, 10*negative_normal+ 7)/ normalized_param.at<double>(i,0);
+        wp1 = vic.at<double>(i, 10*negative_normal+ 6)*vic.at<double>(i, 10*negative_normal+ 7)/ normalized_param.at<double>(i,1);
       
         w1 += wp1;
         w2 += wp2;
