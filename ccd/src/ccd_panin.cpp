@@ -250,16 +250,18 @@ int main (int argc, char * argv[])
   // delta_h: distance step in the normal direction
   int h = 40, delta_h = 2;
 
-  // sigma_hat = gamma_3 * sigma
-  //  double sigma_hat = max(h/sqrt(2*gamma_2), gamma_4);
-  double sigma_hat = h/4.5;
 
   // some useful parameters, give in hanek's paper 
-  double gamma_1 = 0.5, gamma_2 = 4, gamma_3 = 4;
+  double gamma_1 = 0.5, gamma_2 = 4, gamma_3 = 4, gamma_4 = 3;
 
   //double sigma_t = max(double(h/cvSqrt(2*gamma_2)), gamma_4);
-  double sigma = sigma_hat/gamma_3;
+  double sigma = h/(2.5*gamma_3);
+
+  // sigma_hat = gamma_3 * sigma
+  //  double sigma_hat = max(h/sqrt(2*gamma_2), gamma_4);
+  double sigma_hat = gamma_3*sigma + gamma_4;
   
+
   // locate covariance formula:
   // Sigma_v,s =  M_s^2(d^=) / omega_(d_v^=) - m_v,s * (m_v,s)^t + kappa*I
   // here, I is a identy matrix, to avoid signular
@@ -513,7 +515,7 @@ int main (int argc, char * argv[])
         vic.at<double>(i,10*negative_normal + 5) = -64*wp1*wp1*wp1*wp1 + 0.25;
         wp2 = (1 - vic.at<double>(i,10*negative_normal + 4) - gamma_1)/(1-gamma_1);
         vic.at<double>(i,10*negative_normal + 6) = wp2*wp2*wp2*wp2;
-        vic.at<double>(i,10*negative_normal + 7) = max((exp(-0.5*vic.at<double>(i,10*negative_normal + 2)*vic.at<double>(i,10*negative_normal + 2)/(sigma_hat*sigma_hat)) - exp(-gamma_2)), 0.0);
+        vic.at<double>(i,10*negative_normal + 7) = max((exp(-0.5*tmp_dis2.x*tmp_dis2.x/(sigma_hat*sigma_hat)) - exp(-gamma_2)), 0.0);
         vic.at<double>(i, 10*negative_normal + 8) = 0.5*exp(-abs(tmp_dis2.x)/alpha)/alpha;
         vic.at<double>(i, 10*negative_normal + 9) = exp(-tmp_dis2.x*tmp_dis2.x/(2*sigma*sigma))/(sqrt(2*CV_PI)*sigma);
         m2_debug[0] += img.at<Vec3b>(tmp2.y, tmp2.x)[0];
@@ -623,10 +625,10 @@ int main (int argc, char * argv[])
         int negative_normal = k + normal_points_number;
       
         // wp1 = w(a_{k,l})*w(d_{k,l})*w(d)
-        wp1 = vic.at<double>(i, 10*k+ 5)*vic.at<double>(i, 10*k+ 7)/ normalized_param.at<double>(i,0);
+        wp1 = vic.at<double>(i, 10*k+ 5)*vic.at<double>(i, 10*k+ 7)/normalized_param.at<double>(i,0);
 
         // wp2 = w(a_{k,l})*w(d_{k,l})*w(d)
-        wp2 = vic.at<double>(i, 10*k+ 6)*vic.at<double>(i, 10*k+ 7)/ normalized_param.at<double>(i,1);
+        wp2 = vic.at<double>(i, 10*k+ 6)*vic.at<double>(i, 10*k+ 7)/normalized_param.at<double>(i,1);;
 
         //w1 = \sum{wp1}
         w1 += wp1;
@@ -656,9 +658,9 @@ int main (int argc, char * argv[])
                             *img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[n];
           }
         }
-
-        wp2 = vic.at<double>(i, 10*negative_normal+ 5)*vic.at<double>(i, 10*negative_normal+ 7)/ normalized_param.at<double>(i,0);
-        wp1 = vic.at<double>(i, 10*negative_normal+ 6)*vic.at<double>(i, 10*negative_normal+ 7)/ normalized_param.at<double>(i,1);
+        
+        wp1 = vic.at<double>(i, 10*negative_normal+ 5)*vic.at<double>(i, 10*negative_normal+ 7)/normalized_param.at<double>(i,0);
+        wp2 = vic.at<double>(i, 10*negative_normal+ 6)*vic.at<double>(i, 10*negative_normal+ 7)/normalized_param.at<double>(i,1);
       
         w1 += wp1;
         w2 += wp2;
@@ -681,7 +683,9 @@ int main (int argc, char * argv[])
           }
         }
       }
-    
+
+      std::cout << "w1: " << "              w2:" << std::endl;
+      std::cout << "w1 == " << w1 << "  w2== " << w2 << std::endl;
       mean_vic.at<double>(i, 0) = m1[0]/w1;
       mean_vic.at<double>(i, 1) = m1[1]/w1;
       mean_vic.at<double>(i, 2) = m1[2]/w1;
@@ -806,7 +810,7 @@ int main (int argc, char * argv[])
 #endif
 
         //\nabla{E_2} = \sum J * \Sigma_{kl}^{-1} * (I_{kl} - \hat{I_{kl}})
-        nabla_E -= tmp_jacobian*tmp_cov_inv*tmp_pixel_diff;
+        nabla_E += tmp_jacobian*tmp_cov_inv*tmp_pixel_diff;
         //Hessian{E_2} = \sum J * \Sigma_{kl}^{-1} * J
         hessian_E += tmp_jacobian*tmp_cov_inv*tmp_jacobian.t();
       }
