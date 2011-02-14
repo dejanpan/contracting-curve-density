@@ -1,7 +1,6 @@
 #include "ccd.h"
 
 using namespace cv;
-cv::Mat img1;
 // control points initialized mannually
 std::vector<CvPoint2D64f> pts;
 
@@ -16,7 +15,9 @@ std::vector<CvPoint2D64f> pts;
  */
 void on_mouse( int event, int x, int y, int flags, void* param )
 {
-  if( img1.empty())
+  //  MaskParams* params = (MaskParams*)_params;
+  cv::Mat *img = (cv::Mat*)param;
+  if( img->empty())
     return;
 
   //caution: check
@@ -30,10 +31,10 @@ void on_mouse( int event, int x, int y, int flags, void* param )
       break;
     case CV_EVENT_LBUTTONUP:
       // std::cout << "Event = " << event << std::endl;
-      cv::circle(img1,cv::Point(x,y),2,cv::Scalar(0,0,255),2);
+      cv::circle(*img,cv::Point(x,y),2,cv::Scalar(0,0,255),2);
       pts.push_back(cvPoint2D64f(x,y));
       // cvShowImage("Original",img1);
-      cv::imshow("Original",img1);
+      cv::imshow("Original", *img);
       break;
   }
 }
@@ -56,9 +57,12 @@ int main (int argc, char * argv[])
   //img1= cvLoadImage(argv[1], 1);
   // img1 = imread(argv[1], 1);
   // cv::Mat img = imread(argv[1], 1);  
-
-  img1 = imread("../data/ball.png", 1);
   cv::Mat img = imread("../data/ball.png", 1);
+ 
+  //img - working copy
+  //img1 - for visualization
+  CCD my_ccd(img);
+  my_ccd.img1 = imread("../data/ball.png", 1);
   // convert the image into Mat fortmat
   //cv::Mat img(img1);
 
@@ -69,9 +73,9 @@ int main (int argc, char * argv[])
   // mannaully initialize the control points
   ///////////////////////////////////////////////////////////////
   cv::namedWindow("Original", 1);
-  cvSetMouseCallback( "Original", on_mouse, 0 );
+  cvSetMouseCallback( "Original", on_mouse,  (void*)&my_ccd.img1);
   // cvShowImage("Original",img1);
-  cv::imshow("Original", img1);
+  cv::imshow("Original", my_ccd.img1);
   char key ;
   while (1)
   {
@@ -91,7 +95,7 @@ int main (int argc, char * argv[])
     pts.push_back(pts[2]);
   }
 
-  CCD my_ccd(img);
+
   my_ccd.init_pts(pts);
   my_ccd.run_ccd();
   return 0;

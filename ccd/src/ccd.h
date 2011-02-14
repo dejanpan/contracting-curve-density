@@ -28,6 +28,7 @@ struct CCDParams
 class CCD
 {
 public:
+  cv::Mat img, img1;
   CCD(cv::Mat &i):img(i),vic(cv::Mat(params_.resolution, 20*floor(params_.h/params_.delta_h), CV_64F)), mean_vic(cv::Mat(params_.resolution, 6, CV_64F)),cov_vic(cv::Mat(params_.resolution, 18, CV_64F)), nv(cv::Mat(params_.resolution, 2, CV_64F)), Phi(cv::Mat(6,1, CV_64F)),Sigma_Phi(cv::Mat(6,6, CV_64F)), delta_Phi(cv::Mat(6,1, CV_64F)), bs_old(cv::Mat(params_.resolution, 4, CV_64F)), nabla_E(cv::Mat(6,1, CV_64F)), hessian_E(cv::Mat(6,6, CV_64F))
   {};
   void init_pts(std::vector<CvPoint2D64f> &pts);
@@ -39,7 +40,6 @@ private:
   void init_cov(BSpline &bs, int degree);
   void local_statistics(BSpline &bs);
   void refine_parameters(BSpline &bs);
-  cv::Mat img;
   CCDParams params_;
   std::vector<CvPoint2D64f> pts;
   cv::Mat vic;

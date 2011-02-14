@@ -1,9 +1,9 @@
 #include "ccd.h"
 // input image
 // IplImage *img1;
-extern cv::Mat img1;
+//extern cv::Mat img1;
 
-inline void CCD::init_pts(std::vector<CvPoint2D64f> &input_pts)
+void CCD::init_pts(std::vector<CvPoint2D64f> &input_pts)
 {
   pts = input_pts;
 }
