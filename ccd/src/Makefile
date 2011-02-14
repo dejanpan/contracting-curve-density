@@ -5,7 +5,7 @@ LDDIR = -L./lib
 CFLAGS = -g3 -Wall -DLINUX $(EXTRA) $(LDDIR)
 LDLIBS =
 LDFLAGS = $(LDLIBS) -lm `pkg-config --libs opencv`
-OBJECTS=bspline.o 
+OBJECTS=bspline.o ccd.o
 $(OBJECTS): %.o: %.cpp %.h
 	$(CC) $(INCDIR) -c $(CFLAGS) $< -o $@
 PROGRAMS=snake test ros_to_openCv ccd2 ccd_panin
