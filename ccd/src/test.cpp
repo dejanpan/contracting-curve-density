@@ -57,12 +57,35 @@ int main (int argc, char * argv[])
   //img1= cvLoadImage(argv[1], 1);
   // img1 = imread(argv[1], 1);
   // cv::Mat img = imread(argv[1], 1);  
-  cv::Mat img = imread("../data/ball.png", 1);
- 
+  cv::Mat input_img = imread("../data/ball.png", 1);
+
+  cv::Mat img;
+  cv::GaussianBlur(input_img, img , cv::Size(9,9) ,0);
+  // cv::imshow("Origianl", img);
+  char key ;
+  // while (1)
+  // {
+  //   key = cvWaitKey(10);
+  //   if (key == 27) break;
+  // }
   //img - working copy
   //img1 - for visualization
   CCD my_ccd(img);
-  my_ccd.img1 = imread("../data/ball.png", 1);
+  my_ccd.canvas = imread("../data/ball.png", 1);
+
+  double *params = new double[9];
+  params[0] = 0.5;
+  params[1] = 4;
+  params[2] = 4;
+  params[3] = 3;
+  params[4] = 0.5;
+  params[5] = 0.25;
+  params[6] = 40;
+  params[7] = 1;
+  params[8] = 100;
+
+  my_ccd.set_params(params);
+  
   // convert the image into Mat fortmat
   //cv::Mat img(img1);
 
@@ -73,10 +96,9 @@ int main (int argc, char * argv[])
   // mannaully initialize the control points
   ///////////////////////////////////////////////////////////////
   cv::namedWindow("Original", 1);
-  cvSetMouseCallback( "Original", on_mouse,  (void*)&my_ccd.img1);
+  cvSetMouseCallback( "Original", on_mouse,  (void*)&my_ccd.canvas);
   // cvShowImage("Original",img1);
-  cv::imshow("Original", my_ccd.img1);
-  char key ;
+  cv::imshow("Original", my_ccd.canvas);
   while (1)
   {
     key = cvWaitKey(10);
@@ -98,5 +120,7 @@ int main (int argc, char * argv[])
 
   my_ccd.init_pts(pts);
   my_ccd.run_ccd();
+
+  delete(params);
   return 0;
 }

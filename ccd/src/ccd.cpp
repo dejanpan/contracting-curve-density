@@ -1,12 +1,23 @@
 #include "ccd.h"
-// input image
-// IplImage *img1;
-//extern cv::Mat img1;
 
 void CCD::init_pts(std::vector<CvPoint2D64f> &input_pts)
 {
   pts = input_pts;
 }
+
+void CCD::set_params(double *params)
+{
+  params_.gamma_1 = params[0];
+  params_.gamma_2 = params[1];
+  params_.gamma_3 = params[2];
+  params_.gamma_4 = params[3];
+  params_.kappa = params[4];
+  params_.c = params[5];
+  params_.h = (int)params[6];
+  params_.delta_h = (int)params[7];
+  params_.resolution = (int)params[8];
+}
+
 void CCD::init_cov(BSpline &bs, int degree)
 {
   int n_dim = (int)pts.size() - 3;
@@ -72,7 +83,7 @@ void CCD::clear()
 void CCD::local_statistics(BSpline &bs)
 {
   // std::cout << params_.gamma_1 << " " << params_.gamma_2 << " " << params_.gamma_3 << " " << params_.gamma_4 << std::endl;
-  double sigma = params_.h/(1.5*params_.gamma_3);
+  double sigma = params_.h/(1.3*params_.gamma_3);
   // sigma_hat = gamma_3 * sigma
   //  double sigma_hat = max(h/sqrt(2*gamma_2), gamma_4);
   double sigma_hat = params_.gamma_3*sigma + params_.gamma_4;
@@ -94,12 +105,12 @@ void CCD::local_statistics(BSpline &bs)
 
   for(int i=0; i < params_.resolution;i++)
   {
-    cv::circle(img1, bs[i], 1, CV_RGB(0,0, 255),1);
+    cv::circle(canvas, bs[i], 1, CV_RGB(0,0, 255),1);
     
-#ifdef DEBUG
+    //#ifdef DEBUG
     std::cout << bs[i].x  << " " << bs[i].y << std::endl;
     //ROS_DEBUG_STREAM(bs[i].x  << " " << bs[i].y);
-#endif
+    //#endif
 
     // normal vector (n_x, n_y)
     // tagent vector (nv.at<double>(i,1), -n_x)
@@ -571,7 +582,7 @@ void CCD::run_ccd()
     refine_parameters(bs);
     std::cout << "iter: " << iter << "   tol: " << tol  << " norm: " << cv::norm(delta_Phi, NORM_L2) << std::endl;
     bs.release();
-    cv::imshow("Original", img1);
+    cv::imshow("Original", canvas);
     cvWaitKey(2);
     
     if((tol - 0.0 < 0.001) && (cv::norm(delta_Phi, NORM_L2) < 0.01))

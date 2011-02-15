@@ -11,6 +11,27 @@ struct CCDParams
   CCDParams(): gamma_1(0.5), gamma_2(4), gamma_3(4), gamma_4(3), h(40), delta_h(1), kappa(0.5), c(0.25), resolution(50)
   {
   }
+  CCDParams(double p1,
+            double p2,
+            double p3,
+            double p4,
+            double p5,
+            double p6,
+            int p7,
+            int p8,
+            int p9)
+  {
+    gamma_1 = p1;
+    gamma_2 = p2;
+    gamma_3 = p3;
+    gamma_4 = p4;
+    kappa = p5;
+    c = p6;
+    h = p7;
+    delta_h = p8;
+    resolution = p9;
+  }
+
   ~CCDParams()
   {
   }
@@ -28,15 +49,15 @@ struct CCDParams
 class CCD
 {
 public:
-  cv::Mat img, img1;
+  cv::Mat img, canvas;
   CCD(cv::Mat &i):img(i),vic(cv::Mat(params_.resolution, 20*floor(params_.h/params_.delta_h), CV_64F)), mean_vic(cv::Mat(params_.resolution, 6, CV_64F)),cov_vic(cv::Mat(params_.resolution, 18, CV_64F)), nv(cv::Mat(params_.resolution, 2, CV_64F)), Phi(cv::Mat(6,1, CV_64F)),Sigma_Phi(cv::Mat(6,6, CV_64F)), delta_Phi(cv::Mat(6,1, CV_64F)), bs_old(cv::Mat(params_.resolution, 4, CV_64F)), nabla_E(cv::Mat(6,1, CV_64F)), hessian_E(cv::Mat(6,6, CV_64F))
   {};
   void init_pts(std::vector<CvPoint2D64f> &pts);
+  void set_params(double *params);
   void run_ccd();
   ~CCD(){clear();}
 private:
   void clear();
-  void set_params();
   void init_cov(BSpline &bs, int degree);
   void local_statistics(BSpline &bs);
   void refine_parameters(BSpline &bs);
