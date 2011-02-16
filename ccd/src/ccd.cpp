@@ -93,6 +93,8 @@ void CCD::local_statistics(BSpline &bs)
   // the first column save the normalized coefficient outside the curve
   // the second column store the one inside the curve
   cv::Mat normalized_param = Mat::zeros(params_.resolution, 2, CV_64F);
+  
+  vic = Mat::zeros(params_.resolution, 20*floor(params_.h/params_.delta_h), CV_64F);
 
   
   // temporary points used to store those points in the
@@ -107,10 +109,10 @@ void CCD::local_statistics(BSpline &bs)
   {
     cv::circle(canvas, bs[i], 1, CV_RGB(0,0, 255),1);
     
-    //#ifdef DEBUG
+    #ifdef DEBUG
     std::cout << bs[i].x  << " " << bs[i].y << std::endl;
     //ROS_DEBUG_STREAM(bs[i].x  << " " << bs[i].y);
-    //#endif
+    #endif
 
     // normal vector (n_x, n_y)
     // tagent vector (nv.at<double>(i,1), -n_x)
@@ -223,6 +225,7 @@ void CCD::local_statistics(BSpline &bs)
       vic.at<double>(i,10*negative_normal + 2) = tmp_dis2.x;
       vic.at<double>(i,10*negative_normal + 3) = tmp_dis2.y;
       vic.at<double>(i,10*negative_normal + 4) = 0.5*(erf(tmp_dis2.x/(cvSqrt(2)*sigma)) + 1);
+      // vic.at<double>(i,10*negative_normal + 4) = 0.5;
       wp1 = (vic.at<double>(i,10*negative_normal + 4) - 0.25);
       vic.at<double>(i,10*negative_normal + 5) = -64*wp1*wp1*wp1*wp1 + 0.25;
       wp2 = (1 - vic.at<double>(i,10*negative_normal + 4) - params_.gamma_1)/(1-params_.gamma_1);
@@ -546,6 +549,10 @@ void CCD::run_ccd()
     // create a new B-spline curve: degree =2
 
     BSpline bs(t , params_.resolution, pts);
+    // for (int i = 0; i < params_.resolution; ++i){
+    //   std::cout << bs[i].x  << " " << bs[i].y << std::endl;
+    // }
+
 
     if(iter == 0)
     {

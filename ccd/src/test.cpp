@@ -82,7 +82,7 @@ int main (int argc, char * argv[])
   params[5] = 0.25;
   params[6] = 40;
   params[7] = 1;
-  params[8] = 100;
+  params[8] = 80;
 
   my_ccd.set_params(params);
   

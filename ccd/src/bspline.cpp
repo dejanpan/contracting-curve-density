@@ -126,7 +126,7 @@ BSpline::BSpline(int n,
 
     interval += increment;
   }
-  // std::cout << " i = " << i<<  std::endl;
+  // std::cout <<"resolution: " << resolution<<  " i = " << i<<  std::endl;
   // curve_[resolution-1].x=control[m].x;
   // curve_[resolution-1].y=control[m].y;
 }
