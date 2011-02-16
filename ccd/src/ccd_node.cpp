@@ -10,7 +10,8 @@
 #include <ccd/ccd.h>
 
 //class ImageConverter {
-
+double *params;
+std::vector<CvPoint2D64f> pts1;
 class CCDNode : public CCD
 {
 public:
@@ -18,17 +19,55 @@ public:
     n_(n), it_(n_)
     {
       image_sub_ = it_.subscribe(argv[1], 1, &CCDNode::imageCallback, this);
+      params = new double[9];
     }
 
   ~CCDNode()
     {
-      
+      delete(params);
     }
+
+
+/** 
+ * draw control points manually
+ * 
+ * @param event 
+ * @param x 
+ * @param y 
+ * @param flags 
+ * @param param 
+ */
+  void on_mouse( int event, int x, int y, int flags, void* param )
+    {
+      //  MaskParams* params = (MaskParams*)_params;
+      cv::Mat *img = (cv::Mat*)param;
+      if( img->empty())
+        return;
+      
+      //caution: check
+      // if( img1.at<double>() )
+      //   y = img1->height - y;
+      
+      switch( event )
+      {
+      case CV_EVENT_LBUTTONDOWN:
+        // std::cout << "Event = " << event << std::endl;
+        break;
+      case CV_EVENT_LBUTTONUP:
+        // std::cout << "Event = " << event << std::endl;
+        cv::circle(*img,cv::Point(x,y),2,cv::Scalar(0,0,255),2);
+        pts1.push_back(cvPoint2D64f(x,y));
+        // cvShowImage("Original",img1);
+        cv::imshow("Original", *img);
+        break;
+      }
+}
 
   void imageCallback(const sensor_msgs::ImageConstPtr& msg_ptr)
     {
 
-      IplImage *cv_image = NULL;
+      //IplImage *cv_image = NULL;
+      cv::Mat cv_image;
       try
       {
         cv_image = bridge_.imgMsgToCv(msg_ptr, "bgr8");
@@ -37,6 +76,19 @@ public:
       {
         ROS_ERROR("error");
       }
+      //canvas = imread("../data/ball.png", 1);
+      canvas.copyTo(cv_image);
+      img.copyTo(cv_image);
+      params[0] = 0.5;
+      params[1] = 4;
+      params[2] = 4;
+      params[3] = 3;
+      params[4] = 0.5;
+      params[5] = 0.25;
+      params[6] = 40;
+      params[7] = 1;
+      params[8] = 80;
+      set_params(params);
     }
 protected:
   ros::NodeHandle n_;
@@ -55,7 +107,7 @@ int main(int argc, char** argv)
 
   ros::init(argc, argv, "ros_to_openCv");
   ros::NodeHandle n("~");
-  CCDNode ic(n, argv);
+  CCDNode ccd_node(n, argv);
   ros::spin();
   return 0;
 }
