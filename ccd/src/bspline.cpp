@@ -1,7 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <cv.h>
-#include "bspline.h"
+#include "ccd/bspline.h"
 double BSpline::basic(int i,
                       int k,
                       double t)

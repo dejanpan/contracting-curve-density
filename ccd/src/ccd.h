@@ -50,8 +50,10 @@ class CCD
 {
 public:
   cv::Mat img, canvas;
-  CCD(cv::Mat &i):img(i),Phi(cv::Mat(6,1, CV_64F)),Sigma_Phi(cv::Mat(6,6, CV_64F)), delta_Phi(cv::Mat(6,1, CV_64F))
-  {};
+  CCD():Phi(cv::Mat(6,1, CV_64F)),Sigma_Phi(cv::Mat(6,6, CV_64F)), delta_Phi(cv::Mat(6,1, CV_64F))
+  {
+  
+  };
   void init_pts(std::vector<CvPoint2D64f> &pts);
   void set_params(double *params);
   void run_ccd();

@@ -5,23 +5,24 @@
 #include "cv_bridge/CvBridge.h"
 #include <opencv/cv.h>
 #include <opencv2/legacy/legacy.hpp>
-#include "bspline.h"
 #include <opencv/highgui.h>
 #include <string.h>
+#include <ccd/ccd.h>
 
-class ImageConverter {
+//class ImageConverter {
 
+class CCDNode : public CCD
+{
 public:
-  ImageConverter(ros::NodeHandle &n, char **argv) :
+  CCDNode(ros::NodeHandle &n, char **argv) :
     n_(n), it_(n_)
     {
-      image_sub_ = it_.subscribe(argv[1], 1, &ImageConverter::imageCallback, this);
-
+      image_sub_ = it_.subscribe(argv[1], 1, &CCDNode::imageCallback, this);
     }
 
-  ~ImageConverter()
+  ~CCDNode()
     {
-      cvDestroyWindow("Image window");
+      
     }
 
   void imageCallback(const sensor_msgs::ImageConstPtr& msg_ptr)
@@ -54,7 +55,7 @@ int main(int argc, char** argv)
 
   ros::init(argc, argv, "ros_to_openCv");
   ros::NodeHandle n("~");
-  ImageConverter ic(n, argv);
+  CCDNode ic(n, argv);
   ros::spin();
   return 0;
 }

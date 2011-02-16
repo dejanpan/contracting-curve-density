@@ -1,4 +1,4 @@
-#include "ccd.h"
+#include "ccd/ccd.h"
 
 using namespace cv;
 // control points initialized mannually

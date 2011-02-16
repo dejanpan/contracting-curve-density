@@ -1,4 +1,4 @@
-#include "ccd.h"
+#include "ccd/ccd.h"
 
 void CCD::init_pts(std::vector<CvPoint2D64f> &input_pts)
 {
