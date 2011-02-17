@@ -16,10 +16,12 @@ class CCDNode : public CCD
 public:
   double *params;
   std::vector<CvPoint2D64f> pts1;
+  std::string image_topic_;
   CCDNode(ros::NodeHandle &n, char **argv) :
     n_(n), it_(n_)
     {
-      image_sub_ = it_.subscribe(argv[1], 1, &CCDNode::imageCallback, this);
+      n_.param("image_topic", image_topic_, std::string("/narrow_stereo/left/image_rect"));
+      image_sub_ = it_.subscribe(image_topic_, 1, &CCDNode::imageCallback, this);
       params = new double[9];
       cv::namedWindow("Original", 1);
     }
