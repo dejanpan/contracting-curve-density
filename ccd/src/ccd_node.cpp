@@ -14,6 +14,10 @@
 class CCDNode : public CCD
 {
 public:
+  ros::NodeHandle n_;
+  image_transport::ImageTransport it_;
+  image_transport::Subscriber image_sub_;
+  sensor_msgs::CvBridge bridge_;
   double *params;
   std::vector<CvPoint2D64f> pts1;
   std::string image_topic_;
@@ -76,7 +80,7 @@ public:
       cv::Mat cv_image;
       try
       {
-        cv_image = bridge_.imgMsgToCv(msg_ptr, "bgr8");
+        cv_image = bridge_.imgMsgToCv(msg_ptr);
       }
       catch (sensor_msgs::CvBridgeException error)
       {
@@ -84,12 +88,12 @@ public:
       }
       pts1.clear();
       //canvas = imread("../data/ball.png", 1);
-      cv_image.copyTo(canvas);
-      cv_image.copyTo(img);
+//      cv_image.copyTo(canvas);
+      //    cv_image.copyTo(img);
 
-      cv::GaussianBlur(cv_image, img, cv::Size(9,9), 0);
+      //cv::GaussianBlur(cv_image, img, cv::Size(9,9), 0);
       // cv::imshow("Origianl", img);
-      char key ;
+      char key;
 
       params[0] = 0.5;
       params[1] = 4;
@@ -111,23 +115,21 @@ public:
         if (key == 27) 
           break;
       }
-        // for closed curves, we have to append 3 more points
-  // to the end, these 3 new points are the three one
-  // located in the head of the array
+      // for closed curves, we have to append 3 more points
+      // to the end, these 3 new points are the three one
+      // located in the head of the array
       if(pts1.size() > 3)
       {
         pts1.push_back(pts1[0]);
         pts1.push_back(pts1[1]);
         pts1.push_back(pts1[2]);
       }
+      for (int i = 0; i < pts1.size(); i++)
+        std::cerr << "pts1: " << pts1[i].x << " " << pts1[i].y << std::endl;
       init_pts(pts1);
       run_ccd();
     }
-protected:
-  ros::NodeHandle n_;
-  image_transport::ImageTransport it_;
-  image_transport::Subscriber image_sub_;
-  sensor_msgs::CvBridge bridge_;
+//protected:
 };
 
 int main(int argc, char** argv)
@@ -141,6 +143,8 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "ros_to_openCv");
   ros::NodeHandle n("~");
   CCDNode ccd_node(n);
+  ccd_node.canvas = imread(argv[1], 1);
+  ccd_node.img = imread(argv[1], 1);
   ros::spin();
   return 0;
 }
