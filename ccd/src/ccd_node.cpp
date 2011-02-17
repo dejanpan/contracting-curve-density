@@ -17,13 +17,14 @@ public:
   double *params;
   std::vector<CvPoint2D64f> pts1;
   std::string image_topic_;
-  CCDNode(ros::NodeHandle &n, char **argv) :
+  CCDNode(ros::NodeHandle &n) :
     n_(n), it_(n_)
     {
       n_.param("image_topic", image_topic_, std::string("/narrow_stereo/left/image_rect"));
       image_sub_ = it_.subscribe(image_topic_, 1, &CCDNode::imageCallback, this);
       params = new double[9];
       cv::namedWindow("Original", 1);
+      ROS_INFO("CCDNode Ready, listening on topic %s", image_topic_.c_str());
     }
 
   ~CCDNode()
@@ -126,7 +127,7 @@ int main(int argc, char** argv)
 
   ros::init(argc, argv, "ros_to_openCv");
   ros::NodeHandle n("~");
-  CCDNode ccd_node(n, argv);
+  CCDNode ccd_node(n);
   ros::spin();
   return 0;
 }
