@@ -82,11 +82,12 @@ public:
       {
         ROS_ERROR("error");
       }
+      pts1.clear();
       //canvas = imread("../data/ball.png", 1);
-      canvas.copyTo(cv_image);
-      img.copyTo(cv_image);
+      cv_image.copyTo(canvas);
+      cv_image.copyTo(img);
 
-      cv::GaussianBlur(cv_image, img , cv::Size(9,9) ,0);
+      cv::GaussianBlur(cv_image, img, cv::Size(9,9), 0);
       // cv::imshow("Origianl", img);
       char key ;
 
@@ -107,8 +108,20 @@ public:
       while (1)
       {
         key = cvWaitKey(10);
-        if (key == 27) break;
+        if (key == 27) 
+          break;
       }
+        // for closed curves, we have to append 3 more points
+  // to the end, these 3 new points are the three one
+  // located in the head of the array
+      if(pts1.size() > 3)
+      {
+        pts1.push_back(pts1[0]);
+        pts1.push_back(pts1[1]);
+        pts1.push_back(pts1[2]);
+      }
+      init_pts(pts1);
+      run_ccd();
     }
 protected:
   ros::NodeHandle n_;
