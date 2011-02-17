@@ -99,7 +99,7 @@ public:
       params[5] = 0.25;
       params[6] = 40;
       params[7] = 1;
-      params[8] = 80;
+      params[8] = 50;
       set_params(params);
 
       cvSetMouseCallback( "Original", on_mouse,  (void*)this);

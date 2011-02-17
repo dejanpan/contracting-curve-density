@@ -57,10 +57,10 @@ int main (int argc, char * argv[])
   //img1= cvLoadImage(argv[1], 1);
   // img1 = imread(argv[1], 1);
   // cv::Mat img = imread(argv[1], 1);  
-  cv::Mat input_img = imread("../data/ball.png", 1);
+  // cv::Mat input_img = imread("../data/ball.png", 1);
 
-  cv::Mat img;
-  cv::GaussianBlur(input_img, img , cv::Size(9,9) ,0);
+  // cv::Mat img;
+  // cv::GaussianBlur(input_img, img , cv::Size(9,9) ,0);
   // cv::imshow("Origianl", img);
   char key ;
   // while (1)
@@ -70,9 +70,10 @@ int main (int argc, char * argv[])
   // }
   //img - working copy
   //img1 - for visualization
-  CCD my_ccd(img);
+  CCD my_ccd;
   my_ccd.canvas = imread("../data/ball.png", 1);
-
+  my_ccd.img = imread("../data/ball.png", 1);
+  
   double *params = new double[9];
   params[0] = 0.5;
   params[1] = 4;
