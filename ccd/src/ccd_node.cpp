@@ -10,16 +10,18 @@
 #include <ccd/ccd.h>
 
 //class ImageConverter {
-double *params;
-std::vector<CvPoint2D64f> pts1;
+
 class CCDNode : public CCD
 {
 public:
+  double *params;
+  std::vector<CvPoint2D64f> pts1;
   CCDNode(ros::NodeHandle &n, char **argv) :
     n_(n), it_(n_)
     {
       image_sub_ = it_.subscribe(argv[1], 1, &CCDNode::imageCallback, this);
       params = new double[9];
+      cv::namedWindow("Original", 1);
     }
 
   ~CCDNode()
@@ -37,11 +39,12 @@ public:
  * @param flags 
  * @param param 
  */
-  void on_mouse( int event, int x, int y, int flags, void* param )
+ static void on_mouse( int event, int x, int y, int flags, void* param )
     {
       //  MaskParams* params = (MaskParams*)_params;
-      cv::Mat *img = (cv::Mat*)param;
-      if( img->empty())
+      CCDNode *ccd = (CCDNode*)param;
+      
+      if( ccd->canvas.empty())
         return;
       
       //caution: check
@@ -55,10 +58,10 @@ public:
         break;
       case CV_EVENT_LBUTTONUP:
         // std::cout << "Event = " << event << std::endl;
-        cv::circle(*img,cv::Point(x,y),2,cv::Scalar(0,0,255),2);
-        pts1.push_back(cvPoint2D64f(x,y));
+        cv::circle(ccd->canvas,cv::Point(x,y),2,cv::Scalar(0,0,255),2);
+        ccd->pts1.push_back(cvPoint2D64f(x,y));
         // cvShowImage("Original",img1);
-        cv::imshow("Original", *img);
+        cv::imshow("Original", ccd->canvas);
         break;
       }
 }
@@ -79,6 +82,11 @@ public:
       //canvas = imread("../data/ball.png", 1);
       canvas.copyTo(cv_image);
       img.copyTo(cv_image);
+
+      cv::GaussianBlur(cv_image, img , cv::Size(9,9) ,0);
+      // cv::imshow("Origianl", img);
+      char key ;
+
       params[0] = 0.5;
       params[1] = 4;
       params[2] = 4;
@@ -89,6 +97,15 @@ public:
       params[7] = 1;
       params[8] = 80;
       set_params(params);
+
+      cvSetMouseCallback( "Original", on_mouse,  (void*)this);
+      // cvShowImage("Original",img1);
+      cv::imshow("Original", canvas);
+      while (1)
+      {
+        key = cvWaitKey(10);
+        if (key == 27) break;
+      }
     }
 protected:
   ros::NodeHandle n_;
