@@ -62,7 +62,7 @@ int main (int argc, char * argv[])
   // cv::Mat img;
   // cv::GaussianBlur(input_img, img , cv::Size(9,9) ,0);
   // cv::imshow("Origianl", img);
-  char key ;
+  char key;
   // while (1)
   // {
   //   key = cvWaitKey(10);
