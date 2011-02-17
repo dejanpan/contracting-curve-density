@@ -96,7 +96,6 @@ void CCD::local_statistics(BSpline &bs)
   
   vic = Mat::zeros(params_.resolution, 20*floor(params_.h/params_.delta_h), CV_64F);
 
-  
   // temporary points used to store those points in the
   // normal direction as well as negative normal direction
   CvPoint tmp1, tmp2;
@@ -281,10 +280,10 @@ void CCD::local_statistics(BSpline &bs)
     // compute local statistics
     // ////////////////////////////////////////////////////////////////////
     // start search the points in the +n direction as well as -n direction
+    double wp1 = 0.0, wp2 = 0.0;
     for (int j = params_.delta_h; j <= params_.h; j += params_.delta_h, k++)
     {
-      double wp1 = 0.0, wp2 = 0.0;
-      
+      wp1 = 0.0, wp2 = 0.0;
       int negative_normal = k + floor(params_.h/params_.delta_h);
       
       // wp1 = w(a_{k,l})*w(d_{k,l})*w(d)
@@ -301,6 +300,7 @@ void CCD::local_statistics(BSpline &bs)
 
       // compute the mean value in the vicinity of a point
       // m_{ks} = I{k}^{s} = \sum_{l} w_{kls}{I_{kl}} : s = 1 or 2
+
       m1[0] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[0];
       m1[1] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[1];
       m1[2] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[2];
@@ -587,7 +587,7 @@ void CCD::run_ccd()
     // img1.release();
 
     refine_parameters(bs);
-    std::cout << "iter: " << iter << "   tol: " << tol  << " norm: " << cv::norm(delta_Phi, NORM_L2) << std::endl;
+    std::cerr << "iter: " << iter << "   tol: " << tol  << " norm: " << cv::norm(delta_Phi, NORM_L2) << std::endl;
     bs.release();
     cv::imshow("Original", canvas);
     cvWaitKey(2);

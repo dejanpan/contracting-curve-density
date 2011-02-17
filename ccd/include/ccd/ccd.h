@@ -55,6 +55,7 @@ public:
   void init_pts(std::vector<CvPoint2D64f> &pts);
   void set_params(double *params);
   void run_ccd();
+  std::vector<CvPoint2D64f> pts;
   ~CCD(){clear();}
 private:
   void clear();
@@ -62,7 +63,6 @@ private:
   void local_statistics(BSpline &bs);
   void refine_parameters(BSpline &bs);
   CCDParams params_;
-  std::vector<CvPoint2D64f> pts;
   cv::Mat vic;
   cv::Mat mean_vic;
   cv::Mat cov_vic;
