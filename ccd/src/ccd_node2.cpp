@@ -88,6 +88,8 @@ public:
 
   void imageCallback(const sensor_msgs::ImageConstPtr& msg_ptr)
     {
+      // std::cerr << "fuck my life 22" << std::endl;
+
       count_++;
       //IplImage *cv_image = NULL;
       cv::Mat cv_image;
@@ -99,7 +101,7 @@ public:
       {
         ROS_ERROR("error");
       }
-      ccd.pts.clear();
+      //ccd.pts.clear();
       //canvas = imread("../data/ball.png", 1);
       cv_image.copyTo(ccd.canvas);
       cv_image.copyTo(ccd.img);
@@ -129,7 +131,12 @@ public:
           ccd.pts.push_back(ccd.pts[2]);
         }
         for (int i = 0; i < ccd.pts.size(); i++)
-          std::cerr << "pts1: " << ccd.pts[i].x << " " << ccd.pts[i].y << std::endl;
+          std::cerr << "pts: " << ccd.pts[i].x << " " << ccd.pts[i].y << std::endl;
+        
+        int t = 3;
+        BSpline bs(t , ccd.get_resolution(), ccd.pts);
+        ccd.init_cov(bs, t);
+        bs.release();
       }
       //ccd.init_pts(pts1);
       ccd.run_ccd();

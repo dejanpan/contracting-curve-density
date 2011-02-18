@@ -58,6 +58,7 @@ void CCD::init_cov(BSpline &bs, int degree)
       U.at<double>(i+n_dim, j+n_dim) = tmp_mat.at<double>(i,j)/n_dim;
     }
   }
+
   Sigma_Phi = 6/(10*10)*W.t()*U*W;
   // cov = Nx/rou_0^2 * H
   // cov = 6/25*cov;
@@ -535,18 +536,19 @@ void CCD::run_ccd()
       pts[i].x = round(pts_tmp.x);
       pts[i].y = round(pts_tmp.y);
     }
-  
+
+    
     nv = Mat::zeros(params_.resolution, 2, CV_64F);
     mean_vic = Mat::zeros(params_.resolution, 6, CV_64F);
     cov_vic = Mat::zeros(params_.resolution, 18, CV_64F);
     nabla_E = Mat::zeros(6,1, CV_64F);
     hessian_E = Mat::zeros(6,6, CV_64F);
-
     // Phi.zeros(6,1,CV_64F);
 
     // the degree of B-Spline curve
     int t = 3;  
     // create a new B-spline curve: degree =2
+
 
     BSpline bs(t , params_.resolution, pts);
     // for (int i = 0; i < params_.resolution; ++i){
@@ -554,20 +556,6 @@ void CCD::run_ccd()
     // }
 
 
-    if(iter == 0)
-    {
-      init_cov(bs, t);
-#ifdef DEBUG
-      std::cout << " sigma: " << std::endl;
-      for (int m = 0 ; m < 6; ++m)
-      {
-        for (int n = 0; n < 6; ++n)
-        {
-          printf("%-5f ", Sigma_Phi.at<double>(m,n));
-        }
-      }
-#endif
-    }
 
     // converge condition
     // tol = \int (r - r_f)*n

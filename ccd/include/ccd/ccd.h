@@ -55,11 +55,12 @@ public:
   void init_pts(std::vector<CvPoint2D64f> &pts);
   void set_params(double *params);
   void run_ccd();
+  double get_resolution(){return params_.resolution;}
+  void init_cov(BSpline &bs, int degree);
   std::vector<CvPoint2D64f> pts;
   ~CCD(){clear();}
 private:
   void clear();
-  void init_cov(BSpline &bs, int degree);
   void local_statistics(BSpline &bs);
   void refine_parameters(BSpline &bs);
   CCDParams params_;
