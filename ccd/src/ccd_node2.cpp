@@ -107,6 +107,8 @@ public:
       cv_image.copyTo(ccd.canvas);
       cv_image.copyTo(ccd.img);
 
+      std::cerr << "I got a new image" << std::endl;
+
       //cv::GaussianBlur(cv_image, img, cv::Size(9,9), 0);
       // cv::imshow("Origianl", img);
       if (count_ == 1)
@@ -134,6 +136,8 @@ public:
           std::cerr << "pts: " << ccd.pts[i].x << " " << ccd.pts[i].y << std::endl;
         
         BSpline bs(t , ccd.get_resolution(), ccd.pts);
+
+    
 
         for (int i = 0; i < ccd.get_resolution(); ++i)
           std::cerr << "pts: " << bs[i].x << " " << bs[i].y << std::endl;

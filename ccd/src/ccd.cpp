@@ -1,5 +1,11 @@
 #include "ccd/ccd.h"
 
+cv::Scalar random_color(CvRNG* rng)
+{
+int color = cvRandInt(rng);
+return CV_RGB(color&255, (color>>8)&255, (color>>16)&255);
+}
+
 void CCD::init_pts(std::vector<CvPoint2D64f> &input_pts)
 {
   pts = input_pts;
@@ -101,13 +107,16 @@ void CCD::local_statistics(BSpline &bs)
   // normal direction as well as negative normal direction
   CvPoint tmp1, tmp2;
 
+  CvRNG rng;
   // store the distance from a point in normal(negative norml) direction
   // to the point on the curve
   CvPoint2D64f tmp_dis1, tmp_dis2;
 
+  cv::Scalar color = random_color(&rng);
+  
   for(int i=0; i < params_.resolution;i++)
   {
-    cv::circle(canvas, bs[i], 1, CV_RGB(0,0, 255),1);
+    cv::circle(canvas, bs[i], 1,color, 1);
     
     #ifdef DEBUG
     std::cout << bs[i].x  << " " << bs[i].y << std::endl;
@@ -552,9 +561,9 @@ void CCD::run_ccd()
 
 
     BSpline bs(t , params_.resolution, pts);
-    // for (int i = 0; i < params_.resolution; ++i){
-    //   std::cout << bs[i].x  << " " << bs[i].y << std::endl;
-    // }
+    for (int i = 0; i < params_.resolution; ++i)
+      cv::circle(canvas, bs[i], 2 ,CV_RGB(0,255,0), 2);
+
 
 
 
@@ -589,25 +598,28 @@ void CCD::run_ccd()
     bs.release();
     cv::imshow("Original", canvas);
     
-    // cv::waitKey(0);
+    cv::waitKey(250);
 
 
-    if((tol - 0.0 < 0.001) && (norm < 0.01))
-    {
+    // if((tol - 0.0 < 0.001) && (norm < 0.01))
+    // {
+    //   convergence = true;
+    //   char key;
+      
+    //   // while (1)
+    //   // {
+    //   //   key = cvWaitKey(10);
+    //   //   if (key == 27)
+    //   //   {
+    //   //     std::cerr<< "key = " << (int)key << std::endl;
+    //   //     break;          
+    //   //   }
+    //   // }
+
+    //   break;
+    // }
+    if(iter >= 20)
       convergence = true;
-      char key;
-      while (1)
-      {
-        key = cvWaitKey(10);
-        if (key >= 0)
-        {
-          std::cerr<< "key = " << (int)key << std::endl;
-          break;          
-        }
-      }
-
-      break;
-    }
     iter += 1;
   }while(!convergence);
 }
