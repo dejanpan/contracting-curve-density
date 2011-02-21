@@ -21,9 +21,10 @@ private:
                     CvPoint2D64f *p,
                     CvPoint2D64f *tangent,
                     double *mat_ptr,
-                    double v);
+                    double v,
+                    int degree);
   double basic(int k, int t, double v);
-  double basic(int i, double t, double *bp);
+  double basic(int i, int degree, double t, double *bp);
   std::vector<int> knots;
   CvPoint *curve_;
   CvPoint *tangent_;

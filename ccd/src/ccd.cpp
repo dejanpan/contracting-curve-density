@@ -516,6 +516,7 @@ void CCD::run_ccd()
   int iter = 0;
   double tol = 0.0;
   bool convergence = false;
+  double norm = 0.0;
   do{ 
     // update model parameters
     // for (int i = 0; i < 6; ++i)
@@ -546,7 +547,7 @@ void CCD::run_ccd()
     // Phi.zeros(6,1,CV_64F);
 
     // the degree of B-Spline curve
-    int t = 3;  
+    int t = 4;  
     // create a new B-spline curve: degree =2
 
 
@@ -575,21 +576,37 @@ void CCD::run_ccd()
     // img1.release();
 
     refine_parameters(bs);
-    std::cerr << "iter: " << iter << "   tol: " << tol  << " norm: " << cv::norm(delta_Phi, NORM_L2) << std::endl;
+
+    norm =  0.0;
+    for (int i = 0; i < 6; ++i){
+      if(i == 0 || i == 1)
+        norm += delta_Phi.at<double>(i, 0)*delta_Phi.at<double>(i, 0)/10000;
+      else
+        norm += delta_Phi.at<double>(i, 0)*delta_Phi.at<double>(i, 0);
+    }
+    norm = cv::sqrt(norm);
+    std::cerr << "iter: " << iter << "   tol: " << tol  << " norm: " << cv::norm(delta_Phi, NORM_L2)  << " norm_tmp:" << norm<< std::endl;
     bs.release();
     cv::imshow("Original", canvas);
-    cvWaitKey(2);
     
-    if((tol - 0.0 < 0.001) && (cv::norm(delta_Phi, NORM_L2) < 0.01))
+    // cv::waitKey(0);
+
+
+    if((tol - 0.0 < 0.001) && (norm < 0.01))
     {
       convergence = true;
       char key;
       while (1)
       {
         key = cvWaitKey(10);
-        if (key == 27) break;
+        if (key >= 0)
+        {
+          std::cerr<< "key = " << (int)key << std::endl;
+          break;          
+        }
       }
 
+      break;
     }
     iter += 1;
   }while(!convergence);

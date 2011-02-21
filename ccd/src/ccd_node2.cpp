@@ -26,7 +26,8 @@ public:
   CCDNode(ros::NodeHandle &n) :
     n_(n), it_(n_)
     {
-      n_.param("image_topic", image_topic_, std::string("/narrow_stereo/left/image_rect"));
+      // n_.param("image_topic", image_topic_, std::string("/narrow_stereo/left/image_rect"));
+      n_.param("image_topic", image_topic_, std::string("/wide_stereo/left/image_rect"));
       image_sub_ = it_.subscribe(image_topic_, 1, &CCDNode::imageCallback, this);
       params = new double[9];
       cv::namedWindow("Original", 1);
@@ -124,17 +125,19 @@ public:
         // for closed curves, we have to append 3 more points
         // to the end, these 3 new points are the three one
         // located in the head of the array
-        if(ccd.pts.size() > 3)
-        {
-          ccd.pts.push_back(ccd.pts[0]);
-          ccd.pts.push_back(ccd.pts[1]);
-          ccd.pts.push_back(ccd.pts[2]);
-        }
+        int t = 4;
+        if(ccd.pts.size() > t)
+          for (int i = 0; i < t; ++i)
+            ccd.pts.push_back(ccd.pts[i]);
+        
         for (int i = 0; i < ccd.pts.size(); i++)
           std::cerr << "pts: " << ccd.pts[i].x << " " << ccd.pts[i].y << std::endl;
         
-        int t = 3;
         BSpline bs(t , ccd.get_resolution(), ccd.pts);
+
+        for (int i = 0; i < ccd.get_resolution(); ++i)
+          std::cerr << "pts: " << bs[i].x << " " << bs[i].y << std::endl;
+
         ccd.init_cov(bs, t);
         bs.release();
       }

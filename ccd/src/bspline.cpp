@@ -19,31 +19,63 @@ double BSpline::basic(int i,
 }
 
 double BSpline::basic(int i,
+                      int degree,
                       double t,
                       double *bp)
 {
   double temp = 0;
   double t_floor = t-floor(t);
   // std::cout << " t_floor: " << t_floor<<std::endl;
-  if(t -i >= 2 && t- i <= 3)
+  if(degree == 3)
   {
-    temp = 0.5*(1- t_floor)*(1-t_floor);
-    *bp = t_floor - 1;
+    if(t -i >= 2 && t- i <= 3)
+    {
+      temp = 0.5*(1- t_floor)*(1-t_floor);
+      *bp = t_floor - 1;
+    }
+    else if (t - i >= 1 && t-i<= 2)
+    {
+      temp = -t_floor*t_floor + t_floor + 0.5;
+      *bp = 1 - 2*t_floor;
+    }
+    else if (t-i >= 0 && t-i <= 1)
+    {
+      temp = 0.5*t_floor*t_floor;
+      *bp = t_floor;
+    }
+    else
+    {
+      temp = 0;
+      *bp = 0;
+    }
   }
-  else if (t - i >= 1 && t-i<= 2)
+  else if(degree == 4)
   {
-    temp = -t_floor*t_floor + t_floor + 0.5;
-    *bp = 1 - 2*t_floor;
-  }
-  else if (t-i >= 0 && t-i <= 1)
-  {
-    temp = 0.5*t_floor*t_floor;
-    *bp = t_floor;
-  }
-  else
-  {
-    temp = 0;
-    *bp = 0;
+    if(t -i >= 3 && t- i <= 4)
+    {
+      temp = (-t_floor*t_floor*t_floor+3*t_floor*t_floor - 3*t_floor + 1)/6;
+      *bp = -0.5*t_floor*t_floor + t_floor - 0.5;
+    }
+    else if (t - i >= 2 && t-i<= 3)
+    {
+      temp = (3*t_floor*t_floor*t_floor - 6*t_floor*t_floor + 4)/6;
+      *bp = 1.5*t_floor*t_floor - 2*t_floor;
+    }
+    else if (t-i >= 1 && t-i <= 2)
+    {
+      temp = (-3*t_floor*t_floor*t_floor + 3*t_floor*t_floor + 3*t_floor +1)/6;
+      *bp = -t_floor*t_floor + t_floor + 0.5;
+    }
+    else if(t-i >= 0 && t-i <= 1)
+    {
+      temp = t_floor*t_floor*t_floor/6;
+      *bp = 0.5*t_floor*t_floor;
+    }
+    else
+    {
+      temp = 0;
+      *bp = 0;
+    }    
   }
   return temp;
 }
@@ -69,7 +101,8 @@ void BSpline::computePoint(
     CvPoint2D64f *output,
     CvPoint2D64f *slope,
     double *mat_ptr,
-    double t)
+    double t,
+    int degree)
 {
   double b = 0, bp = 0;
   // initialize the variables that will hold our outputted point
@@ -80,7 +113,7 @@ void BSpline::computePoint(
   for (size_t i = 0; i < control.size(); i++)
   {
     // b = basic(i, n_order_, t);
-    b = basic(i, t, &bp);
+    b = basic(i, degree, t, &bp);
     mat_ptr[i] = b;
     output->x += control[i].x * b;
     output->y += control[i].y * b;
@@ -108,7 +141,7 @@ BSpline::BSpline(int n,
   // std::cout <<  "increment << " << increment << std::endl;  
   for (interval = n-1; fabs(interval - m) > 0.0000001 ; ++i){
     double *mat_ptr = basic_mat_.ptr<double>(i);
-    computePoint(control, &tmp_point, &tmp_tangent, mat_ptr, interval);
+    computePoint(control, &tmp_point, &tmp_tangent, mat_ptr, interval, n);
     curve_[i].x = round(tmp_point.x);
     curve_[i].y = round(tmp_point.y);
     // if(i<20)
