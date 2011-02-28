@@ -38,7 +38,7 @@ public:
       params[3] = 3;
       params[4] = 0.5;
       params[5] = 0.25;
-      params[6] = 20;
+      params[6] = 40;
       params[7] = 1;
       params[8] = 50;
       ccd.set_params(params);
@@ -147,6 +147,8 @@ public:
       }
       //ccd.init_pts(pts1);
       ccd.run_ccd();
+      cv::imshow("Original", ccd.canvas);
+      cv::waitKey(200);
     }
 //protected:
 };

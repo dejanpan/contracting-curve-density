@@ -595,9 +595,9 @@ void CCD::run_ccd()
     }
     norm = cv::sqrt(norm);
     std::cerr << "iter: " << iter << "   tol: " << tol  << " norm: " << cv::norm(delta_Phi, NORM_L2)  << " norm_tmp:" << norm<< std::endl;
-    cv::imshow("Original", canvas);
+    //cv::imshow("Original", canvas);
     
-        cv::waitKey(10);
+    //cv::waitKey(100);
 
 
     // if((tol - 0.0 < 0.001) && (norm < 0.01))
@@ -623,6 +623,6 @@ void CCD::run_ccd()
       init_cov(bs, t);
     }
     iter += 1;
-    bs.release();
+    //    bs.release();
   }while(!convergence);
 }

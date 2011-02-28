@@ -7,7 +7,7 @@ public:
   void release(){
       basic_mat_.release();
       if (curve_ != NULL) delete [] curve_;
-      if (curve_ != NULL) delete [] tangent_;    
+      if (tangent_ != NULL) delete [] tangent_;    
   }
 
   /* void clear(){delete [] basic_mat_; delete [] curve_; delete [] tangent_;} */
