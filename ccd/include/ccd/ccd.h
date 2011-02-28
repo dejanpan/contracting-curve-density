@@ -5,6 +5,8 @@
 #include <string>
 #include <cstdio>
 #include <algorithm>
+#include <siftfast/siftfast.h>
+
 using namespace cv;
 struct CCDParams
 {
