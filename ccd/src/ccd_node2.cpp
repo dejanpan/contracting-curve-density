@@ -89,8 +89,6 @@ public:
 
   void imageCallback(const sensor_msgs::ImageConstPtr& msg_ptr)
     {
-      // std::cerr << "fuck my life 22" << std::endl;
-
       count_++;
       //IplImage *cv_image = NULL;
       cv::Mat cv_image;
@@ -106,6 +104,8 @@ public:
       //canvas = imread("../data/ball.png", 1);
       cv_image.copyTo(ccd.canvas);
       cv_image.copyTo(ccd.img);
+      std::cerr << "sample data: " << (int)ccd.img.at<Vec3b>(356, 180)[0] << " " << (int)ccd.img.at<Vec3b>(356, 180)[1] << " " << (int)ccd.img.at<Vec3b>(356, 180)[2] << " "  << std::endl;
+
 
       std::cerr << "I got a new image" << std::endl;
 
