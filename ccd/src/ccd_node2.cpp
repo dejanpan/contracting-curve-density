@@ -143,12 +143,14 @@ public:
           std::cerr << "pts: " << bs[i].x << " " << bs[i].y << std::endl;
 
         ccd.init_cov(bs, t);
-        bs.release();
+        // bs.release();
+        // bs.~BSpline();
       }
       //ccd.init_pts(pts1);
       ccd.run_ccd();
       cv::imshow("Original", ccd.canvas);
-      cv::waitKey(200);
+      cv::waitKey(2);
+      sleep(1);
     }
 //protected:
 };

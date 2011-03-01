@@ -561,6 +561,7 @@ void CCD::run_ccd()
 
 
     BSpline bs(t , params_.resolution, pts);
+    
     for (int i = 0; i < params_.resolution; ++i)
       cv::circle(canvas, bs[i], 2 ,CV_RGB(0,255,0), 2);
 
@@ -578,6 +579,8 @@ void CCD::run_ccd()
                    (bs[k].y - bs_old.at<double>(k, 1))*bs_old.at<double>(k, 3), 2);
       }
     }
+
+    std::cerr << "bs sample : " << bs[0].x << " " << bs[0].y << std::endl;
     
     local_statistics(bs);
 
@@ -623,6 +626,6 @@ void CCD::run_ccd()
       init_cov(bs, t);
     }
     iter += 1;
-    //    bs.release();
+    // bs.release();
   }while(!convergence);
 }

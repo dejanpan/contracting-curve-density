@@ -3,12 +3,16 @@ public:
   BSpline();
   BSpline(const BSpline &bs){}
   BSpline(int n, int resolution, std::vector<CvPoint2D64f> control_points);
-  ~BSpline(){}
-  void release(){
-      basic_mat_.release();
-      if (curve_ != NULL) delete [] curve_;
-      if (tangent_ != NULL) delete [] tangent_;    
-  }
+  ~BSpline();
+  /* 
+   * void release(){
+   *     /\* basic_mat_.release(); *\/
+   *     /\* 
+   *      * if (curve_ != NULL) delete [] curve_;
+   *      * if (tangent_ != NULL) delete [] tangent_;    
+   *      *\/
+   * }
+   */
 
   /* void clear(){delete [] basic_mat_; delete [] curve_; delete [] tangent_;} */
   CvPoint& operator[](const size_t);

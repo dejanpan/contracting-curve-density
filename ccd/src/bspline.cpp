@@ -178,3 +178,10 @@ CvPoint& BSpline::dt(const size_t index)
 {
   return tangent_[index];
 }
+
+BSpline::~BSpline(){
+       /* basic_mat_.release(); */
+       /* knots.clear(); */
+       if (curve_ != NULL) delete [] curve_;
+       if (tangent_ != NULL) delete [] tangent_;
+  }
