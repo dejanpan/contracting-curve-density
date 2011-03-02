@@ -579,9 +579,22 @@ void CCD::run_ccd()
                    (bs[k].y - bs_old.at<double>(k, 1))*bs_old.at<double>(k, 3), 2);
       }
     }
-
-    std::cerr << "bs sample : " << bs[0].x << " " << bs[0].y << std::endl;
     
+    //HACK!!!!!
+    bool invalid = false;
+    for (int i = 0; i < params_.resolution; i++)
+      {
+	if (abs(bs[i].x) > 640 || abs(bs[i].y) > 480)
+	  {
+	    invalid = true;
+	    continue;
+	    std::cerr << "bs sample : " << bs[i].x << " " << bs[i].y << std::endl;
+	  }
+      }
+    if (invalid)
+      continue;
+    //END HACK!!!!!
+
     local_statistics(bs);
 
     

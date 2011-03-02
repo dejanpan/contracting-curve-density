@@ -133,14 +133,14 @@ public:
             ccd.pts.push_back(ccd.pts[i]);
         
         for (int i = 0; i < ccd.pts.size(); i++)
-          std::cerr << "pts: " << ccd.pts[i].x << " " << ccd.pts[i].y << std::endl;
+          std::cerr << "pts initialized: " << ccd.pts[i].x << " " << ccd.pts[i].y << std::endl;
         
         BSpline bs(t , ccd.get_resolution(), ccd.pts);
 
     
 
         for (int i = 0; i < ccd.get_resolution(); ++i)
-          std::cerr << "pts: " << bs[i].x << " " << bs[i].y << std::endl;
+          std::cerr << "pts bspline: " << bs[i].x << " " << bs[i].y << std::endl;
 
         ccd.init_cov(bs, t);
         // bs.release();
@@ -148,9 +148,12 @@ public:
       }
       //ccd.init_pts(pts1);
       ccd.run_ccd();
-      cv::imshow("Original", ccd.canvas);
-      cv::waitKey(2);
-      sleep(1);
+      //cv::imshow("Original", ccd.canvas);
+      //cv::waitKey(2);
+      std::stringstream name;
+      name << count_;
+      cv::imwrite(name.str() + ".png", ccd.canvas);
+      //sleep(1);
     }
 //protected:
 };
