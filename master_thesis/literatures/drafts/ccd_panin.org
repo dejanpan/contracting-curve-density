@@ -1,0 +1,269 @@
+#+TITLE: CCD code transcript
+#+OPTIONS: toc:2
+#+AUTHOR: Shulei ZHU
+#+EMAIL: zhus@.in.tum.de
+#+LaTeX_CLASS: article
+
+
+* function1: main 
+** variables
+*** constant parameters
+**** *int* resolution: the amount of points on the contour, equidistant distributed
+**** *int* t: degree of B-Spline Curve
+**** *int* h: search radius in the normal direction
+**** *int* delta\_h: distance step in the normal direction
+**** *double* sigma\_hat:
+\begin{displaymath}
+\mathrm{\hat{\sigma}} = \frac{h}{2.5}
+\end{displaymath}
+**** *double* gamma_1 = 0.5, gamma_2 = 4, gamma_3 = 4
+\begin{displaymath}
+\gamma_1 = 0.5, \gamma_2 = 4, \gamma_3 = 4
+\end{displaymath}
+**** *double* sigma = sigma_hat/gamma_3
+\begin{displaymath}
+\sigma = \frac{\hat{\sigma}}{\gamma_3}
+\end{displaymath}
+**** *double* kappa = 0.5 
+\begin{displaymath}
+\kappa = 0.5
+\end{displaymath}
+\begin{displaymath}
+\Sigma_{v,s} =  M_s^2(d^=) / \omega_(d_v^=) - m_{v,s} * (m_{v,s})^t + \kappa*I
+\end{displaymath}
+here, I is a identy matrix, to avoid singular
+**** *double* c:parameter used to update model covariance matrix
+\begin{displaymath}
+\Sigma_{\Phi}^{new} = c * \Sigma_{\Phi} + (1 -c)(H_{\Phi}E)^{-1}
+\end{displaymath}
+
+**** *int* normal\_points_number 
+\begin{displaymath}
+\mathrm{normal\_points\_number} = floor(\frac{h}{\delta_h})
+\end{displaymath}
+**** *double* tol = 0
+**** *double* iter = 0
+*** matrix and points
+**** *CvPoint2D64f* pts\_tmp: used to store all resulting control points
+**** *cv::Mat* Phi: model parameters, it is a 6x1 matrix
+\begin{displaymath}
+\Phi =
+\left[ {\begin{array}{c}
+\phi_0 \\
+\phi_1 \\
+\phi_2 \\
+\phi_3 \\
+\phi_4 \\
+\phi_5
+ \end{array} } \right]
+\end{displaymath}
+**** *cv::Mat* Sigma\_phi: covariance matrix, it is a 6x6 matrix
+\begin{displaymath}
+\Sigma_{\Phi} =
+\left[ {\begin{array}{cccccc}
+\sigma_{00} & \sigma_{01} & \sigma_{02} & \sigma_{03} & \sigma_{04} &
+\sigma_{05}\\
+\sigma_{10} & \sigma_{11} & \sigma_{12} & \sigma_{13} & \sigma_{14} &
+\sigma_{15}\\
+\sigma_{20} & \sigma_{21} & \sigma_{22} & \sigma_{23} & \sigma_{24} &
+\sigma_{25}\\
+\sigma_{30} & \sigma_{31} & \sigma_{32} & \sigma_{33} & \sigma_{34} &
+\sigma_{35}\\
+\sigma_{40} & \sigma_{41} & \sigma_{42} & \sigma_{43} & \sigma_{44} &
+\sigma_{45}\\
+\sigma_{50} & \sigma_{51} & \sigma_{52} & \sigma_{53} & \sigma_{54} &
+\sigma_{55}\\
+ \end{array} } \right]
+\end{displaymath}
+**** *cv::Mat* mean\_vic: mean value of points located in the vicinity of the contour, resolutionx6
+**** *cv::Mat* cov\_vic: covariance matrix of points located in the vicinity of the contour, resolutionx18
+**** *cv::Mat* nabla\_E:
+\begin{displaymath}
+\nabla_E = \nabla_{E_1} + \nabla_{E_2}
+         = 2*(\Sigma_\Phi^*)^{-1}*\Phi
+         - \sum_{k,l}J_{a_1} \hat{\Sigma}_{k,l}^{-1} (I_{k,l} - \hat{I}_{k,l})
+\end{displaymath}
+**** *cv::Mat* hessian\_E:
+\begin{displaymath}
+\mathrm{hessian} E = \mathrm{hessian} {E_1} + \mathrm{hessian} {E_2}
+           = (\Sigma_\Phi)^{-1} +
+           \sum_{k,l} J_{a_1} \hat{\Sigma}_{k,l}^{-1} J_{a_1}
+\end{displaymath}
+**** *cv::Mat* tmp\_cov:
+\begin{displaymath}
+\mathrm{tmp\_cov} = \hat{\Sigma}_{k,l}
+\end{displaymath}
+**** *cv::Mat* tmp\_cov\_inv:
+\begin{displaymath}
+\mathrm{tmp\_cov\_inv} = \hat{\Sigma}_{k,l}^{-1}
+\end{displaymath}
+
+**** *cv::Mat* tmp\_jacobian:
+
+\begin{displaymath}
+\mathrm{tmp\_jacobian} =
+\left[ {\begin{array}{cccccc}
+\frac{\partial p_x}{\partial x_0}& \frac{\partial p_x}{\partial x_1}& \frac{\partial p_x}{\partial x_2}& \frac{\partial p_x}{\partial x_3}&\frac{\partial p_x}{\partial x_4} &\frac{\partial p_x}{\partial x_5}  \\
+\frac{\partial p_y}{\partial x_0}& \frac{\partial p_y}{\partial x_1}& \frac{\partial p_y}{\partial x_2}& \frac{\partial p_y}{\partial x_3}&\frac{\partial p_y}{\partial x_4} &\frac{\partial p_y}{\partial x_5}  \\
+ \end{array} } \right]
+\end{displaymath}
+
+**** *cv::Mat* tmp\_pixel\_diff:
+\begin{displaymath}
+\mathrm{tmp\_pixel\_diff} = I_{k,l} - \hat{I}_{k,l}
+\end{displaymath}
+
+**** *cv::Mat* nv: normal vector(both directions)
+\begin{eqnarray}
+\mathrm{nv}[0] &=& \frac{ -bs'.y}{\sqrt{(bs'.x)^2 + (bs'.y)^2}}\\
+\mathrm{nv}[1] &=& \frac{ -bs'.x}{\sqrt{(bs'.x)^2 + (bs'.y)^2}}
+\end{eqnarray}
+
+**** *CvPoint* tmp1, tmp2: 
+temporary points used to store those points in the
+ normal direction as well as negative normal direction
+\begin{eqnarray}
+\label{eq:1}
+tmp1.x  & = & round(bs.x + \delta_{h}*nv[0])\\
+tmp1.y  & = & round(bs.y + \delta_{h}*nv[1])
+\end{eqnarray}
+
+**** *CvPoint2D64f* tmp\_dis1, tmp\_dis2:
+store the distance from a point in normal(negative norml) direction
+to the point on the curve
+\begin{eqnarray}
+\label{eq:2}
+tmp\_dis1.x & =  &  (tmp1.x - bs.x)*nv[0] + (tmp1.y - bs.y)*nv[1] \\
+tmp\_dis1.y & =  &  (tmp1.x - bs.x)*nv[1] + (tmp1.y - bs.y)*nv[0] \\
+tmp\_dis2.x & =  &  (tmp2.x - bs.x)*nv[0] + (tmp2.y - bs.y)*nv[1] \\
+tmp\_dis2.y & =  &  (tmp2.x - bs.x)*nv[1] + (tmp2.y - bs.y)*nv[0]
+\end{eqnarray}
+
+**** *cv::Mat* vic
+***** col_1, col_2: coordinates of x and y
+***** col_3, col_4: the distance between a normal points and the point on the curve d_v(x), d_v(y)
+***** col_5: the probability
+\begin{displaymath}
+P_{v,1}(x, m_\phi, \hat{\sigma}) = 0.5*erf(\frac{d_{v}'(x)}{(\sqrt(2)*\hat{\sigma})})
+\end{displaymath}
+***** col_6: the probability of pixel p to belong to the desired side s.
+\begin{displaymath}
+       W_s(p) = max(0, [a-\gamma_{1})/(1-\gamma_{1})]^4)
+\end{displaymath}
+***** col_7, col_8 : evaluates the proximity of pixel p to the curve
+\begin{displaymath}
+       W_p(d_p, \sigma_p) = c*max[0, exp(-d_p^2/2*\sigma_p'^2) - exp(-\gamma_2))]
+\end{displaymath}
+\begin{displaymath}
+       \sigma_p' = \gamma_3*\sigma_p + \gamma_4
+\end{displaymath}
+\begin{displaymath}
+       W_{sp} = W_s * W_p
+\end{displaymath}
+***** col_9:  access the distance $|{d_v}^{=} - {d_p}^{=}|$ between pixel $p$ and pixel $v$ along the curve
+\begin{displaymath}
+      W' = 0.5*exp(-|{d_v}^{=} - {d_p}^{=}|/\alpha)/\alpha
+\end{displaymath}
+
+***** col_10: the derivative of col_5:
+\begin{displaymath}
+\frac{1}{\sqrt{2*\pi}*\sigma}*exp \left\{ \frac{-d_{k,l}^2}{(2*\hat{\sigma}*\hat{\sigma})} \right\} 
+\end{displaymath}
+so last $\omega_ps = W_s * W'$
+**** *cv::Mat* normalized\_param
+to save the normalized parameters of $vic[7]$,
+dimension: resolution x 2,
+the first column save the normalized coefficient outside the curve,
+the second column store the one inside the curve
+**** *cv::Mat* bs\_old:
+dimension is 4, the structure is similar as bs
+** while loop
+*** generate new control points
+\begin{displaymath}
+Q = W\Phi + Q_0
+\end{displaymath}
+here, we use pts\_tmp to represent $Q$, use pts to represent $Q_0$
+
+*** set nv, mean\_vic, cov_vic, nabla\_E hessian\_E as zero matrices
+*** create a new B-Spline contour use new control points(degree is 3, it is a Uniform quadratic B-spline)
+\begin{displaymath}
+\mathbf{bs}_(t) = \begin{bmatrix} t^2 & t & 1 \end{bmatrix} \frac{1}{2} \begin{bmatrix}
+1 & -2 & 1 \\
+-2 &  2 & 0 \\
+1 &  1 & 0 \end{bmatrix}
+\begin{bmatrix} \mathbf{Q}_{i-1} \\ \mathbf{Q}_{i} \\ \mathbf{Q}_{i+1} \end{bmatrix}
+\end{displaymath}
+for $t \in [0,1], i = 1,2 \ldots m-2$
+*** initialize the covariance matrix
+\begin{displaymath}
+\Sigma_{\Phi} = \frac{\mathrm{dim}_{\Phi}}{h^2} \mathcal{H} =
+\frac{\mathrm{dim}_{\Phi}}{h^2} W^T \mathcal{U} W
+\end{displaymath}
+*** computing the tolerance
+\begin{displaymath}
+\mathrm{tol} =  \sum_{i=0}^{\mathrm{resolution}} (\vec{\mathrm{bs\_new}} -\vec{
+\mathrm{bs\_old}}) \times \vec{n}
+\end{displaymath}
+
+*** compute the normal vector and save old axis components and normal vector into bs\_old
+\begin{displaymath}
+\vec{t} = \frac{\partial \mathrm{\vec{bs}}}{\partial \vec{l}}
+\end{displaymath}
+where $\vec{l}$ along the curve, therefore
+\begin{displaymath}
+\vec{nv} = [-t_{y}, t_{x}]
+\end{displaymath}
+*** calculate all values of elements in matrix *vic*
+\begin{eqnarray}
+vic[0] & = & y \\
+vic[1] & = & x \\
+vic[2] & = & distance.x \\
+vic[3] & = & distance.y \\
+vic[4] & = & \frac{1}{2}erf(\frac{distance.x}{\sqrt{2}*\sigma})\\
+vic[5] &= & \left(\frac{vic[4] - \gamma_1}{1-\gamma_1} \right)^4\\
+vic[6] &= & -64\left(0.75-vic[4]\right)^4 + 0.25\\ 
+vic[7] &=& \mathrm{max}\left(
+\mathrm{exp}\{\frac{-(distance.x)^2}{2*{\hat{\sigma}}^2}\} -
+\mathrm{exp}(-\gamma_2), 0.0 \right)\\
+vic[8] &=& \frac{\mathrm{exp}\left\{ \frac{-|distance.y|}{\alpha}
+\right\}}{2\alpha}\\
+vic[9] &=& \frac{\mathrm{exp} \left\{ \frac{-(distance.x)^2}{2\sigma^2} \right\}}{\sqrt{2\pi}\sigma}
+\end{eqnarray}
+in addition, we have to computing the normalization parameter fro $vic[7]$
+*** computing weights for both sides
+\begin{eqnarray}
+w_{1} &  =  & \sum \mathrm{w_{p,1}} = \frac{1}{c_{1}}\sum vic[5]*vic[7]*vic[8] \\
+w_{2} &  =  & \sum \mathrm{w_{p,2}} = \frac{1}{c_2}\sum vic[6]*vic[7]*vic[8]
+\end{eqnarray}
+*** calculate the average values of all pixels located in each side of the vicinity respectively
+\begin{displaymath}
+m_{k,s} = \hat{I}_{k,s} = \frac{M_s(d_k)}{\omega_s(d_k)}
+\end{displaymath}
+*** calculate the local covariance matrix
+\begin{displaymath}
+\Sigma_{k,s} = \frac{M^2_{s}(d_k)}{\omega_{s}(d_k)} -
+m_{k,s}*m_{k,s}^{2} + \kappa I
+\end{displaymath}
+where 
+\begin{eqnarray}
+\omega_s(d_k) &=& \sum_{p \in \mathcal{V}}  \omega_{p,s}(d_k)\\
+M_s(d_k)  & = & \sum_{p \in \mathcal{V}} \omega_{p,s}(d_k) I_p \\
+M^2_s(d_k)  & = & \sum_{p \in \mathcal{V}} \omega_{p,s}(d_k) I_p*I_{p}^T
+\end{eqnarray}
+
+*** calculate $\nabla_{E}$ and $H\_E$
+\begin{eqnarray}
+\label{eq:3}
+E & = & E_1 + E_2\\
+E_1 &  = & \frac{1}{2}(\Phi -
+m^{*}_{\Phi})^{-1}(\Sigma^{*}_{\Phi})^{-1}(\Phi - m^{*}_{\Phi}) \\
+E_2 & = & \frac{1}{2} \sum_k\sum_l (I_{k,l} - \hat{I}_{k,l}(\Phi))^T
+\hat{\Sigma}_{k,l}^{-1} (I_{k,l} - \hat{I}_{k,l}(\Phi))\\
+\nabla{E_1} &= & 2(\Sigma_\Phi^*)^{-1}\Phi\\
+\nabla{E_2} & = & -\sum_{k,l}J_{a_1}^T \hat{\Sigma}_{k,l}^{-1} (I_{k,l} -
+\hat{I}_{k,l}) \\
+\mathbf{H} E_{1} & = & (\Sigma_\Phi^*)^{-1}\\
+\mathbf{H} E_{2} & = &\sum_{k,l} J_{a_1}^T \hat{\Sigma}_{k,l}^{-1} J_{a_1}\\
+\nabla{E} &=& \nabla{E_1} +  \nabla{E_2}\\\
+\mathbf{H} E &=& \mathbf{H} E_1 + \mathbf{H} E_2
+\end{eqnarray}

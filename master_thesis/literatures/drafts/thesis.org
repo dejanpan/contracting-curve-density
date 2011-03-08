@@ -1,0 +1,16 @@
+#+TITLE: Master's Thesis
+#+LaTeX_CLASS: article
+
+
+Title: *Implementation of Contracting Curve Density Algorithm for Applications in Personal Robotics*
+
+
+Abstract:
+
+Objective of the thesis is to implement a Contracting Curve Density (CCD) algorithm, a method for fitting 
+parametric curve models to boundaries of image regions, in the ecosystem of Robot Operating System 
+(ROS, http://www.ros.org).
+After the implementation phase the algorithm is to be tested for the following applications:
+- objects of daily use detection using CAD models objects,
+- tracking of objects of daily use,
+- robust camera to laser calibration using 2D to 3D curve correspondences.

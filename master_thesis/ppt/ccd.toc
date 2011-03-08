@@ -1,0 +1,6 @@
+\beamer@endinputifotherversion {3.10pt}
+\select@language {english}
+\beamer@sectionintoc {1}{Overview}{3}{0}{1}
+\beamer@sectionintoc {2}{Description}{4}{0}{2}
+\beamer@sectionintoc {3}{Steps of CCD algorithms}{6}{0}{3}
+\beamer@sectionintoc {4}{Advantages and application}{7}{0}{4}

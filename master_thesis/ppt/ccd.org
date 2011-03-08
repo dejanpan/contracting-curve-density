@@ -1,0 +1,81 @@
+#+LaTeX_CLASS: beamer
+#+TITLE: Contracting Curve Density Algorithm
+#+OPTIONS: toc:2
+#+AUTHOR: Dejan Pangercic
+#+LaTeX_CLASS_OPTIONS: [english,10pt,presentation]
+#+BEAMER_FRAME_LEVEL: 2
+#+BEAMER_HEADER_EXTRA: \usetheme{amsterdam}\usecolortheme{rose}
+#+COLUMNS: %35ITEM %10BEAMER_env(Env) %10BEAMER_envargs(Args) %4BEAMER_col(Col) %8BEAMER_extra(Ex)
+
+* Overview
+**  Contracting Curve Density (CCD) Algorithm
+*** a model-based image segmentation method
+*** fits a parametric curve model (prior knowledge) to an image
+
+#+CAPTION: A curve fitting problem
+    #+LABEL:   fig:1
+    #+ATTR_LaTeX: width=8cm,angle=0
+[[/scratch/personal/doc/master_thesis/ppt/images/cup.png]]
+
+* Description
+** Bayesian theorem
+    given the prior distribution of model parameters $p(\phi)$, and
+    likelihood of the model parameters given the image data
+    $p(I^*|\phi)$ (here $I^{*}$ is the image data), the goal is
+    maximum a posteriori estimation (MAP)
+\begin{displaymath}
+\mathcal{X}^2(\phi) = \mathrm{argmin}_{\phi} p(\phi|I^*)
+\end{displaymath}
+
+where 
+\begin{displaymath}
+p(\phi|I^*) = \frac{p(I^*|\phi) p(\phi)}{p(I^{*})}
+\end{displaymath}
+
+** Fuzzy assignment
+use a probabilistic way to compute the weight $\omega$ of pixels assigned to
+respective side (A and B)
+#+CAPTION: Fuzzy assignment
+#+LABEL:   fig:2
+#+ATTR_LaTeX: width=8cm,angle=0
+[[/scratch/personal/doc/master_thesis/ppt/images/fuzzy.png]]
+
+
+* Steps of CCD algorithms
+** Steps of CCD algorithms
+*** repeat these two steps until convergence                   :B_alertblock:
+    :PROPERTIES:
+    :BEAMER_env: alertblock
+    :END:
+**** Learn local statistics
+compute the pixel values and its statistics information ($I_v(\omega), m_{v}(\omega), \Sigma_v(\omega)$) from the vicinity of the expected curve based on
+the current mean vector $m_{\phi}$ and the current covariance matrix $\Sigma_{\phi}$
+**** Refine the estimate of the model parameter vector
+a) Update the mean vector $m_{\phi}$ using a maximum a posteriori (MAP) criterion derived
+from the local statistics
+b) Update the covariance matrix $\Sigma_{\phi}$ based on the Hessian of the objective function used
+in a) 
+
+
+
+* Advantages and application
+
+** Advantages and disadvantages
+*** advantages                                                      :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END: 
+**** robust to clutter, occlusions etc
+**** sub-pixel scale optimization
+**** fast
+
+*** disadvantages                                                   :B_alertblock:
+    :PROPERTIES:
+    :BEAMER_env: alertblock
+    :END:
+**** need to initialize the hypothesis manually  
+**** not work for objects with holes
+
+** Application
+*** Segmentation
+*** Tracking

@@ -1,0 +1,94 @@
+#+TITLE: Energy Function
+#+OPTIONS: toc:2
+#+AUTHOR: Shulei ZHU
+#+EMAIL: zhus@.in.tum.de
+#+LaTeX_CLASS: article
+
+* Energy function
+\begin{displaymath}
+\mathcal{X}^2(\phi) = \mathrm{argmin}_{\phi} \mathcal{X}^2(\phi)
+\end{displaymath}
+where 
+\begin{align*}
+\mathcal{X}^2(\phi) = & -2\ln \left\{ {\frac{1}{{(2\pi)}^{1/2}}}
+\frac{1}{|\Sigma_{\phi}^{*}|}
+\mathrm{exp}\{-\frac{1}{2}{(\phi-m_{\phi}^{*})^T{\Sigma_{\phi}^{*}}^{-1}(\phi-m_{\phi}^{*})}\}
+\right\}  \\ & - 2 \ln \left\{ \prod_{v \in \mathcal{V}}^{N} {\frac{1}{(2\pi)^{1/2}}
+\frac{1}{|\Sigma_v|} \mathrm{exp}\{-\frac{1}{2}
+{\left[I_{v}-m_v(a_{v,1})\right]^T\{\Sigma_{v}(a_{v,1})\}^{-1}\left[I_{v}-m_v(a_{v,1})\right]}
+}\} \right\}
+\end{align*}
+
+Where we assume $m_{\phi}^{*}$ as $\left[0 \quad 0 \quad 0 \quad 0 \quad
+0 \quad 0 \right]$ and $m_{\phi}^{*}$ as a $6 \times 6$ identity
+matrix, $m_v$ and $\Sigma_{v}$ represent the mean value and covariance
+of a given point on the curve.
+
+\begin{displaymath}
+m_v = a_{v,1} m_{v,1} + (1- a_{v,1}) m_{v,2}
+\end{displaymath}
+\begin{displaymath}
+\Sigma_{v} = a_{v,1} \Sigma_{v,1} + (1- a_{v,1}) \Sigma_{v,2}
+\end{displaymath}
+
+$m_{v,1}(m_{v,2})$, $\Sigma_{v,1}(\Sigma_{v,2})$ are the mean
+values and covariance metrics in the positive(negative) normal
+direction near the vicinity of a given point, but the formula to
+calculate these four variables is very complicated, so I will not show
+it. $a_{v,1}$ ,$a_{v,2}$ are the fuzzy weights of a
+given point locating in side 1 and 2, N means the number of points on
+the curve. $I_v$ denotes the pixel value of given point. $a_{v,1}$ and
+$a_{v,2}$ are given by
+
+\begin{displaymath}
+a_{v,1} = \Sigma_{i}^{m} \left\{ \frac{1}{2}\cdot
+erf(\frac{d_v(x)}{\sqrt{2}\cdot\sigma_v}) + \frac{1}{2}\right\}
+\end{displaymath}
+
+\begin{displaymath}
+a_{v,2} = 1- a_{v,1}
+\end{displaymath}
+
+
+here $m$ means the number of points in the positive normal ($+\vec{n}$)
+direction in the vicinity of a given point, there are also m points in
+the negative normal direction ($-\vec{n}$), $\sigma_{v}$ is given by
+\begin{displaymath}
+\sigma_v^2 = \mathbf{n}_v^T\cdot
+\mathbf{J}_v \cdot \mathbf{\Sigma}_{\phi}\cdot \mathbf{J}_v^T\cdot \mathbf{n}_v
+\end{displaymath}
+where $\mathbf{n}$ is the normal vector, $\mathbf{J}_v$ denots the Jacobian of curve, i.e. the partial derivatives
+of c with respect to model parameters $\phi$ in the given point,e.g we
+are given a point $(p_x,p_{y})$, and model parameters are given by
+$\left[ x_0, x_1, x_2, x_3, x_4, x_5 \right]$, we can write $\mathbf{J}_v$ as
+
+\[
+\mathbf{J}_v =
+\left[ {\begin{array}{cccccc}
+\frac{\partial p_x}{\partial x_0}& \frac{\partial p_x}{\partial x_1}& \frac{\partial p_x}{\partial x_2}& \frac{\partial p_x}{\partial x_3}&\frac{\partial p_x}{\partial x_4} &\frac{\partial p_x}{\partial x_5}  \\
+\frac{\partial p_y}{\partial x_0}& \frac{\partial p_y}{\partial x_1}& \frac{\partial p_y}{\partial x_2}& \frac{\partial p_y}{\partial x_3}&\frac{\partial p_y}{\partial x_4} &\frac{\partial p_y}{\partial x_5}  \\
+ \end{array} } \right]
+\]
+
+Furthermore, The energy function can be simplified as 
+\begin{align*}
+\mathcal{X}^2(\phi) = & \ln{(2\pi)} + 2\ln{|\Sigma_{\phi}^{*}|}
++ {\phi}^T{\Sigma_{\phi}^{*}}^{-1}\phi
+ \\ & + N\ln{2\pi} + 2N\Sigma_{v \in \mathcal{V}}^{N}{\ln{|\Sigma_v|}} + \Sigma_{v \in \mathcal{V}}^{N} 
+\left\{{\left[I_{v}-m_v(a_{v,1})\right]^T\{\Sigma_{v}(a_{v,1})\}^{-1}\left[I_{v}-m_v(a_{v,1})\right]}\right\}
+\end{align*}
+
+* Compute the first order derivative of energy function
+\begin{align*}
+\nabla_{\phi}\{{\mathcal{X}^2(\phi)}\} = & 0 + 0
++ \{{\Sigma_{\phi}^{*}}^{-1}\}^{T}{\phi} + {\Sigma_{\phi}^{*}}^{-1}\phi
+ \\ & + 0 + 0 + \Sigma_{v \in \mathcal{V}}^{N} \nabla_{\phi}\left\{
+{\left[I_{v}-m_v(a_{v,1})\right]^T\{\Sigma_{v}(a_{v,1})\}^{-1}\left[I_{v}-m_v(a_{v,1})\right]}\right\}
+\end{align*}
+
+*The question is how to calculate the last term in the above formula*.
+
+PS. You can find the expression of $a_{v,1}$ in the first part.
+
+
+

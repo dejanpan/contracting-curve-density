@@ -1,0 +1,64 @@
+% Created 2010-09-03 Fri 12:39
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{ezfontcfg}
+\usepackage[version=3]{mhchem}
+\usepackage[colorlinks=true,bookmarksnumbered=true,linkcolor=blue,pdfstartview=FitH]{hyperref}
+
+\usepackage{fixltx2e}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{soul}
+\usepackage{textcomp}
+\usepackage{marvosym}
+\usepackage{wasysym}
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{ifthen}
+\usepackage{hyperref}
+\usepackage{mypgf}
+\providecommand{\alert}[1]{\textbf{#1}}
+
+\title{CCD algorithms}
+\author{Shulei ZHU}
+\date{03 September 2010}
+
+\begin{document}
+
+\maketitle
+
+
+ Steps(for segmentation)
+
+\section{Initialization}
+\label{sec-1}
+
+   use b-spline to make the contour $\mathbb{C}$ of one object
+\section{Compute local, mixed color statistics:}
+\label{sec-2}
+
+
+Collect all color pixels along the contour $\mathbb{C}$, calculate mean value $M\_in$, $M\_out$ and  covariance $Covar\_in$,
+$Covar\_out$ (subscript \textbf{in} means inside the contour, \textbf{out} means
+outside the contour)
+\section{Calculate the cost function (likelihood function of local statistics)}
+\label{sec-3}
+
+\begin{itemize}
+\item Compute the color gradient
+\item Compute the color Jacobian matrix
+\end{itemize}
+\section{Apply the Levenberg–Marquardt algorithm to the cost function}
+\label{sec-4}
+
+   get $\delta p$, update the pose of contour $\mathbb{C} \rightarrow
+   p+\delta p$ 
+\section{if $\delta p$ is smaller than a given threshold, then stop otherwise, go to step 2.}
+\label{sec-5}
+
+\end{document}

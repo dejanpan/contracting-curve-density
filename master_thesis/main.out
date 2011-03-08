@@ -1,0 +1,24 @@
+\BOOKMARK [0][-]{section*.1}{Acknowledgements}{}% 1
+\BOOKMARK [0][-]{section*.2}{Abstract}{}% 2
+\BOOKMARK [0][-]{chapter.1}{Introduction}{}% 3
+\BOOKMARK [1][-]{section.1.1}{Model-based Image Segmentation}{chapter.1}% 4
+\BOOKMARK [1][-]{section.1.2}{Sketch of The Contracting Curve Density \(CCD\) Approach}{chapter.1}% 5
+\BOOKMARK [1][-]{section.1.3}{Overview of the Thesis}{chapter.1}% 6
+\BOOKMARK [0][-]{chapter.2}{Related work}{}% 7
+\BOOKMARK [0][-]{chapter.3}{Software and Hardware Infrastructure}{}% 8
+\BOOKMARK [1][-]{section.3.1}{The Robot Operation System \(ROS\)}{chapter.3}% 9
+\BOOKMARK [1][-]{section.3.2}{PR2}{chapter.3}% 10
+\BOOKMARK [0][-]{chapter.4}{Shape-space Models and B-Spline Curves}{}% 11
+\BOOKMARK [1][-]{section.4.1}{Shape-space models}{chapter.4}% 12
+\BOOKMARK [1][-]{section.4.2}{B-Spline Curves}{chapter.4}% 13
+\BOOKMARK [0][-]{chapter.5}{The CCD Algorithm}{}% 14
+\BOOKMARK [1][-]{section.5.1}{Initialization}{chapter.5}% 15
+\BOOKMARK [1][-]{section.5.2}{Local statistics}{chapter.5}% 16
+\BOOKMARK [1][-]{section.5.3}{Refine parameters}{chapter.5}% 17
+\BOOKMARK [1][-]{section.5.4}{Efficiency and complexity}{chapter.5}% 18
+\BOOKMARK [0][-]{chapter.6}{Applications in Robotics}{}% 19
+\BOOKMARK [1][-]{section.6.1}{Perception}{chapter.6}% 20
+\BOOKMARK [1][-]{section.6.2}{Tracking}{chapter.6}% 21
+\BOOKMARK [1][-]{section.6.3}{Refinement of 3D percepts \(Point Cloud\)}{chapter.6}% 22
+\BOOKMARK [0][-]{chapter.7}{Experiments and Results}{}% 23
+\BOOKMARK [0][-]{chapter.8}{Conclusion and Future Work}{}% 24

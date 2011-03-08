@@ -38,4 +38,6 @@ rosbuild_add_executable(test_ccd src/bspline.cpp src/ccd.cpp src/test.cpp)
 rosbuild_add_executable(opencv_to_ros_node src/openCV_to_ros.cpp)
 rosbuild_add_executable(ccd_node2 src/ccd.cpp src/bspline.cpp
 src/ccd_node2.cpp)
-#rosbuild_add_executable(ccd_node3 src/ccd.cpp src/bspline.cpp src/ccd_node3.cpp)
+#rosbuild_add_executable(ccd_node3 src/ccd.cpp src/bspline.cpp
+#src/ccd_node3.cpp)
+rosbuild_add_executable(sift src/sift.cpp)

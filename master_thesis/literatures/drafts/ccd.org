@@ -1,0 +1,27 @@
+#+TITLE: CCD algorithms
+#+OPTIONS: toc:nil
+#+AUTHOR: Shulei ZHU
+#+EMAIL: zhus@.in.tum.de
+#+LaTeX_CLASS: article
+
+ Steps(for segmentation)
+
+** Initialization
+   use b-spline to make the contour $\mathbb{C}$ of one object
+
+** Compute local, mixed color statistics:
+
+Collect all color pixels along the contour $\mathbb{C}$, calculate mean value $M\_in$, $M\_out$ and  covariance $Covar\_in$,
+$Covar\_out$ (subscript *in* means inside the contour, *out* means
+outside the contour)
+
+** Calculate the cost function (likelihood function of local statistics)
+  + Compute the color gradient
+  + Compute the color Jacobian matrix
+
+** Apply the Levenberg–Marquardt algorithm to the cost function
+   get $\delta p$, update the pose of contour $\mathbb{C} \rightarrow
+   p+\delta p$ 
+
+** if $\delta p$ is smaller than a given threshold, then stop otherwise, go to step 2.
+
