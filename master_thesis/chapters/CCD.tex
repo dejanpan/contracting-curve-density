@@ -1,11 +1,156 @@
 \chapter{The CCD Algorithm}
 \label{chapter:ccd}
-
-\section{Initialization}
+In this chapter, we describe the underlying principles of the
+Contracting Curve Density (CCD) algorithm, which is shown to
+over-perform in many challenging problems in the field of computer
+vison and robotics(paper list). Generally, as mentioned in section 1.3.3,
+the algorithm includes three steps: initialization, learning
+local statistics and model parameters refinement. We describe these
+steps in the following sections respectively. 
+\section{Pre-processing and model parametrization}
 \label{sec:init}
+The input of the CCD algorithm is image data (one or multiple images)
+and parametric curve model. Hence, initialization step comprises
+pre-processing of input data and model parametrization.
+\subsection{Pre-processing of input data}
+\label{sec:pid}
+
+Before we start to processing step, it is required to
+improve the quality of the images though the CCD
+algorithm is proved robust for noise and clutter information in
+images. Sometimes pre-processing make a problem easier to solve
+because it greatly reduces the variability , and is helpful to extract
+features. Furthermore, pre-processing might be performed in order to
+speed up computation. In our implementation, the idea case is that
+input data is noiseless, shadowless and have sharp edges or boundaries
+between objects. There are a group of operations corresponding to this
+aim.
+\begin{itemize}
+\item \textbf{Noise reduction}. Many linear and non-linear algorithms
+  can help to remove noises, such as mean filer, Gaussian blur,
+  Bilinear interpolation and so on.
+\item \textbf{Contrast improvement}. Usually, we can use a window to
+  adjust brightness and contrast by selecting a range of input values
+  which are mapped to the full output range of intensities.
+\item \textbf{Sharpening and detail enhancement}. Scale space is one
+  of methods to highlight and enhance fine details in a image.
+\end{itemize}
+
+OpenCV provides a series of implementation of these operations. Note
+that for different input data, according to the object properties,
+illumination and other physical conditions, different operations
+should be taken. 
+
+\subsection{Contour initialization}
+\label{sec:mp}
+
+After the pre-processing of input data, let's start to discuss the
+initialization of model contour. It is followed by the process of
+model parametrization.
+
+In our implementation, we model the
+contour as a continuous, differentiable and uniform quadratic or cubic
+B-Spline in $\mathbb{R}^2$, which is discussed in chapter 3. 
+Given a ROI (region of interest), the first step is generating
+sufficient control points $\mathbf{P} = {P_0, \ldots, P_{N_p-1}}$ to
+do justice to the complexity of the object shape (add a image here).
+
+Now there are two major methods to generate control points:
+manual initialization and intelligent initialization. The former is
+given as a simple form by hand. It is easy to use and
+control. However, there are some problems and limitations in case that
+the cost of manual operation is large, or vision deviation due to
+similar brightness between object and background. Therefore, a few new
+intelligent initialization methods are proposed to extract the
+contour.
+In this paper, a initial contour estimation method is described and
+implemented by employing the well-known SIFT algorithm (source) for
+keypoint detection and matching. Chapter 6.1(?) be discussed this in
+detail.
+
+\subsection{Model parametrization}
+\label{sec:mp}
+
+By applying the (uniform quadratic or cubic) B-spline interpolation to the control points, a new curve
+grouped by a sequence of equidistant distributed points is generated
+(add image). The B-spline curve is defined in (Formula 4.12) and is
+composed of a sequence of points $\mathbf{C} = \{C_0, \ldots,
+C_{N_{C-1}}\}$. Because the parametric curve is continuous and
+differentiable, we can compute the normal $\vec{\mathbf{n}} = \{\vec{n}_0, \ldots,
+\vec{n}_{N_{C-1}}\}$ and tangent vector $\vec{\mathbf{t}} = \{\vec{t}_0, \ldots, \vec{t}_{N_{C-1}}\}$
+conveniently. Note $N_c$ denotes the number of sample points in the
+parametric curve.
+
+In the planar affine shape-space $\mathcal{S}$. The curve, a
+hypothetical initial estimate, can be compactly represented using a
+vector with 6 real elements $\mathbf{\Phi}$, namely model
+parameters. From the perspective of probability, the hypothetical
+curve gives a uncertainty, the solution of the curving problem is
+therefore no longer just a single curve, but a whole family of
+possible curves. The Gaussian probability density for these possible
+curves in shape-space $\mathcal{S}$ is:
+
+\begin{equation}
+  \label{eq:5.1}
+   p(\mathbf{\Phi}) \propto
+\mathrm{exp} \left\{ -\frac{1}{2} (\mathbf{\Phi} -
+  \mathbf{\Sigma}_{\mathbf{\Phi}})^T \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} (\mathbf{\Phi} -
+  \mathbf{\Sigma}_{\mathbf{\Phi}}) \right\}
+\end{equation}
+
+As claimed in chapter 1, $\mathbf{\Sigma}_{\mathbf{\Phi}}$ is a $6 \times 6$ 
+covariance matrix, which measure the variability of
+how much two group of model parameters change together. The
+information matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}^-1$ can be
+written as 
+\begin{equation}
+  \label{eq:5.2}
+  \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} = \frac{N_{\mathbf{\Phi}}}{\rho_0^2} \mathbf{A}^T\mathcal{U}\mathbf{A}
+\end{equation}
+
+where $\rho_0^2$ denotes the mean-square displacement along the entire
+curve (AC). $\mathbf{A}$ is the shape-matrix, and $\mathcal{U}$ is
+metric matrix for curves. $N_{\mathbf{\Phi}}$ represents
+the number of model parameters, for our case, it is 6. Note $\rho_0^2$
+is a real value and can be computed easily as 
+\begin{equation}
+  \label{eq:5.3}
+  \rho_0^2 = \mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}})
+\end{equation}
+where $\mathrm{tr}(\cdot)$ denotes the trace of a matrix.
+
+The pre-processed input data and parametric curve model have been
+prepared. In the following sections, the iterative procedure of the
+CCD algorithm will be described in detail.
 
 \section{Local statistics}
 \label{sec:ls}
+
+As claimed in chapter 1.1, one of advantages of the curve-fitting
+problem is that the problem can be restricted to a ROI, and is
+expected to reduce the computational cost. Therefore, we first define
+the region which contains pixels in the vicinity of expected image
+curve. 
+Consider complexity and the expense of computing, it is practicable
+that choose those pixels actually required for interpolation along
+normals of the curve. This is proved useful and important for image
+perception and real-time tracking system. In the implementation of
+this thesis, processing is limited to a segment of each normal within
+a search region. A fixed distance $h$ along the normal segment are
+choose according hypothetical uncertainty of parametric curve. In the
+special case of the norm-squared prior in spline space, a reasonable
+search segment is 
+
+\begin{equation}
+  \label{eq:5.4}
+  h = \sqrt{2} \rho_0 = \sqrt{\mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}}\mathbf{A}^T\mathcal{U}\mathbf{A})}
+\end{equation}
+
+Then a set of points located on these segments can be collected and
+evaluated. For a contour that encloses a limited area, moreover, some attention has been
+paid to limit the search distance on the internal side, in order
+to avoid "crossing" the opposite boundary, thus sampling
+pixels from the wrong area(ICVS06).
 
 \section{Refine parameters}
 \label{sec:ref}

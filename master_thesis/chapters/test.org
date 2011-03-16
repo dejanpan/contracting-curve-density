@@ -1,0 +1,32 @@
+#+TITLE: title
+#+OPTIONS: toc:3
+#+AUTHOR: Shulei ZHU
+#+EMAIL: zhus@.in.tum.de
+#+LaTeX_CLASS: article
+#+LATEX_HEADER:\usepackage{}
+
+\begin{displaymath} 
+  p(\mathbf{\Phi} | \mathbf{m}_{\mathbf{\Phi}}, \mathbf{\mathbf{\Sigma}}_{\mathbf{\Phi}}) = \mathcal{N}(\mathbf{\Phi} |
+  \mathbf{m}_{\mathbf{\Phi}},\mathbf{\Sigma}_{\mathbf{\Phi}}) =
+  \frac{1}{(2\pi )^{D/2}} \frac{1}{\mathbf{\Sigma}_{\mathbf{\Phi}}^{1/2}}
+\mathrm{exp} \left\{ -\frac{1}{2} (\mathbf{\Phi} -
+  \mathbf{\Sigma}_{\mathbf{\Phi}})^T \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} (\mathbf{\Phi} -
+  \mathbf{\Sigma}_{\mathbf{\Phi}}) \right\}
+\end{displaymath}
+
+\begin{displaymath}
+p(\mathbf{\mathcal{L}} |\mathbf{\Phi}) = \prod_{n=1}^N \mathcal{N}(l_n | \mathbf{\Phi})
+\end{displaymath}
+
+\begin{displaymath}
+p(\mathbf{\Phi}|\mathbf{\mathcal{L}}) \propto p(\mathbf{\mathcal{L}} |\mathbf{\Phi})p(\mathbf{\Phi} | \mathbf{m}_{\mathbf{\Phi}}, \mathbf{\mathbf{\Sigma}}_{\mathbf{\Phi}})
+\end{displaymath}
+
+\begin{displaymath}
+\hat{\mathbf{\Phi}} = \underset{\mathbf{\Phi}}\operatorname{arg\,max} \ p(\mathbf{\Phi}|\mathbf{\mathcal{L}})
+\end{displaymath}
+
+\begin{displaymath}
+\end{displaymath}
+
+
