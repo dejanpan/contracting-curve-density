@@ -75,11 +75,11 @@ By applying the (uniform quadratic or cubic) B-spline interpolation to the contr
 grouped by a sequence of equidistant distributed points is generated
 (add image). The B-spline curve is defined in (Formula 4.12) and is
 composed of a sequence of points $\mathbf{C} = \{C_0, \ldots,
-C_{N_{C-1}}\}$. Because the parametric curve is continuous and
+C_{k}\}, k = N_{C-1}$. $N_c$ denotes the number of sample points in the
+parametric curve. Because the parametric curve is continuous and
 differentiable, we can compute the normal $\vec{\mathbf{n}} = \{\vec{n}_0, \ldots,
-\vec{n}_{N_{C-1}}\}$ and tangent vector $\vec{\mathbf{t}} = \{\vec{t}_0, \ldots, \vec{t}_{N_{C-1}}\}$
-conveniently. Note $N_c$ denotes the number of sample points in the
-parametric curve.
+\vec{n}_{k}\}$ and tangent vector $\vec{\mathbf{t}} = \{\vec{t}_0, \ldots, \vec{t}_{k}\}$
+conveniently. 
 
 In the planar affine shape-space $\mathcal{S}$. The curve, a
 hypothetical initial estimate, can be compactly represented using a
@@ -126,6 +126,10 @@ CCD algorithm will be described in detail.
 \section{Local statistics}
 \label{sec:ls}
 
+\subsection{Collecting local information}
+\label{sec:cls}
+
+
 As claimed in chapter 1.1, one of advantages of the curve-fitting
 problem is that the problem can be restricted to a ROI, and is
 expected to reduce the computational cost. Therefore, we first define
@@ -146,14 +150,350 @@ search segment is
   h = \sqrt{2} \rho_0 = \sqrt{\mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}}\mathbf{A}^T\mathcal{U}\mathbf{A})}
 \end{equation}
 
-Then a set of points located on these segments can be collected and
-evaluated. For a contour that encloses a limited area, moreover, some attention has been
-paid to limit the search distance on the internal side, in order
-to avoid "crossing" the opposite boundary, thus sampling
-pixels from the wrong area(ICVS06).
+Usually, $h$ denotes the size of \textit{window} used for computing
+local statistics. In the begining of interative procedure, the value
+is relatively big and only describe the vicinity of the image curve
+roughly due to the high uncertainty. The
+uncertainty is reduced after some iteration steps, as a result, the $h$ becomes smaller and
+smaller. After determining the length of search segment, 
+a set of points located on these segments can be collected and
+evaluated. Note the parametric model curve is not required to be
+closed, but whatever case it encloses a limited area. We only plan to
+analyze the pixels located in the vicinity of the contour. Therefore,
+we should pay attention to limit the search distance on the
+\textit{internal} side in order to avoid crossing the opposite
+boundary to sample pixels from the wrong area (ICVS06). In order to
+decrease the computational expenses, it is advisable to uniformly sample those
+pixels on both segments in the vicinity of the contour. In the other
+hand, we should avoid to only collect a small number of pixels, thus
+it makes no sense from the perspective of statistics. Let's denote the
+sample distance using $\delta h$, then the an overall number of spaced
+sample points $L$ ($2L$ for both sides in all) can be given by 
+\begin{equation}
+  \label{eq:5.5}
+  L = \lfloor \frac{h}{\delta h} \rfloor
+\end{equation}
+
+As mentioned before, the goal of the algorithm is assignment each pixel
+($\mathrm{v}_{k,l}, k \in [0,\ldots,N_{\mathrm{C}}-1], l \in [0,
+2L-1]$) to either side of the contour, which is determined by the
+curve distribution. We first compute the probabilistic
+assignments $\mathbf{a}_{v}$ for each pixel $\mathrm{v}_{k,l}$
+\begin{equation}
+  \label{eq:5.6}
+  \mathbf{a}_v  = (a_{v,1}, a_{v,2})^T
+\end{equation}
+where $a_{v,1}$ describes to which extent a pixel $v$ is expected to
+be influenced by side $1$ of the curve, and $a_{v,2}$ is equivalent
+for side 2 given by $a_{v,2} = 1- a_{v,1}$. For arbitrary curve
+$\mathbf{C}$, it is difficult to give a closed form of $a_v$. In the
+following, a efficient approximation of the assignment is derived.
+
+We use $d_{k,l}$ to denote the \textbf{signed} distance between pixel
+$\mathrm{v}_{k,l}$ and a given curve $\mathbf{C}$(a image). $d_{k,l}$
+can be approximated by
+\begin{equation}
+  \label{eq:5.7}
+  d_{k,l} = \vec{n_k} \cdot ( \mathbf{v}_{k,l} - C_k)
+\end{equation}
+
+where $\mathbf{v}_{k,l} = {x_{k,l} \choose y_{k,l}}$ is the axis components of pixel
+$\mathrm{v}_{k,l}$, and $C_k$ is the equivalent for point $C$ on the
+curve given by ${x_k \choose y_k}$. Now consider that the curve is
+distorted by a Gaussian distribution $p(\mathbf{\Phi})$, therefore, the
+displacement $d_{k,l}$ is also a Gaussian distribution, $p(d_{k,l}) \sim
+\mathcal{N}(d_{k,l}|m_d, \sigma)$, where $m_d$ and $\sigma$ are mean
+and covariance of the distribution. Covariance $sigma$ holds
+\begin{equation}
+  \label{eq:5.8}
+  \sigma = \vec{n_k} \cdot \mathbf{J}_k \cdot \mathbf{\Sigma}_{\Phi}
+  \cdot \mathbf{J}_k^T \cdot \vec{n_K}^T
+\end{equation}
+where $\mathbf{J}_k$ is the Jacobian of curve $\mathbf{C}$. $sigma$
+can be take as the uncertainty of the curve along the normal
+introduced by the covariance $\mathbf{\Sigma}_{\mathbf{\Phi}}$.
+Therefore, the probability that a point lies on side 1 of the
+curve can be evaluated by
+\begin{equation}
+  \label{eq:5.9}
+  a_{v,1} = \frac{1}{2}erf(\frac{d_{k,l}}{\sqrt{2}\sigma} + 1)
+\end{equation}
+Where $erf(\cdot)$ is the error function of a distribution. This
+approximation process is called \textbf{fuzzy} (or \textbf{smooth})
+assignment. The accuracy of this assignment will increase as the
+uncertainty of curve governed by covariance
+$\mathbf{\Sigma}_{\mathrm{\Phi}}$ decreases.
+
+With this assignment and following the suggested rule in (hanek's
+paper), we now start to assign two suitable weighting functions
+$\omega_1$, $\omega_2$ to the pixels $\mathrm{v}_{k,l}$ along the
+normal for the two sides of the curve. the weighting functions are
+defined as
+
+\begin{equation}
+  \label{eq:5.10}
+  \omega_{1/2}(d_{k,l}) = C\left(\frac{a_{1/2}(d_{k,l}) -
+    \gamma_1}{1-\gamma_2}\right)^4 \left[e^{-d_{k,l}/(2\hat{\sigma}^2)} - e^{-\gamma_2}\right]^+
+\end{equation}
+
+where $\gamma_1$ holds $0.5$ (disjoint weight assignment) and $\gamma_2$
+holds $4$ for the truncated Gaussian in (5). In addition, the standard
+deviation is chosen in order to cover the specified distance $h$,
+which yields 
+\begin{equation}
+  \label{eq:5.11}
+  \hat{\sigma} = \max \left[\frac{h}{\sqrt(2\gamma_2)}, \gamma_4
+  \right], \sigma  = \frac{1}{\gamma_3} \hat{\sigma}
+\end{equation}
+
+with the two additional constants $\gamma_3 = 6$ (linear dependence
+between $\sigma$ and $\hat{\sigma}$) and $\sigma_4 = 4$ (minimum
+weighting window width) introduced in (ICVS06). 
+
+In the implementation of this thesis,
+$2 \cdot L \cdot N_C$ distance ($d_{k,l}$), fuzzy assignment
+($a_{v,1}(d_{k,l}))$ and weight function ($\omega_1(d_{k,l})$,
+$\omega_1(d_{k,l})$) are evaluated offline and saved in a big
+array. Now we have restrict our analysis the region of interest in the
+limited area, then collect all statistic information required to learn
+local statistics. In the next part, we will evaluated the local
+statistics.
+
+\subsection{Learning local statistics}
+\label{sec:lls}
+
+For simplicity, in current implementation, we only consider raw RGB
+statistics. With the pixel coordinates, assignment and weight
+function, local mean vectors $\mathbf{m}_{v,s}$  and local covariance matrices
+$\mathbf{\Sigma}_{\mathbf{\Phi}}$ will be derived for each side $s \in
+{1,2}$ of the curve.
+We first calculate the zero, first and second order weighted moments
+$M_{k,s}^0(d_{k,l,s})$, $\mathbf{M}_{k,s}^1(d_{k,l,s})$ and $\mathbf{M}_{k,s}^2(d_{k,l,s})$
+\begin{eqnarray}
+  \label{eq:5.13}
+  M_{k,s}^{(0)}(d_{k,l,s}) &=& \sum_{l=0}^{2L-1} \omega_s(d_{k,l})\\
+  \mathbf{M}_{k,s}^{(1)}(d_{k,l,s}) &=& \sum_{l=0}^{2L-1} \omega_s(d_{k,l}) \mathrm{I}_{k,l}\\
+  \mathbf{M}_{k,s}^{(2)}(d_{k,l,s}) &=& \sum_{l=0}^{2L-1} \omega_s(d_{k,l}) \mathrm{I}_{k,l}\mathrm{I}_{k,l}^T
+\end{eqnarray}
+
+Where $\mathbf{I}$ is just the pixel raw RGB value, its elements'
+value are between 0 and 255. Then local mean vectors $\mathbf{m}_{v,s}$  and local covariance matrices
+$\mathbf{\Sigma}_{\mathbf{\Phi}}$  are obtained by 
+\begin{eqnarray}
+  \label{eq:5.14}
+  \mathbf{m}_{k,s} &=& \frac{\mathbf{M}^{(1)}_{k,s}}{M^{(0)}_{k,s}}\\
+  \mathbf{\Sigma}_{k,s} &=& \frac{\mathbf{M}^{(2)}_{k,s}}{M^{(0)}_{k,s}}
+  - \mathbf{m}_{k,s}\mathbf{m}_{k,s}^T  + \kappa \mathbf{I}
+\end{eqnarray}
+In function (????) $\kappa I$  means an identity matrix scaled by
+$\kappa$ in order to avoid numerical singularity because later it is
+required to calculate the inverse matrix of
+$\mathbf{\Sigma}_{k,s}$. In our experiments, we choose $\kappa$ to be
+quite small, $\kappa = 0.5$. It is shown that this is efficient to
+avoid numerical problems in the process of iteration.
+
+With the local mean vectors $\mathbf{m}_{v,s}$  and local covariance matrices
+$\mathbf{\Sigma}_{\mathbf{\Phi}}$, we can compute the
+likelihood function   $p(\mathbf{I}_{k,l} | \mathbf{m}_{v,1}, \mathbf{m}_{v,2},
+  \mathbf{\Sigma}_{v,1}, \mathbf{\Sigma}_{v,1})$ for each pixel
+  $\mathrm{v}_{k,l}$. In terms of observation model, the likelihood
+  function describes how probable the observed data set is for
+  different settings of the parameter vector. Hence, we first establish
+  the relation between image data $\mathrm{I_{k,l}}$ and the model
+  parameter $\mathbf{\Phi}$. Here we model the pixel value
+  $\hat{\mathbf{m}}_{k,l}$ and $\hat{mathbf{\Sigma}}_{k,l}$
+  for all pixels $\mathrm{v_{k,l}}$ in the vicinity of curve as the
+  linear combination of $\mathbf{m}_{v,1}$ and $\mathbf{m}_{v,2}$
+
+  \begin{equation}
+    \label{eq:5.17}
+    \hat{\mathbf{m}}_{k,l} = a_{v,1}(d_{k,l})\mathbf{m}_{v,1} + a_{v,2}(d_{k,l})\mathbf{m}_{v,2}
+  \end{equation}
+
+If we define  $\hat{mathbf{\Sigma}}_{k,l}$ using the rule as
+$\hat{mathbf{m}}_{k,l}$ resulting in a function about $d_{k,l}$, the computational cost in the procedure of
+parameters refinement which is discussed in next section  will be dramatically high. Instead, we decide to
+model the covariance matrix $\hat{mathbf{\Sigma}}_{k,l}$ following the
+rule in (????????), but we do not consider it as the function about $d_{k,l}$
+\begin{equation}
+  \label{eq:5.18}
+  \hat{\mathbf{\mathbf{\Sigma}}}_{k,l} = a_{v,1}(d_{k,l})\mathbf{\Sigma}_{v,1} + a_{v,2}(d_{k,l})\mathbf{\Sigma}_{v,2}
+\end{equation}
+
+Now for each observed pixel $\mathbf{I}_{k,l}$, the likelihood
+function is given by
+\begin{equation}
+  \label{eq:5.19}
+p(\mathbf{I}_{k,l} | \mathbf{m}_{v,1}, \mathbf{m}_{v,2},
+  \mathbf{\Sigma}_{v,1}, \mathbf{\Sigma}_{v,1}) = p(\mathbf{I}_{k,l} | \hat{\mathbf{\mathbf{m}}}_{k,l},\hat{\mathbf{\mathbf{\Sigma}}}_{k,l}) 
+\end{equation}
+However, we hope to the likelihood for all pixels in the vicinity of
+the curve. If we consider the coupling or other complex relation among
+different group of pixels, the problem will become dramatically
+complicated and the cost of computing will be very expensive. We can
+avoid these problem if we assume pixels are drawn independently from the same distribution
+(this is not true), namely independent and identically distributed
+(i.i.d)(bishop). Thus we can model the likelihood function as
+\begin{equation}
+  \label{eq:5.20}
+  p(\mathbf{I}_{\mathcal{V}} |
+  \hat{\mathbf{\mathbf{m}}}_{\mathcal{V}},\hat{\mathbf{\mathbf{\Sigma}}}_{\mathcal{V}})
+  = \prod_l \prod_k p(\mathbf{I}_{k,l} | \hat{\mathbf{\mathbf{m}}}_{k,l},\hat{\mathbf{\mathbf{\Sigma}}}_{k,l}) 
+\end{equation}
+
+The index $\mathcal{V}$ indicates quantities for all pixels $v$ in
+$\mathcal{V}$. Note we only take into account those pixels which are
+in the vicinity $\mathcal{V}$ of the curve. Pixels outside
+$\mathcal{V}$ are not considered.
+
+We have derived the likelihood function of observed pixels. Together
+with the input data and prior knowledge, now we can go into parameters
+refinement stage by applying Bayesian's theorem.
 
 \section{Refine parameters}
 \label{sec:ref}
+
+With the likelihood function in (5.20) and prior distribution in
+(5.1), we can estimate the $\hat{\Phi}$ using MAP which is based the
+Bayesian treatment.
+Firstly, the posterior distribution holds
+\begin{align}
+    p(\mathbf{\Phi}|\mathbf{\mathbf{I}}_{\mathcal{V}}) 
+    \propto &
+    p(\mathbf{\mathbf{I}_{\mathcal{V}}}
+    |\hat{\mathbf{\mathbf{m}}}_{\mathcal{V}}(\mathrm{\Phi}),\hat{\mathbf{\mathbf{\Sigma}}}_{\mathcal{V}}(\mathrm{\Phi}))p(\mathbf{\Phi}
+    | \mathbf{m}_{\mathbf{\Phi}},
+    \mathbf{\mathbf{\Sigma}}_{\mathbf{\Phi}})\nonumber\\
+    = & {\frac{1}{{(2\pi)}^{1/2}}}
+      \frac{1}{|\mathbf{\Sigma}_{\mathbf{\Phi}}|}
+      \mathrm{exp}\{-\frac{1}{2}{(\phi-m_{\mathbf{\Phi}})^T{\mathbf{\Sigma}_{\mathbf{\Phi}}}^{-1}(\phi-\mathbf{m}_{\mathbf{\Phi}})}\}\cdot
+    \nonumber\\ 
+    & \prod_{k = 0}^{N_{c}-1} \prod_{l=0}^{2L-1}{\frac{1}{(2\pi)^{1/2}}
+        \frac{1}{|\hat{\mathbf{\Sigma}}_{k,l}|} \mathrm{exp}\{-\frac{1}{2}
+        {\left[I_{k,l}-\hat{\mathbf{m}}_{k,l}(a_{v,1})\right]^T\hat{\mathbf{\Sigma}}_{k,l}^{-1}\left[I_{k,l}-\hat{\mathbf{m}}_{k,l}(a_{v,1})\right]}
+      }\}
+\end{align}
+
+Let's using a function $\mathcal{Q}$ to denote the logarithm function
+of right part in (5.21)
+\begin{align}
+  \label{eq:5.22}
+  \mathcal{Q} = & -2 \ln \left\{  p(\mathbf{\mathbf{I}_{\mathcal{V}}}
+    |\hat{\mathbf{\mathbf{m}}}_{\mathcal{V}}(\mathrm{\Phi}),\hat{\mathbf{\mathbf{\Sigma}}}_{\mathcal{V}}(\mathrm{\Phi}))p(\mathbf{\Phi}
+    | \mathbf{m}_{\mathbf{\Phi}},
+    \mathbf{\mathbf{\Sigma}}_{\mathbf{\Phi}})\right\}\nonumber\\
+ = & \ln{(2\pi)} + 2\ln{|\mathbf{\Sigma}_{\mathbf{\Phi}}|} +
+ {\mathbf{\Phi}}^T{\mathbf{\Sigma}_{\mathbf{\Phi}}}^{-1}\mathbf{\Phi}
+ + 2LN_{C} \cdot \ln{2\pi} + \nonumber \\
+& 2\sum_{k = 0}^{N_{c}-1} \sum_{l=0}^{2L-1}{\ln{|\mathbf{\Sigma}_{k,l}|}} + \sum_{k = 0}^{N_{c}-1} \sum_{l=0}^{2L-1}
+\left\{{\left[I_{k,l}-\hat{\mathbf{m}}_{k,l}(a_{v,1})\right]^T\hat{\mathbf{\Sigma}}_{k,l}^{-1}\left[I_{k,l}-\hat{\mathbf{m}}_{k,l}(a_{v,1})\right]}\right\}
+\end{align}
+
+We interpret the estimate $\hat{\mathbf{\Phi}}$ of the model
+parameters $\mathbf{\Phi}$ as  the mean $\mathbf{m}_{\mathbf{\Phi}}$ of a Gaussian
+approximation of the posterior distribution, and $\hat{\mathbf{\Phi}}$ can be evaluated as 
+\begin{equation}
+  \label{eq:5.23}
+  \hat{\mathbf{\Phi}} = \mathbf{m}_{\mathbf{\Phi}}\underset{\mathbf{\Phi}}{\arg\max} \ \mathcal{Q}
+\end{equation}
+
+For the estimate $\mathbf{m}_{\mathbf{\Phi}}$ optimizing
+$\mathcal{Q}$, the Gauss-Newton approximation to
+the Hessian matrix can be adopted, first the partial derivatives of
+$\mathcal{Q}$ is computed as 
+
+\begin{equation}
+\label{eq:5.24}
+\nabla_{\mathbf{\Phi}}\{{\mathcal{Q}(\mathbf{\Phi})}\} =  2\{{\mathbf{\Sigma}_{\mathbf{\Phi}}}^{-1}\}^{T}{\mathbf{\Phi}} - \sum_{k = 0}^{N_{c}-1} \sum_{l=0}^{2L-1}
+\left\{\mathcal{J}_{a_{v,1}}^T\hat{\mathbf{\Sigma}}_{k,l}^{-1}\left[I_{k,l}-\hat{\mathbf{m}}_{k,l}(a_{v,1})\right]\right\}
+\end{equation}
+
+with 
+\begin{equation}
+  \label{eq:5.25}
+  \mathcal{J}_{a_{v,1}} = \left( \mathbf{m}_{k,1} -\mathbf{m}_{k,2} \right)(\nabla_{\phi} a_{v,1}(d_{k,l}))^T
+\end{equation}
+
+because $d_{k,l}$ is a function with respect to $\mathbf{\Phi}$, there
+$a_{v,1}(d_{k,l})$ holds
+\begin{equation}
+  \label{eq:5.26}
+\nabla_{\mathbf{\Phi}} a_{v,1}(d_{k,l}) = \frac{\partial a_{v,1}(d_{k,l})}{\partial d_{k,l}}
+\left( \frac{\partial d_{k,l}}{\partial x_{k,l}}\mathbf{J}_{\mathbf{\Phi}}(\mathrm{v}_{k,l}(x)) + \frac{\partial d_{k,l}}{\partial y_{k,l}}\mathbf{J}_{\mathbf{\Phi}}(\mathrm{v}_{k,l}(y))
+ \right)  
+\end{equation}
+Where $\mathrm{v}_{k,l}(x)$ and $\mathrm{v}_{k,l}(y)$ are the axis
+components of pixel $\mathrm{v}_{k,l}$ , and $d_{k,l}$ is given by
+\begin{equation}
+  \label{eq:5.27}
+  d_{k,l} = (x_{k,l} - x_{k})n_{k}(x) +(y_{k,l} - y_{k}) n_{k}(y)
+\end{equation}
+with $n_{k}(x)$ and $n_{k}(y)$ are the components of normal vector of
+curve point $C_{k}$. Moreover, we have
+\begin{equation}
+  \label{eq:5.28}
+  \nabla_{\mathbf{\Phi}} a_{v,1}(d_{k,l}) = \frac{1}{\sqrt{2\pi}\sigma} \mathrm{exp}\left\{ -\frac{d_{k,l}^2}{2\sigma^2} \right\}
+\left( n_k(x)\mathbf{J}_{\mathbf{\Phi}}(\mathrm{v}_{k,l}(x)) + n_k(y)\mathbf{J}_{\mathbf{\Phi}}(\mathrm{v}_{k,l}(y))
+ \right) 
+\end{equation}
+In terms of the properties of  B-spline curve  and planar affine
+model-space. The pixel coordinate of $\mathrm{v}_{kl}$ can be written
+as
+\begin{eqnarray}
+  \label{eq:5.29}
+\mathrm{v}_{k,l}(x) &= & \mathbf{U}_k^{T}\mathbf{A}_x \mathbf{\Phi} + \mathbf{U}_k P_0(y) + \Delta_h n_k(x) \\
+          &=&\Phi_0\sum_{i}^nU_{k,i} +
+          (1+\Phi_2)\sum_{i}^nU_{k,i}*x_{k,i} + \Phi_{5}\sum_{i}^n
+          U_{k,i}y_{k,i} + \Delta_h n_k(x)\\
+\mathrm{v}_{k,l}(y) &=& \mathbf{U}_k^{T}\mathbf{A}_x \mathbf{\Phi} +
+\mathbf{U}_k P_0(y) + \Delta_h n_k(y) \\
+          &=&\Phi_0\sum_{i}^nU_{k,i} +
+          (1+\Phi_2)\sum_{i}^nU_{k,i}*x_{k,i} + \Phi_{5}\sum_{i}^n
+          U_{k,i}y_{k,i} + \Delta_h n_k(x)
+\end{eqnarray}
+
+Now we can compute $\mathbf{J}_{\mathbf{\Phi}}$ by the following
+formula
+
+\begin{equation}
+  \label{eq:5.30}
+\mathbf{J}_{\mathbf{\Phi}}(\mathrm{v}_{k,l}) =
+\left[ {\begin{array}{cccccc}
+\frac{\partial \mathrm{v}_{k,l}(x)}{\partial \Phi_0}& \frac{\partial \mathrm{v}_{k,l}(x)}{\partial \Phi_1}& \frac{\partial \mathrm{v}_{k,l}(x)}{\partial \Phi_2}& \frac{\partial \mathrm{v}_{k,l}(x)}{\partial \Phi_3}&\frac{\partial \mathrm{v}_{k,l}(x)}{\partial \Phi_4} &\frac{\partial \mathrm{v}_{k,l}(x)}{\partial \Phi_5}  \\
+\frac{\partial \mathrm{v}_{k,l}(y)}{\partial \Phi_0}& \frac{\partial \mathrm{v}_{k,l}(y)}{\partial \Phi_1}& \frac{\partial \mathrm{v}_{k,l}(y)}{\partial \Phi_2}& \frac{\partial \mathrm{v}_{k,l}(y)}{\partial \Phi_3}&\frac{\partial \mathrm{v}_{k,l}(y)}{\partial \Phi_4} &\frac{\partial \mathrm{v}_{k,l}(y)}{\partial \Phi_5}  \\
+ \end{array} } \right]
+\end{equation}
+
+Afterwords, the Gauss-Newton approximation to the Hessian
+matrix is given by
+
+\begin{equation}
+  \label{eq:5.31}
+  \mathcal{H}_{\mathbf{\Phi}} \mathcal{Q}  =
+  \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} + \sum_{k = 0}^{N_{c}-1}
+  \sum_{l=0}^{2L-1} \left\{\mathcal{J}_{a_{v,1}}^T\hat{\mathbf{\Sigma}}_{k,l}^{-1}\mathcal{J}_{a_{v,1}}\right\}
+\end{equation}
+
+
+The overall gradient and Hessian matrices for the optimization
+are obtained by adding the prior cost function
+derivatives, and the Newton optimization step can finally be
+performed as
+
+\begin{eqnarray}
+  \mathbf{m}_{\mathbf{\Phi}}^{new} & = &
+  \mathbf{m}_{\mathbf{\Phi}} - (\mathcal{H}_{\mathbf{\Phi}}
+  \mathcal{Q})^{-1} \nabla_{\mathbf{\Phi}} \mathcal{Q} \nonumber \\
+  \mathbf{\Sigma}_{\mathbf{\Phi}}^{new} & = &
+  c\mathbf{\Sigma}_{\mathbf{\Phi}} - (1-c)(\mathcal{H}_{\mathbf{\Phi}}
+  \mathcal{Q})^{-1}
+\end{eqnarray}
+with $c = \frac{1}{4}$ in our implementation, note the covariance
+matrix is updated as well by an exponential decay rule.
+
+\subsection{Validation gate}
+\label{sec:vg}
+
 
 \section{Efficiency and complexity}
 \label{sec:eff}
