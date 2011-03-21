@@ -33,12 +33,12 @@ double BSpline::basic(int i,
       temp = 0.5*(1- t_floor)*(1-t_floor);
       *bp = t_floor - 1;
     }
-    else if (t - i >= 1 && t-i<= 2)
+    else if (t - i >= 1 && t-i< 2)
     {
       temp = -t_floor*t_floor + t_floor + 0.5;
       *bp = 1 - 2*t_floor;
     }
-    else if (t-i >= 0 && t-i <= 1)
+    else if (t-i >= 0 && t-i < 1)
     {
       temp = 0.5*t_floor*t_floor;
       *bp = t_floor;
@@ -67,7 +67,7 @@ double BSpline::basic(int i,
       temp = (-3*t_floor*t_floor*t_floor + 3*t_floor*t_floor + 3*t_floor +1)/6;
       *bp = -1.5*t_floor*t_floor + t_floor + 0.5;
     }
-    else if(t-i > 0 && t-i <= 1)
+    else if(t-i >= 0 && t-i < 1)
     {
       temp = t_floor*t_floor*t_floor/6;
       *bp = 0.5*t_floor*t_floor;

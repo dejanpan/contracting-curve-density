@@ -581,16 +581,12 @@ void CCD::run_ccd()
 
     BSpline bs(params_.degree , params_.resolution, pts);
 
-    std::cout << "BSPLINE POINTS:" << std::endl;
+    // std::cout << "BSPLINE POINTS:" << std::endl;
     for (int i = 0; i < params_.resolution; ++i)
     {
-      std::cout << bs[i].x << " " << bs[i].y << std::endl;
+      // std::cout << bs[i].x << " " << bs[i].y << std::endl;
       cv::circle(canvas, bs[i], 2 ,CV_RGB(0,255,0), 2); 
     }
-      
-
-
-
 
     // converge condition
     // tol = \int (r - r_f)*n
@@ -635,9 +631,9 @@ void CCD::run_ccd()
     }
     norm = cv::sqrt(norm);
     std::cerr << "iter: " << iter << "   tol: " << tol  << " norm: " << cv::norm(delta_Phi, NORM_L2)  << " norm_tmp:" << norm<< std::endl;
-    cv::imshow("Original", canvas);
+    // cv::imshow("Original", canvas);
     
-    cv::waitKey(100);
+    // cv::waitKey(100);
 
 
     // if((tol - 0.0 < 0.001) && (norm < 0.01))
@@ -660,7 +656,7 @@ void CCD::run_ccd()
     if(iter >= 20)
     {
       convergence = true;
-      // init_cov(bs, params_.degree);
+      init_cov(bs, params_.degree);
     }
     iter += 1;
     // bs.release();

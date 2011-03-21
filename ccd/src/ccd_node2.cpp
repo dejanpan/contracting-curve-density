@@ -41,6 +41,7 @@ public:
       params[6] = 40;
       params[7] = 1;
       params[8] = 50;
+      params[9] = 4;
       ccd.set_params(params);
       count_ = 0;
     }
@@ -128,33 +129,32 @@ public:
         // for closed curves, we have to append 3 more points
         // to the end, these 3 new points are the three one
         // located in the head of the array
-        int t = 4;
-        if(ccd.pts.size() > t)
-          for (int i = 0; i < t; ++i)
+        if(ccd.pts.size() > params[9])
+          for (int i = 0; i < params[9]; ++i)
             ccd.pts.push_back(ccd.pts[i]);
         
-        for (int i = 0; i < ccd.pts.size(); i++)
-          std::cerr << "pts initialized: " << ccd.pts[i].x << " " << ccd.pts[i].y << std::endl;
+        // for (int i = 0; i < ccd.pts.size(); i++)
+        //   std::cerr << "pts initialized: " << ccd.pts[i].x << " " << ccd.pts[i].y << std::endl;
         
-        BSpline bs(t , ccd.get_resolution(), ccd.pts);
+        BSpline bs(params[9], ccd.get_resolution(), ccd.pts);
 
     
 
-        for (int i = 0; i < ccd.get_resolution(); ++i)
-          std::cerr << "pts bspline: " << bs[i].x << " " << bs[i].y << std::endl;
+        // for (int i = 0; i < ccd.get_resolution(); ++i)
+        //   std::cerr << "pts bspline: " << bs[i].x << " " << bs[i].y << std::endl;
 
-        ccd.init_cov(bs, t);
+        ccd.init_cov(bs, params[9]);
         // bs.release();
         // bs.~BSpline();
       }
       //ccd.init_pts(pts1);
       ccd.run_ccd();
-      //cv::imshow("Original", ccd.canvas);
-      //cv::waitKey(2);
+      // cv::imshow("Original", ccd.canvas);
+      // cv::waitKey(1);
       std::stringstream name;
       name << count_;
       cv::imwrite(name.str() + ".png", ccd.canvas);
-      //sleep(1);
+      // sleep(1);
     }
 //protected:
 };
