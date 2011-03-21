@@ -67,11 +67,15 @@ void CCD::init_cov(BSpline &bs, int degree)
     }
   }
 
-  Sigma_Phi = 6/(10*10)*W.t()*U*W;
+  cv::Mat tmp_cov;
+  cv::gemm(W, U, 6/100,  cv::Mat(), 0, tmp_cov, cv::GEMM_1_T);
+  cv::gemm(tmp_cov, W, 1,  cv::Mat(), 0, Sigma_Phi, 0);
+  //Sigma_Phi = 6/(10*10)*W.t()*U*W;
   // cov = Nx/rou_0^2 * H
   // cov = 6/25*cov;
-  W.release();
-  U.release();
+  // W.release();
+  // U.release();
+  // tmp_mat.release();
 }
 
 
@@ -137,14 +141,15 @@ void CCD::local_statistics(BSpline &bs)
     // 2 - normal vector x
     // 3 - normal vector y
     bs_old = Mat::zeros(params_.resolution, 4, CV_64F);
+    double *bs_old_ptr = bs_old.ptr<double>(i);
 
     // save the old value of bspline
-    bs_old.at<double>(i,0) = bs[i].x;
-    bs_old.at<double>(i,1) = bs[i].y;
+    bs_old_ptr[0] = bs[i].x;
+    bs_old_ptr[1] = bs[i].y;
 
     // save the old normal vector of bspline
-    bs_old.at<double>(i,2) = nv_ptr[0];
-    bs_old.at<double>(i,3) = nv_ptr[1];
+    bs_old_ptr[2] = nv_ptr[0];
+    bs_old_ptr[3] = nv_ptr[1];
     
 
     // std::cout << nv_ptr[0] << " " << nv_ptr[1] << std::endl;
@@ -296,6 +301,8 @@ void CCD::local_statistics(BSpline &bs)
     double wp1 = 0.0, wp2 = 0.0;
 
     double *vic_ptr = vic.ptr<double>(i);
+    double *mean_vic_ptr = mean_vic.ptr<double>(i);
+    double *cov_vic_ptr = cov_vic.ptr<double>(i);
     for (int j = params_.delta_h; j <= params_.h; j += params_.delta_h, k++)
     {
       wp1 = 0.0, wp2 = 0.0;
@@ -364,23 +371,23 @@ void CCD::local_statistics(BSpline &bs)
 
     // std::cout << "w1: " << "              w2:" << std::endl;
     // std::cout << "w1 == " << w1 << "  w2== " << w2 << std::endl;
-    mean_vic.at<double>(i, 0) = m1[0]/w1;
-    mean_vic.at<double>(i, 1) = m1[1]/w1;
-    mean_vic.at<double>(i, 2) = m1[2]/w1;
-    mean_vic.at<double>(i, 3) = m2[0]/w2;
-    mean_vic.at<double>(i, 4) = m2[1]/w2;
-    mean_vic.at<double>(i, 5) = m2[2]/w2;
+    mean_vic_ptr[ 0] = m1[0]/w1;
+    mean_vic_ptr[ 1] = m1[1]/w1;
+    mean_vic_ptr[ 2] = m1[2]/w1;
+    mean_vic_ptr[ 3] = m2[0]/w2;
+    mean_vic_ptr[ 4] = m2[1]/w2;
+    mean_vic_ptr[ 5] = m2[2]/w2;
     
     for (int m = 0; m < 3; ++m)
     {
       for (int n = 0 ; n < 3; ++n)
       {
-        cov_vic.at<double>(i, m*3+n) = m1_o2[m*3+n]/w1 -m1[m]*m1[n]/(w1*w1);
-        cov_vic.at<double>(i, 9+m*3+n) = m2_o2[m*3+n]/w2 -m2[m]*m2[n]/(w2*w2);
+        cov_vic_ptr[ m*3+n] = m1_o2[m*3+n]/w1 -m1[m]*m1[n]/(w1*w1);
+        cov_vic_ptr[ 9+m*3+n] = m2_o2[m*3+n]/w2 -m2[m]*m2[n]/(w2*w2);
         if(m == n)
         {
-          cov_vic.at<double>(i, m*3+n) += params_.kappa;
-          cov_vic.at<double>(i, 9+m*3+n) += params_.kappa;
+          cov_vic_ptr[ m*3+n] += params_.kappa;
+          cov_vic_ptr[ 9+m*3+n] += params_.kappa;
         }
       }
     }
@@ -405,6 +412,8 @@ void CCD::refine_parameters(BSpline &bs)
     // vic_pixels.at<Vec3b>(i,normal_points_number)[2] = img(bs[i].x, bs[i].y)[2];
     double *vic_ptr = vic.ptr<double>(i);
     double *nv_ptr = nv.ptr<double>(i);
+    double *mean_vic_ptr = mean_vic.ptr<double>(i);
+    double *cov_vic_ptr = cov_vic.ptr<double>(i);
     double normal_points_number = floor(params_.h/params_.delta_h);
     for (int j = 0; j < 2*normal_points_number; ++j)
     {
@@ -414,10 +423,11 @@ void CCD::refine_parameters(BSpline &bs)
       // \hat{}\Sigma_{kl}} = a_{kl}\Sigma_{k}^{1} + (1 - a_{kl})\Sigma_{k}^{2}
       for (int m = 0; m < 3; ++m)
       {
+        double *tmp_cov_ptr = tmp_cov.ptr<double>(m);
         for (int n = 0; n < 3; ++n)
         {
-          tmp_cov.at<double>(m, n) = vic_ptr[10*j+4] * cov_vic.at<double>(i,m*3+n)
-                                     +(1-vic_ptr[10*j+4])* cov_vic.at<double>(i,m*3+n+9);
+          tmp_cov_ptr[n] = vic_ptr[10*j+4] * cov_vic_ptr[m*3+n]
+                                     +(1-vic_ptr[10*j+4])* cov_vic_ptr[m*3+n+9];
         }
       }
 
@@ -425,7 +435,7 @@ void CCD::refine_parameters(BSpline &bs)
       // std::cout << "debug " << std::endl;
 
       // for (int m = 0; m < 18; ++m){
-      //   std::cout << cov_vic.at<double>(i,m) << " " ;
+      //   std::cout << cov_vic_ptr[m] << " " ;
       // }
 
       // std::cout << std::endl;
@@ -446,7 +456,7 @@ void CCD::refine_parameters(BSpline &bs)
         // }
 
           
-        tmp_pixel_diff.at<double>(m,0) = img(vic_ptr[10*j+0], vic_ptr[10*j+1])[m]- vic_ptr[10*j+4] * mean_vic.at<double>(i,m)- (1-vic_ptr[10*j+4])* mean_vic.at<double>(i,m+3);
+        tmp_pixel_diff.at<double>(m,0) = img(vic_ptr[10*j+0], vic_ptr[10*j+1])[m]- vic_ptr[10*j+4] * mean_vic_ptr[m]- (1-vic_ptr[10*j+4])* mean_vic_ptr[m+3];
       }
       // std::cout << std::endl;
       //compute jacobian matrix
@@ -455,13 +465,13 @@ void CCD::refine_parameters(BSpline &bs)
  
       for (int n = 0; n < 3; ++n)
       {
-        tmp_jacobian.at<double>(0,n) = vic_ptr[ 10*j + 9]*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv_ptr[0];
-        tmp_jacobian.at<double>(1,n) = vic_ptr[ 10*j + 9]*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv_ptr[1];
-        tmp_jacobian.at<double>(2,n) = vic_ptr[ 10*j + 9]*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv_ptr[0]*bs[i].x;
-        tmp_jacobian.at<double>(3,n) = vic_ptr[ 10*j + 9]*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv_ptr[1]*bs[i].y;
-        tmp_jacobian.at<double>(4,n) = vic_ptr[ 10*j + 9]*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv_ptr[1]*bs[i].x;
-        tmp_jacobian.at<double>(5,n) = vic_ptr[ 10*j + 9]*(mean_vic.at<double>(i, n) - mean_vic.at<double>(i,n+3))*nv_ptr[0]*bs[i].y;
-        // std::cout << mean_vic.at<double>(i,n) << " " << mean_vic.at<double>(i,n+3) << std::endl;
+        tmp_jacobian.at<double>(0,n) = vic_ptr[ 10*j + 9]*(mean_vic_ptr[ n] - mean_vic_ptr[n+3])*nv_ptr[0];
+        tmp_jacobian.at<double>(1,n) = vic_ptr[ 10*j + 9]*(mean_vic_ptr[ n] - mean_vic_ptr[n+3])*nv_ptr[1];
+        tmp_jacobian.at<double>(2,n) = vic_ptr[ 10*j + 9]*(mean_vic_ptr[ n] - mean_vic_ptr[n+3])*nv_ptr[0]*bs[i].x;
+        tmp_jacobian.at<double>(3,n) = vic_ptr[ 10*j + 9]*(mean_vic_ptr[ n] - mean_vic_ptr[n+3])*nv_ptr[1]*bs[i].y;
+        tmp_jacobian.at<double>(4,n) = vic_ptr[ 10*j + 9]*(mean_vic_ptr[ n] - mean_vic_ptr[n+3])*nv_ptr[1]*bs[i].x;
+        tmp_jacobian.at<double>(5,n) = vic_ptr[ 10*j + 9]*(mean_vic_ptr[ n] - mean_vic_ptr[n+3])*nv_ptr[0]*bs[i].y;
+        // std::cout << mean_vic_ptr[n] << " " << mean_vic_ptr[n+3] << std::endl;
       }
 
 
