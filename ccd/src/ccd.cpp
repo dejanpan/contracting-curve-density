@@ -17,6 +17,7 @@ void CCD::set_params(double *params)
   params_.h = (int)params[6];
   params_.delta_h = (int)params[7];
   params_.resolution = (int)params[8];
+  params_.degree = (int)params[9];
 }
 
 void CCD::init_cov(BSpline &bs, int degree)
@@ -122,7 +123,7 @@ void CCD::local_statistics(BSpline &bs)
   cv::Scalar color = random_color(&rng);
   for(int i=0; i < params_.resolution;i++)
   {
-    cv::circle(canvas, bs[i], 1,color, 1);
+    // cv::circle(canvas, bs[i], 1,color, 1);
     
 #ifdef DEBUG
     std::cout << bs[i].x  << " " << bs[i].y << std::endl;
@@ -575,15 +576,18 @@ void CCD::run_ccd()
     hessian_E = Mat::zeros(6,6, CV_64F);
     // Phi.zeros(6,1,CV_64F);
 
-    // the degree of B-Spline curve
-    int t = 4;  
     // create a new B-spline curve: degree =2
 
 
-    BSpline bs(t , params_.resolution, pts);
-    
+    BSpline bs(params_.degree , params_.resolution, pts);
+
+    std::cout << "BSPLINE POINTS:" << std::endl;
     for (int i = 0; i < params_.resolution; ++i)
-      cv::circle(canvas, bs[i], 2 ,CV_RGB(0,255,0), 2);
+    {
+      std::cout << bs[i].x << " " << bs[i].y << std::endl;
+      cv::circle(canvas, bs[i], 2 ,CV_RGB(0,255,0), 2); 
+    }
+      
 
 
 
@@ -656,7 +660,7 @@ void CCD::run_ccd()
     if(iter >= 20)
     {
       convergence = true;
-      init_cov(bs, t);
+      // init_cov(bs, params_.degree);
     }
     iter += 1;
     // bs.release();

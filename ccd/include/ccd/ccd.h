@@ -10,7 +10,7 @@
 using namespace cv;
 struct CCDParams
 {
-  CCDParams(): gamma_1(0.5), gamma_2(4), gamma_3(4), gamma_4(3), h(40), delta_h(1), kappa(0.5), c(0.25), resolution(50)
+ CCDParams(): gamma_1(0.5), gamma_2(4), gamma_3(4), gamma_4(3), h(40), delta_h(1), kappa(0.5), c(0.25), resolution(50), degree(4)
   {
   }
   CCDParams(double p1,
@@ -21,7 +21,9 @@ struct CCDParams
             double p6,
             int p7,
             int p8,
-            int p9)
+            int p9,
+            int p10
+            )
   {
     gamma_1 = p1;
     gamma_2 = p2;
@@ -32,6 +34,7 @@ struct CCDParams
     h = p7;
     delta_h = p8;
     resolution = p9;
+    degree = p10;
   }
 
   ~CCDParams()
@@ -46,6 +49,7 @@ struct CCDParams
   double kappa;
   double c;
   int resolution;
+  int degree;
 };
 
 class CCD

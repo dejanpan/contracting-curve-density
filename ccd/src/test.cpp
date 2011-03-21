@@ -73,7 +73,7 @@ int main (int argc, char * argv[])
   my_ccd.canvas = imread("../data/ball.png", 1);
   my_ccd.image = imread("../data/ball.png", 1);
   
-  double *params = new double[9];
+  double *params = new double[10];
   params[0] = 0.5;
   params[1] = 4;
   params[2] = 4;
@@ -83,6 +83,7 @@ int main (int argc, char * argv[])
   params[6] = 40;
   params[7] = 1;
   params[8] = 80;
+  params[9] = 4;
 
   my_ccd.set_params(params);
   
@@ -110,17 +111,17 @@ int main (int argc, char * argv[])
   // for closed curves, we have to append 3 more points
   // to the end, these 3 new points are the three one
   // located in the head of the array
-  if(pts.size() > 4)
+  if(pts.size() > params[9])
   {
-    pts.push_back(pts[0]);
-    pts.push_back(pts[1]);
-    pts.push_back(pts[2]);
-    pts.push_back(pts[3]);
+    for (int i = 0; i < params[9]; ++i)
+      pts.push_back(pts[i]);
   }
 
   my_ccd.init_pts(pts);
   my_ccd.run_ccd();
 
+  double interval = (pts.size() - params[9])/params[8];
+  std::cout << "resolution" << params[8] << " pts-n " << (pts.size() - params[9]) << " increment: " <<  interval  << " interval " << params[8]/(pts.size() - params[9]) << std::endl;
   delete(params);
   return 0;
 }

@@ -51,22 +51,23 @@ double BSpline::basic(int i,
   }
   else if(degree == 4)
   {
-    if(t -i >= 3 && t- i <= 4)
+    
+    if((t -i >= 3 && t- i <= 4))
     {
       temp = (-t_floor*t_floor*t_floor+3*t_floor*t_floor - 3*t_floor + 1)/6;
       *bp = -0.5*t_floor*t_floor + t_floor - 0.5;
     }
-    else if (t - i >= 2 && t-i<= 3)
+    else if (t - i >= 2 && t-i< 3)
     {
       temp = (3*t_floor*t_floor*t_floor - 6*t_floor*t_floor + 4)/6;
       *bp = 1.5*t_floor*t_floor - 2*t_floor;
     }
-    else if (t-i >= 1 && t-i <= 2)
+    else if (t-i >= 1 && t-i < 2)
     {
       temp = (-3*t_floor*t_floor*t_floor + 3*t_floor*t_floor + 3*t_floor +1)/6;
-      *bp = -t_floor*t_floor + t_floor + 0.5;
+      *bp = -1.5*t_floor*t_floor + t_floor + 0.5;
     }
-    else if(t-i >= 0 && t-i <= 1)
+    else if(t-i > 0 && t-i <= 1)
     {
       temp = t_floor*t_floor*t_floor/6;
       *bp = 0.5*t_floor*t_floor;
@@ -133,13 +134,14 @@ BSpline::BSpline(int n,
 {
   double increment, interval;
   CvPoint2D64f tmp_point, tmp_tangent;
-  int i = 0;
   int m = control.size() - 1;
   computeKnots();
   increment = (double) (m - n + 1)/resolution;
-  interval = 0;
+  // interval = 0;
   // std::cout <<  "increment << " << increment << std::endl;  
-  for (interval = n-1; fabs(interval - m) > 0.0000001 ; ++i){
+  // for (interval = n-1; fabs(interval - m) > 0.0000001 ; ++i){
+  interval = n -1;
+  for (int i = 0; i < resolution; ++i){
     double *mat_ptr = basic_mat_.ptr<double>(i);
     computePoint(control, &tmp_point, &tmp_tangent, mat_ptr, interval, n);
     curve_[i].x = round(tmp_point.x);
