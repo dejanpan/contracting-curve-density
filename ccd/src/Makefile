@@ -19,10 +19,10 @@ snake:snake.cpp
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $< $(LDFLAGS)
 test:test.cpp $(OBJECTS)
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
-sift:sift.c $(OBJECTS)
-	$(GCC) $(INCDIR) $(CFLAGS)  -o $@ $@.c $(OBJECTS) $(LDFLAGS)
-test1:test1.cpp $(OBJECTS)
-	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
+sift_init.o:sift_init.c sift_init.h
+	$(GCC) $(INCDIR) $(CFLAGS) -c -o sift_init.o sift_init.c
+test1:test1.cpp $(OBJECTS) sift_init.o
+	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) sift_init.o $(LDFLAGS)
 draw:draw.cpp $(OBJECTS)
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
 ccd:ccd.cpp ccd.h $(OBJECTS)

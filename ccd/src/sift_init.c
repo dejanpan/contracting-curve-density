@@ -1,11 +1,3 @@
-/*
-  Detects SIFT features in two images and finds matches between them.
-
-  Copyright (C) 2006-2010  Rob Hess <hess@eecs.oregonstate.edu>
-
-  @version 1.1.2-20100521
-*/
-
 #include "sift.h"
 #include "imgfeatures.h"
 #include "kdtree.h"
@@ -17,14 +9,12 @@
 #include <highgui.h>
 
 #include <stdio.h>
-
+#include <sift_init.h>
 
 /* the maximum number of keypoint NN candidates to check during BBF search */
 #define KDTREE_BBF_MAX_NN_CHKS 200
-
 /* threshold on squared ratio of distances between NN and 2nd NN */
 #define NN_SQ_DIST_RATIO_THR 0.49
-
 
 CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
 {
@@ -142,10 +132,10 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
       (ptr+i*step)[2] = 1;
       i++;
     }
-      (ptr+i*step)[0] = 0;
-      (ptr+i*step)[1] = 0;
-      (ptr+i*step)[2] = 1;
-      i++;
+    (ptr+i*step)[0] = 0;
+    (ptr+i*step)[1] = 0;
+    (ptr+i*step)[2] = 1;
+    i++;
     printf("i == %d \n", i);
 
     
@@ -177,24 +167,4 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
   free( feat1 );
   free( feat2 );
   return *coordinates;
-}
-
-int main (int argc, char * argv[]) 
-{
-  IplImage *img1 = cvLoadImage( argv[1], 1 );
-  IplImage *img2 = cvLoadImage( argv[2], 1 );
-  int row;
-  
-  CvMat control_points = sift_init(img1, img2, 17);
-  double *ptr = control_points.data.db;
-  int step = control_points.step/sizeof(double);
-  for (row = 0; row < control_points.rows; ++row){
-    cvCircle(img2, cvPoint((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]), 2, CV_RGB(0,255,0), 2, 8, 0);
-  }
-  cvNamedWindow( "Xformed", 1 );
-  cvShowImage( "Xformed", img2);
-  cvWaitKey( 0 );
-  cvReleaseImage( &img1 );
-  cvReleaseImage( &img2 );
-  return 0;
 }
