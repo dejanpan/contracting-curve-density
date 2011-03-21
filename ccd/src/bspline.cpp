@@ -164,20 +164,6 @@ BSpline::BSpline(int n,
   // curve_[resolution-1].y=control[m].y;
 }
 
-CvPoint& BSpline::operator[](const size_t index)
-{
-  return curve_[index];
-}
-
-const CvPoint& BSpline::operator[](const size_t index) const
-{
-  return curve_[index];
-}
-
-CvPoint& BSpline::dt(const size_t index)
-{
-  return tangent_[index];
-}
 
 BSpline::~BSpline(){
        /* basic_mat_.release(); */

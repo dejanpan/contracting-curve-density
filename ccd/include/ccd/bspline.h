@@ -15,9 +15,20 @@ public:
    */
 
   /* void clear(){delete [] basic_mat_; delete [] curve_; delete [] tangent_;} */
-  CvPoint& operator[](const size_t);
-  const CvPoint& operator[](const size_t) const;
-  CvPoint& dt(const size_t);
+  inline CvPoint& operator[](const size_t index)
+  {
+    return curve_[index];
+  }
+
+  inline const CvPoint& operator[](const size_t index) const
+  {
+    return curve_[index];
+  }
+
+  inline CvPoint& dt(const size_t index)
+  {
+    return tangent_[index];
+  }
   cv::Mat basic_mat_;
 private:
   void computeKnots();

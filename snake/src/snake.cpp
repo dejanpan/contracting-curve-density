@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string.h>
 #include <cv.h>
-#include <opencv2/legacy/legacy.hpp>
+//#include <opencv2/legacy/legacy.hpp>
 #include <highgui.h>
 #include <fstream>
 

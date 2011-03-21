@@ -69,8 +69,8 @@ public:
         return;
       
       //caution: check
-      // if( img1.at<double>() )
-      //   y = img1->height - y;
+      // if( image1.at<double>() )
+      //   y = image1->height - y;
       
       switch( event )
       {
@@ -81,7 +81,7 @@ public:
         // std::cout << "Event = " << event << std::endl;
         cv::circle(ccd->canvas,cv::Point(x,y),2,cv::Scalar(0,0,255),2);
         ccd->pts.push_back(cvPoint2D64f(x,y));
-        // cvShowImage("Original",img1);
+        // cvShowImage("Original",image1);
         cv::imshow("Original", ccd->canvas);
         break;
       }
@@ -103,8 +103,9 @@ public:
       //ccd.pts.clear();
       //canvas = imread("../data/ball.png", 1);
       cv_image.copyTo(ccd.canvas);
-      cv_image.copyTo(ccd.img);
-      std::cerr << "sample data: " << (int)ccd.img.at<Vec3b>(356, 180)[0] << " " << (int)ccd.img.at<Vec3b>(356, 180)[1] << " " << (int)ccd.img.at<Vec3b>(356, 180)[2] << " "  << std::endl;
+      cv_image.copyTo(ccd.image);
+      Mat_<Vec3b>& img = (Mat_<Vec3b>&)ccd.image;
+      std::cerr << "sample data: " << (int)img(356, 180)[0] << " " << (int)img(356, 180)[1] << " " << (int)img(356, 180)[2] << " "  << std::endl;
 
 
       std::cerr << "I got a new image" << std::endl;

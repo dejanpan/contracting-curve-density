@@ -51,10 +51,13 @@ struct CCDParams
 class CCD
 {
 public:
-  cv::Mat img, canvas;
+  cv::Mat image, canvas;
   CCD():Phi(cv::Mat(6,1, CV_64F)),Sigma_Phi(cv::Mat(6,6, CV_64F)), delta_Phi(cv::Mat(6,1, CV_64F))
   {};
-  void init_pts(std::vector<CvPoint2D64f> &pts);
+  inline void init_pts(std::vector<CvPoint2D64f> &input_pts)
+  {
+    pts = input_pts;
+  }
   void set_params(double *params);
   void run_ccd();
   double get_resolution(){return params_.resolution;}

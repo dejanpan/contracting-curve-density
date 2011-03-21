@@ -1,15 +1,10 @@
 #include "ccd/ccd.h"
-
-cv::Scalar random_color(CvRNG* rng)
+inline cv::Scalar random_color(CvRNG* rng)
 {
-int color = cvRandInt(rng);
-return CV_RGB(color&255, (color>>8)&255, (color>>16)&255);
+  int color = cvRandInt(rng);
+  return CV_RGB(color&255, (color>>8)&255, (color>>16)&255);
 }
 
-void CCD::init_pts(std::vector<CvPoint2D64f> &input_pts)
-{
-  pts = input_pts;
-}
 
 void CCD::set_params(double *params)
 {
@@ -89,6 +84,7 @@ void CCD::clear()
 
 void CCD::local_statistics(BSpline &bs)
 {
+  Mat_<Vec3b>& img = (Mat_<Vec3b>&)image;
   // std::cout << params_.gamma_1 << " " << params_.gamma_2 << " " << params_.gamma_3 << " " << params_.gamma_4 << std::endl;
   double sigma = params_.h/(1.3*params_.gamma_3);
   // sigma_hat = gamma_3 * sigma
@@ -118,10 +114,10 @@ void CCD::local_statistics(BSpline &bs)
   {
     cv::circle(canvas, bs[i], 1,color, 1);
     
-    #ifdef DEBUG
+#ifdef DEBUG
     std::cout << bs[i].x  << " " << bs[i].y << std::endl;
     //ROS_DEBUG_STREAM(bs[i].x  << " " << bs[i].y);
-    #endif
+#endif
 
     // normal vector (n_x, n_y)
     // tagent vector (nv.at<double>(i,1), -n_x)
@@ -195,9 +191,9 @@ void CCD::local_statistics(BSpline &bs)
       // the derivative of col_5: 1/(sqrt(2*PI)*sigma)*exp{-d_{k,l}^2/(2*sigma*sigma)}
       vic.at<double>(i, 10*k + 9) = exp(-tmp_dis1.x*tmp_dis1.x/(2*sigma*sigma))/(sqrt(2*CV_PI)*sigma);
 
-      // m1_debug[0] += img.at<Vec3b>(tmp1.y, tmp1.x)[0];
-      // m1_debug[1] += img.at<Vec3b>(tmp1.y, tmp1.x)[1];
-      // m1_debug[2] += img.at<Vec3b>(tmp1.y, tmp1.x)[2];
+      // m1_debug[0] += img(tmp1.y, tmp1.x)[0];
+      // m1_debug[1] += img(tmp1.y, tmp1.x)[1];
+      // m1_debug[2] += img(tmp1.y, tmp1.x)[2];
       // calculate the normalization parameter c 
       normalized_param.at<double>(i, 0) += vic.at<double>(i, 10*k + 7);
 
@@ -211,7 +207,7 @@ void CCD::local_statistics(BSpline &bs)
 
       // for (int m = 0; m < 3; ++m)
       // {
-      //   vic_pixels.at<Vec3b>(i, k)[m] = img.at<Vec3b>(tmp1.y, tmp1.x)[m];          
+      //   vic_pixels.at<Vec3b>(i, k)[m] = img(tmp1.y, tmp1.x)[m];          
       // }
 
       ///////////////////////////////////////////////////////////////////////////////////////////
@@ -246,7 +242,7 @@ void CCD::local_statistics(BSpline &bs)
       // cv::circle(img1, tmp2, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
       // for (int m = 0; m < 3; ++m)
       // {
-      //   vic_pixels.at<Vec3b>(i, negative_normal)[m] = img.at<Vec3b>(tmp2.y, tmp2.x)[m];          
+      //   vic_pixels.at<Vec3b>(i, negative_normal)[m] = img(tmp2.y, tmp2.x)[m];          
       // }
     }
     // std::cout
@@ -311,12 +307,12 @@ void CCD::local_statistics(BSpline &bs)
       // compute the mean value in the vicinity of a point
       // m_{ks} = I{k}^{s} = \sum_{l} w_{kls}{I_{kl}} : s = 1 or 2
 
-      m1[0] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[0];
-      m1[1] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[1];
-      m1[2] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[2];
-      m2[0] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[0];
-      m2[1] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[1];
-      m2[2] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[2];
+      m1[0] += wp1*img(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[0];
+      m1[1] += wp1*img(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[1];
+      m1[2] += wp1*img(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[2];
+      m2[0] += wp2*img(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[0];
+      m2[1] += wp2*img(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[1];
+      m2[2] += wp2*img(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[2];
 
       // compute second order local statistics
       // m_{k,s} = \sum_{l} w_{kls} I_{kl}*I_{kl}^T
@@ -325,10 +321,10 @@ void CCD::local_statistics(BSpline &bs)
       {
         for (int n =0; n < 3; ++n)
         {
-          m1_o2[m*3+n] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[m]
-                          *img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[n];
-          m2_o2[m*3+n] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[m]
-                          *img.at<Vec3b>(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[n];
+          m1_o2[m*3+n] += wp1*img(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[m]
+                          *img(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[n];
+          m2_o2[m*3+n] += wp2*img(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[m]
+                          *img(vic.at<double>(i, 10*k + 0 ), vic.at<double>(i, 10*k + 1 ))[n];
         }
       }
         
@@ -338,21 +334,21 @@ void CCD::local_statistics(BSpline &bs)
       w1 += wp1;
       w2 += wp2;
       
-      m1[0] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[0];
-      m1[1] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[1];
-      m1[2] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[2];
-      m2[0] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[0];
-      m2[1] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[1];
-      m2[2] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[2];
+      m1[0] += wp1*img(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[0];
+      m1[1] += wp1*img(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[1];
+      m1[2] += wp1*img(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[2];
+      m2[0] += wp2*img(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[0];
+      m2[1] += wp2*img(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[1];
+      m2[2] += wp2*img(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[2];
       
       for (int m = 0; m < 3; ++m)
       {
         for (int n =0; n < 3; ++n)
         {
-          m1_o2[m*3+n] += wp1*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[m]
-                          *img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[n];
-          m2_o2[m*3+n] += wp2*img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[m]
-                          *img.at<Vec3b>(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[n];
+          m1_o2[m*3+n] += wp1*img(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[m]
+                          *img(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[n];
+          m2_o2[m*3+n] += wp2*img(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[m]
+                          *img(vic.at<double>(i, 10*negative_normal + 0 ), vic.at<double>(i, 10*negative_normal + 1 ))[n];
         }
       }
     }
@@ -386,6 +382,7 @@ void CCD::local_statistics(BSpline &bs)
 
 void CCD::refine_parameters(BSpline &bs)
 {
+  Mat_<Vec3b>& img = (Mat_<Vec3b>&)image;
   cv::Mat tmp_cov(3,3,CV_64F);
   cv::Mat tmp_cov_inv(3,3,CV_64F);
   cv::Mat tmp_jacobian(6,3,CV_64F);
@@ -394,9 +391,9 @@ void CCD::refine_parameters(BSpline &bs)
   for (int i = 0; i < params_.resolution; ++i)
   {
 
-    // vic_pixels.at<Vec3b>(i,normal_points_number)[0] = img.at<Vec3b>(bs[i].x, bs[i].y)[0];
-    // vic_pixels.at<Vec3b>(i,normal_points_number)[1] = img.at<Vec3b>(bs[i].x, bs[i].y)[1];
-    // vic_pixels.at<Vec3b>(i,normal_points_number)[2] = img.at<Vec3b>(bs[i].x, bs[i].y)[2];
+    // vic_pixels.at<Vec3b>(i,normal_points_number)[0] = img(bs[i].x, bs[i].y)[0];
+    // vic_pixels.at<Vec3b>(i,normal_points_number)[1] = img(bs[i].x, bs[i].y)[1];
+    // vic_pixels.at<Vec3b>(i,normal_points_number)[2] = img(bs[i].x, bs[i].y)[2];
 
     double normal_points_number = floor(params_.h/params_.delta_h);
     for (int j = 0; j < 2*normal_points_number; ++j)
@@ -430,16 +427,16 @@ void CCD::refine_parameters(BSpline &bs)
       for (int m = 0; m < 3; ++m)
       {
         // if(j < normal_points_number)
-        //   vic_pixels.at<Vec3b>(i, j)[m] = img.at<Vec3b>(vic.at<double>(i,10*j+0), vic.at<double>(i,10*j+1))[m];
+        //   vic_pixels.at<Vec3b>(i, j)[m] = img(vic.at<double>(i,10*j+0), vic.at<double>(i,10*j+1))[m];
         // else if(j >= normal_points_number)
         // {
-        //   vic_pixels.at<Vec3b>(i, j+1)[m] = img.at<Vec3b>(vic.at<double>(i,10*j+0), vic.at<double>(i,10*j+1))[m];
+        //   vic_pixels.at<Vec3b>(i, j+1)[m] = img(vic.at<double>(i,10*j+0), vic.at<double>(i,10*j+1))[m];
         //   if ( m ==0 )
         //     std::cout << "i = " << i << " bs.x " << bs[i].x << " bs.y " << bs[i].y << " vic.x "<<  vic.at<double>(i,10*j+0)<< " vic.y " << vic.at<double>(i,10*j+1) <<std::endl;
         // }
 
           
-        tmp_pixel_diff.at<double>(m,0) = img.at<Vec3b>(vic.at<double>(i,10*j+0), vic.at<double>(i,10*j+1))[m]- vic.at<double>(i,10*j+4) * mean_vic.at<double>(i,m)- (1-vic.at<double>(i,10*j+4))* mean_vic.at<double>(i,m+3);
+        tmp_pixel_diff.at<double>(m,0) = img(vic.at<double>(i,10*j+0), vic.at<double>(i,10*j+1))[m]- vic.at<double>(i,10*j+4) * mean_vic.at<double>(i,m)- (1-vic.at<double>(i,10*j+4))* mean_vic.at<double>(i,m+3);
       }
       // std::cout << std::endl;
       //compute jacobian matrix
@@ -487,11 +484,12 @@ void CCD::refine_parameters(BSpline &bs)
     }
   }
 
-  
-  hessian_E += Sigma_Phi.inv(DECOMP_SVD);
-  nabla_E += 2*Sigma_Phi.inv(DECOMP_SVD)*Phi;
-  
-  delta_Phi = hessian_E.inv(DECOMP_SVD)*nabla_E;
+  cv::Mat Sigma_Phi_inv = Sigma_Phi.inv(DECOMP_SVD);
+  hessian_E += Sigma_Phi_inv;
+  nabla_E += 2*Sigma_Phi_inv*Phi;
+
+  cv::Mat hessian_E_inv = hessian_E.inv(DECOMP_SVD);
+  delta_Phi = hessian_E_inv*nabla_E;
   // delta_Phi.at<double>(0,0) = 0.0;
   // delta_Phi.at<double>(1,0) = 0.0;
   // delta_Phi.at<double>(2,0) = 0.0;
@@ -510,8 +508,10 @@ void CCD::refine_parameters(BSpline &bs)
   // cv::norm(delta_Phi);
   
   Phi -= delta_Phi;
-  Sigma_Phi = params_.c*Sigma_Phi + (1-params_.c)*hessian_E.inv(DECOMP_SVD);
+  Sigma_Phi = params_.c*Sigma_Phi + (1-params_.c)*hessian_E_inv;
 
+  Sigma_Phi_inv.release();
+  hessian_E_inv.release();
   tmp_cov.release();
   tmp_cov_inv.release();
   tmp_jacobian.release();
@@ -583,14 +583,14 @@ void CCD::run_ccd()
     //HACK!!!!!
     bool invalid = false;
     for (int i = 0; i < params_.resolution; i++)
-      {
-	if (abs(bs[i].x) > 640 || abs(bs[i].y) > 480)
+    {
+      if (abs(bs[i].x) > 640 || abs(bs[i].y) > 480)
 	  {
 	    invalid = true;
 	    continue;
 	    std::cerr << "bs sample : " << bs[i].x << " " << bs[i].y << std::endl;
 	  }
-      }
+    }
     if (invalid)
       continue;
     //END HACK!!!!!
@@ -611,9 +611,9 @@ void CCD::run_ccd()
     }
     norm = cv::sqrt(norm);
     std::cerr << "iter: " << iter << "   tol: " << tol  << " norm: " << cv::norm(delta_Phi, NORM_L2)  << " norm_tmp:" << norm<< std::endl;
-    //cv::imshow("Original", canvas);
+    cv::imshow("Original", canvas);
     
-    //cv::waitKey(100);
+    cv::waitKey(100);
 
 
     // if((tol - 0.0 < 0.001) && (norm < 0.01))

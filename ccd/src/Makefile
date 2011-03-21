@@ -1,12 +1,12 @@
 CC = g++
 EXTRA = 
-INCDIR =-I. `pkg-config --cflags opencv`
-LDDIR = -L./lib 
+INCDIR =-I. `pkg-config --cflags opencv` -I../include -I../../libsiftfast/include
+LDDIR = -L./lib -L../libsiftfast/lib
 CFLAGS = -g3 -Wall -DLINUX $(EXTRA) $(LDDIR)
 LDLIBS =
 LDFLAGS = $(LDLIBS) -lm `pkg-config --libs opencv`
 OBJECTS=bspline.o ccd.o
-$(OBJECTS): %.o: %.cpp %.h
+$(OBJECTS): %.o: %.cpp
 	$(CC) $(INCDIR) -c $(CFLAGS) $< -o $@
 PROGRAMS=snake test ros_to_openCv ccd2 ccd_panin
 all:$(PROGRAMS)
