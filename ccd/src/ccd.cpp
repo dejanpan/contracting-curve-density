@@ -123,7 +123,7 @@ void CCD::local_statistics(BSpline &bs)
   cv::Scalar color = random_color(&rng);
   for(int i=0; i < params_.resolution;i++)
   {
-    // cv::circle(canvas, bs[i], 1,color, 1);
+    cv::circle(canvas, bs[i], 1,color, 1);
     
 #ifdef DEBUG
     std::cout << bs[i].x  << " " << bs[i].y << std::endl;
@@ -631,9 +631,9 @@ void CCD::run_ccd()
     }
     norm = cv::sqrt(norm);
     std::cerr << "iter: " << iter << "   tol: " << tol  << " norm: " << cv::norm(delta_Phi, NORM_L2)  << " norm_tmp:" << norm<< std::endl;
-    // cv::imshow("Original", canvas);
+    cv::imshow("Original", canvas);
     
-    // cv::waitKey(100);
+    cv::waitKey(50);
 
 
     // if((tol - 0.0 < 0.001) && (norm < 0.01))
