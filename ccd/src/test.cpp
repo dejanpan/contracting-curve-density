@@ -2,84 +2,97 @@
 #include "opencv/highgui.h"
 #include <iostream>
 #include <vector>
+#include <string>
 #include "sift_init.h"
 #include "ccd/bspline.h"
 #include "ccd/ccd.h"
 using namespace cv;
-// control points initialized mannually
-std::vector<cv::Point2d> pts;
+using namespace std;
 
-/** 
- * draw control points manually
- * 
- * @param event 
- * @param x 
- * @param y 
- * @param flags 
- * @param param 
- */
-void on_mouse( int event, int x, int y, int flags, void* param )
+int print_help()
 {
-  //  MaskParams* params = (MaskParams*)_params;
-  cv::Mat *image = (cv::Mat*)param;
-  if( image->empty())
-    return;
+  cout << "Usage:\n ./test -m init_method [-t template_image] -i input_image params.xml"<< endl;
+  return 0;
+}
 
-  //caution: check
-  // if( image1.at<double>() )
-  //   y = image1->height - y;
-
-  switch( event )
-  {
-    case CV_EVENT_LBUTTONDOWN:
-      // std::cout << "Event = " << event << std::endl;
-      break;
-    case CV_EVENT_LBUTTONUP:
-      // std::cout << "Event = " << event << std::endl;
-      cv::circle(*image,cv::Point(x,y),2,cv::Scalar(0,0,255),2);
-      pts.push_back(cv::Point2d(x,y));
-      // cvShowImage("Original",image1);
-      cv::imshow("Original", *image);
-      break;
-  }
+static bool read_params( const string& filename, vector<double> &params)
+{
+    FileStorage fs(filename, FileStorage::READ);
+    if( !fs.isOpened() )
+        return false;
+    FileNode n = fs.getFirstTopLevelNode();
+    if( n.type() != FileNode::SEQ )
+        return false;
+    FileNodeIterator it = n.begin(), it_end = n.end();
+    for(; it < it_end; it++ )
+    {
+      std::cout << (double)*it << std::endl;
+      params.push_back((double)*it);
+    }
+    // l.push_back((double)*it);
+    return true;
 }
 
 int main (int argc, char * argv[]) 
 {
-  // if (argc < 2)
-  // {
-  //   printf("Usage %s image.png \n", argv[0]);
-  //   exit(0);
-  // }
-  // 
-  // the count of points on curve, equidistant distributed
-  // const int resolution = 50;
-  
-  // the degree of B-Spline curve
-  // int t = 3;
-  
-  // load image from a specified file
-  //image1= cvLoadImage(argv[1], 1);
-  // image1 = imread(argv[1], 1);
-  // cv::Mat image = imread(argv[1], 1);  
-  // cv::Mat input_image = imread("../data/ball.png", 1);
-
-  // cv::Mat image;
-  // cv::GaussianBlur(input_image, image , cv::Size(9,9) ,0);
-  // cv::imshow("Origianl", image);
   char key;
-  // while (1)
-  // {
-  //   key = cvWaitKey(10);
-  //   if (key == 27) break;
-  // }
-  //image - working copy
-  //image1 - for visualization
-  CCD my_ccd;
-  my_ccd.canvas = imread("../data/ball.png", 1);
-  my_ccd.image = imread("../data/ball.png", 1);
+  std::vector<cv::Point2d> pts;
+
+
+  string  image_path, template_path, params_file_path;
+  int init_method;
+  if(argc <= 1)
+    return print_help();
   
-  double *params = new double[10];
+  for( int i = 1; i < argc; i++ )
+  {
+    if( string(argv[i]) == "-m" )
+    {
+      if( sscanf(argv[++i], "%d", &init_method) != 1 || (init_method <= 0  ||  init_method >=3))
+      {
+        cout << "invalid initialization method" << endl;
+        return print_help();
+      }
+    }
+    else if( string(argv[i]) == "-i" )
+    {
+      if( string(argv[++i]).length() <= 0 )
+      {
+        cout << "invalid image file path" << endl;
+        return print_help();
+      }
+      else
+        image_path = argv[i];
+    }
+    else if( string(argv[i]) == "-t" )
+    {
+      if( string(argv[++i]).length() <= 0 )
+      {
+        cout << "invalid template image file path" << endl;
+        return print_help();
+      }
+      else
+        template_path = argv[i];
+    }
+    else if( string(argv[i]) == "--help" )
+      return print_help();
+    else if( argv[i][0] == '-' )
+    {
+      cout << "invalid option " << argv[i] << endl;
+      return 0;
+    }
+    else
+      params_file_path = argv[i];
+
+  }
+  if(params_file_path == "")
+  {
+    params_file_path = "ccd_params.xml";
+  }
+    
+  // double *params = new double[10];
+  vector<double> params(10,0.0);
+  // read_params(params_file_path, params);
   params[0] = 0.5;
   params[1] = 4;
   params[2] = 4;
@@ -88,46 +101,35 @@ int main (int argc, char * argv[])
   params[5] = 0.25;
   params[6] = 40;
   params[7] = 1;
-  params[8] = 80;
-  params[9] = 4;
+  params[8] = 100;
+  params[9] = 4;   
 
+  // for (int i = 0; i < 10; ++i){
+  //   std::cout << (double)params[i] << " ";
+  // }
+  // cout<< std::endl;
+  
+  CCD my_ccd;
   my_ccd.set_params(params);
   
-  // convert the image into Mat fortmat
-  //cv::Mat image(image1);
+  my_ccd.canvas = cv::imread(image_path, 1);
+  my_ccd.image = cv::imread(image_path, 1);
+  if(template_path.size() > 0)
+    my_ccd.tpl = cv::imread(template_path, 1 );
 
-  // store the control points trasformed in the shape space
-  // CvPoint2D64f pts_tmp;
+  my_ccd.init_pts(init_method);
+  
+  cv::imshow("CCD", my_ccd.canvas);
 
-  ////////////////////////////////////////////////////////////////
-  // mannaully initialize the control points
-  ///////////////////////////////////////////////////////////////
-  cv::namedWindow("Original", 1);
-  cv::setMouseCallback( "Original", on_mouse,  (void*)&my_ccd.canvas);
-  // cvShowImage("Original",image1);
-  cv::imshow("Original", my_ccd.canvas);
   while (1)
   {
-    key = cvWaitKey(10);
+    key = cv::waitKey(10);
     if (key == 27) break;
   }
-  ////////////////////////////////////////////////////////////////
-
   
-  // for closed curves, we have to append 3 more points
-  // to the end, these 3 new points are the three one
-  // located in the head of the array
-  if(pts.size() > params[9])
-  {
-    for (int i = 0; i < params[9]; ++i)
-      pts.push_back(pts[i]);
-  }
-
-  my_ccd.init_pts(pts);
   my_ccd.run_ccd();
 
   double interval = (pts.size() - params[9])/params[8];
-  std::cout << "resolution" << params[8] << " pts-n " << (pts.size() - params[9]) << " increment: " <<  interval  << " interval " << params[8]/(pts.size() - params[9]) << std::endl;
-  delete(params);
+  std::cout << "resolution: " << params[8] << " pts_number - degree: " << (pts.size() - params[9]) << " increment: " <<  interval  << " interval " << params[8]/(pts.size() - params[9]) << std::endl;
   return 0;
 }

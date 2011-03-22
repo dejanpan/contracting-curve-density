@@ -37,7 +37,7 @@ void on_mouse(int event, int x, int y, int flags, void* param )
   }
 }
 
-void CCD::set_params(double *params)
+void CCD::set_params(vector<double> &params)
 {
   params_.gamma_1 = params[0];
   params_.gamma_2 = params[1];
@@ -89,6 +89,7 @@ void CCD::init_cov(BSpline &bs, int degree)
       }
     }
   }
+  
   for (int i = 0; i < n_dim; ++i)
   {
     double *tmp_mat_ptr = tmp_mat.ptr<double>(i);
@@ -107,6 +108,7 @@ void CCD::init_cov(BSpline &bs, int degree)
   //Sigma_Phi = 6/(10*10)*W.t()*U*W;
   // cov = Nx/rou_0^2 * H
   // cov = 6/25*cov;
+  // clean....
   // W.release();
   // U.release();
   // tmp_mat.release();
@@ -562,7 +564,7 @@ void CCD::refine_parameters(BSpline &bs)
   // cv::norm(delta_Phi);
   
   Phi -= delta_Phi;
-  Sigma_Phi = params_.c*Sigma_Phi + (1-params_.c)*hessian_E_inv;
+  Sigma_Phi = params_.c*Sigma_Phi + 2*(1-params_.c)*hessian_E_inv;
 
   Sigma_Phi_inv.release();
   hessian_E_inv.release();
@@ -707,9 +709,11 @@ void CCD::contour_sift()
   double *ptr = points_mat_ptr->data.db;
   int step = points_mat.step/sizeof(double);
   for (row = 0; row < points_mat_ptr->rows; ++row)
+  {
     pts.push_back(cv::Point2d((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]));
-  // cv::circle(my_ccd.canvas, cvPoint((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]), 2, CV_RGB(0,255,0), 2, 8, 0);
-
+    // cv::circle(my_ccd.canvas, cvPoint((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]), 2, CV_RGB(0,255,0), 2, 8, 0);
+  }
+  //clean..........
   // cvReleaseImage(&tpl_ptr);
   // cvReleaseImage(&tpl_img_ptr);
   // cvReleaseMat(&points_mat_ptr);
@@ -722,16 +726,11 @@ void CCD::contour_manually()
 {
   char key;
   cv::namedWindow("CCD", 1);
-  // void (*cl_on_mouse)(int, int,int,int, void*) = on_mouse;
   cv::setMouseCallback( "CCD", on_mouse,  (void*)this);
-  // for closed curves, we have to append 3 more points
-  // to the end, these 3 new points are the three one
-  // located in the head of the array
   cv::imshow("CCD", canvas);
   while (1)
   {
     key = cv::waitKey(10);
     if (key == 27) break;
   }
-  // std::cout << "size number: " << this->pts.size() << std::endl;
 }

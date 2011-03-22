@@ -1,6 +1,6 @@
 struct CCDParams
 {
- CCDParams(): gamma_1(0.5), gamma_2(4), gamma_3(4), gamma_4(3), h(40), delta_h(1), kappa(0.5), c(0.25), resolution(50), degree(4)
+ CCDParams(): gamma_1(0.5), gamma_2(4), gamma_3(4), gamma_4(3), kappa(0.5),c(0.25), h(40), delta_h(1),resolution(100), degree(4)
   {
   }
   CCDParams(double p1,
@@ -34,10 +34,10 @@ struct CCDParams
   double gamma_2;
   double gamma_3;
   double gamma_4;
-  int h;
-  int delta_h;
   double kappa;
   double c;
+  int h;
+  int delta_h;
   int resolution;
   int degree;
 };
@@ -49,7 +49,7 @@ public:
   std::vector<cv::Point2d> pts;
 CCD():Phi(cv::Mat(6,1, CV_64F)),Sigma_Phi(cv::Mat(6,6, CV_64F)), delta_Phi(cv::Mat(6,1, CV_64F))
   {};
-  void set_params(double *params);
+  void set_params(vector<double> &params);
   void run_ccd();
   double get_resolution(){return params_.resolution;}
   inline void init_pts(int init_method);
