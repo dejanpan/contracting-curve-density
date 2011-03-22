@@ -1,7 +1,13 @@
+#include "opencv/cv.h"
+#include "opencv/highgui.h"
+#include <iostream>
+#include <vector>
+#include "sift_init.h"
+#include "ccd/bspline.h"
 #include "ccd/ccd.h"
 using namespace cv;
 // control points initialized mannually
-std::vector<CvPoint2D64f> pts;
+std::vector<cv::Point2d> pts;
 
 /** 
  * draw control points manually
@@ -31,7 +37,7 @@ void on_mouse( int event, int x, int y, int flags, void* param )
     case CV_EVENT_LBUTTONUP:
       // std::cout << "Event = " << event << std::endl;
       cv::circle(*image,cv::Point(x,y),2,cv::Scalar(0,0,255),2);
-      pts.push_back(cvPoint2D64f(x,y));
+      pts.push_back(cv::Point2d(x,y));
       // cvShowImage("Original",image1);
       cv::imshow("Original", *image);
       break;
@@ -97,7 +103,7 @@ int main (int argc, char * argv[])
   // mannaully initialize the control points
   ///////////////////////////////////////////////////////////////
   cv::namedWindow("Original", 1);
-  cvSetMouseCallback( "Original", on_mouse,  (void*)&my_ccd.canvas);
+  cv::setMouseCallback( "Original", on_mouse,  (void*)&my_ccd.canvas);
   // cvShowImage("Original",image1);
   cv::imshow("Original", my_ccd.canvas);
   while (1)

@@ -7,10 +7,7 @@
 #include <cv.h>
 #include <cxcore.h>
 #include <highgui.h>
-
-#include <stdio.h>
-#include <sift_init.h>
-
+#include "ccd/sift_init.h"
 /* the maximum number of keypoint NN candidates to check during BBF search */
 #define KDTREE_BBF_MAX_NN_CHKS 200
 /* threshold on squared ratio of distances between NN and 2nd NN */
@@ -81,15 +78,16 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
   if( H )
   {
     int   step  = H->step/sizeof(double);
-    for (row = 0; row < H->rows; ++row){
-      double *ptr = H->data.db;
-      for (col = 0; col < H->cols; ++col){
-        printf("%f ", (ptr+row*step)[col]);
-      }
-      printf("\n");
-    }
-    /* CvMat *coordinates_t_t = cvCreateMat(control_points_number, 3, CV_64FC1); */
-    printf("cont_n = %d\n", control_points_number);
+    /* 
+     * for (row = 0; row < H->rows; ++row){
+     *   double *ptr = H->data.db;
+     *   for (col = 0; col < H->cols; ++col){
+     *     printf("%f ", (ptr+row*step)[col]);
+     *   }
+     *   printf("\n");
+     * }
+     */
+    /* printf("cont_n = %d\n", control_points_number); */
     step = coordinates->step/sizeof(double);
     double *ptr = coordinates->data.db;
     i = 0;
@@ -136,7 +134,7 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
     (ptr+i*step)[1] = 0;
     (ptr+i*step)[2] = 1;
     i++;
-    printf("i == %d \n", i);
+    /* printf("i == %d \n", i); */
 
     
     cvGEMM(H, coordinates, 1, 0,0, coordinates_t, CV_GEMM_B_T);

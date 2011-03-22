@@ -1,13 +1,3 @@
-#include "opencv/cv.h"
-#include "opencv/highgui.h"
-#include "bspline.h"
-#include <iostream>
-#include <string>
-#include <cstdio>
-#include <algorithm>
-#include <siftfast/siftfast.h>
-
-using namespace cv;
 struct CCDParams
 {
  CCDParams(): gamma_1(0.5), gamma_2(4), gamma_3(4), gamma_4(3), h(40), delta_h(1), kappa(0.5), c(0.25), resolution(50), degree(4)
@@ -55,23 +45,23 @@ struct CCDParams
 class CCD
 {
 public:
-  cv::Mat image, canvas;
-  CCD():Phi(cv::Mat(6,1, CV_64F)),Sigma_Phi(cv::Mat(6,6, CV_64F)), delta_Phi(cv::Mat(6,1, CV_64F))
+  cv::Mat image, canvas, tpl;
+  std::vector<cv::Point2d> pts;
+CCD():Phi(cv::Mat(6,1, CV_64F)),Sigma_Phi(cv::Mat(6,6, CV_64F)), delta_Phi(cv::Mat(6,1, CV_64F))
   {};
-  inline void init_pts(std::vector<CvPoint2D64f> &input_pts)
-  {
-    pts = input_pts;
-  }
   void set_params(double *params);
   void run_ccd();
   double get_resolution(){return params_.resolution;}
+  inline void init_pts(int init_method);
   void init_cov(BSpline &bs, int degree);
-  std::vector<CvPoint2D64f> pts;
   ~CCD(){clear();}
 private:
   void clear();
+  void contour_sift();
+  void contour_manually();
   void local_statistics(BSpline &bs);
   void refine_parameters(BSpline &bs);
+  /* void on_mouse( int event, int x, int y, int flags, void* param ); */
   CCDParams params_;
   cv::Mat vic;
   cv::Mat mean_vic;
@@ -84,3 +74,16 @@ private:
   cv::Mat nabla_E;
   cv::Mat hessian_E;
 };
+
+inline void CCD::init_pts(int init_method)
+{
+  if(init_method == 1)    
+    contour_manually();
+  else if(init_method == 2)
+    contour_sift();
+  if((int)pts.size() > params_.degree)
+  {
+    for (int i = 0; i < params_.degree; ++i)
+      pts.push_back(pts[i]);
+  }
+}

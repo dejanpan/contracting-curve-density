@@ -1,10 +1,41 @@
+#include "opencv/cv.h"
+#include "opencv/highgui.h"
+#include <vector>
+#include "ccd/sift_init.h"
+#include "ccd/bspline.h"
 #include "ccd/ccd.h"
+
 inline cv::Scalar random_color(CvRNG* rng)
 {
   int color = cvRandInt(rng);
   return CV_RGB(color&255, (color>>8)&255, (color>>16)&255);
 }
 
+
+void on_mouse(int event, int x, int y, int flags, void* param )
+{
+  //  MaskParams* params = (MaskParams*)_params;
+  
+  CCD *my_ccd = (CCD *)param;
+  cv::Mat image = my_ccd->canvas;
+  if( image.empty())
+    return;
+
+  //caution: check
+  // if( image1.at<double>() )
+  //   y = image1->height - y;
+
+  switch( event )
+  {
+    case CV_EVENT_LBUTTONDOWN:
+      break;
+    case CV_EVENT_LBUTTONUP:
+      cv::circle(image,cv::Point(x,y),2,cv::Scalar(0,0,255),2);
+      my_ccd->pts.push_back(cv::Point2d(x,y));
+      cv::imshow("CCD", image);
+      break;
+  }
+}
 
 void CCD::set_params(double *params)
 {
@@ -23,8 +54,8 @@ void CCD::set_params(double *params)
 void CCD::init_cov(BSpline &bs, int degree)
 {
   int n_dim = (int)pts.size() - 3;
-  cv::Mat W = Mat::zeros(2*n_dim,6, CV_64F);
-  cv::Mat U = Mat::zeros(2*n_dim, 2*n_dim, CV_64F);
+  cv::Mat W = cv::Mat::zeros(2*n_dim,6, CV_64F);
+  cv::Mat U = cv::Mat::zeros(2*n_dim, 2*n_dim, CV_64F);
   for (int i = 0; i < n_dim; ++i)
   {
     double *W_ptr = W.ptr<double>(i);
@@ -42,8 +73,10 @@ void CCD::init_cov(BSpline &bs, int degree)
     W_ptr[4] = pts[i].x;
     W_ptr[5] = 0;
   }
-  cv::Mat tmp_mat = Mat::zeros(n_dim, n_dim, CV_64F);
+
+  cv::Mat tmp_mat = cv::Mat::zeros(n_dim, n_dim, CV_64F);
   int interval = params_.resolution/(pts.size() - degree);
+
   for (int i = 0; i < n_dim; ++i)
   {
     double *basic_mat_ptr = bs.basic_mat_.ptr<double>(i*interval);
@@ -96,7 +129,7 @@ void CCD::clear()
 
 void CCD::local_statistics(BSpline &bs)
 {
-  Mat_<Vec3b>& img = (Mat_<Vec3b>&)image;
+  cv::Mat_<cv::Vec3b>& img = (cv::Mat_<cv::Vec3b>&)image;
   // std::cout << params_.gamma_1 << " " << params_.gamma_2 << " " << params_.gamma_3 << " " << params_.gamma_4 << std::endl;
   double sigma = params_.h/(1.3*params_.gamma_3);
   // sigma_hat = gamma_3 * sigma
@@ -107,9 +140,9 @@ void CCD::local_statistics(BSpline &bs)
   // dimension: resolution x 2
   // the first column save the normalized coefficient outside the curve
   // the second column store the one inside the curve
-  cv::Mat normalized_param = Mat::zeros(params_.resolution, 2, CV_64F);
+  cv::Mat normalized_param = cv::Mat::zeros(params_.resolution, 2, CV_64F);
   
-  vic = Mat::zeros(params_.resolution, 20*floor(params_.h/params_.delta_h), CV_64F);
+  vic = cv::Mat::zeros(params_.resolution, 20*floor(params_.h/params_.delta_h), CV_64F);
 
   // temporary points used to store those points in the
   // normal direction as well as negative normal direction
@@ -141,7 +174,7 @@ void CCD::local_statistics(BSpline &bs)
     // 1 - y value
     // 2 - normal vector x
     // 3 - normal vector y
-    bs_old = Mat::zeros(params_.resolution, 4, CV_64F);
+    bs_old = cv::Mat::zeros(params_.resolution, 4, CV_64F);
     double *bs_old_ptr = bs_old.ptr<double>(i);
 
     // save the old value of bspline
@@ -399,7 +432,7 @@ void CCD::local_statistics(BSpline &bs)
 
 void CCD::refine_parameters(BSpline &bs)
 {
-  Mat_<Vec3b>& img = (Mat_<Vec3b>&)image;
+  cv::Mat_<cv::Vec3b>& img = (cv::Mat_<cv::Vec3b>&)image;
   cv::Mat tmp_cov(3,3,CV_64F);
   cv::Mat tmp_cov_inv(3,3,CV_64F);
   cv::Mat tmp_jacobian(6,3,CV_64F);
@@ -418,8 +451,8 @@ void CCD::refine_parameters(BSpline &bs)
     double normal_points_number = floor(params_.h/params_.delta_h);
     for (int j = 0; j < 2*normal_points_number; ++j)
     {
-      tmp_cov = Mat::zeros(3,3,CV_64F);
-      tmp_cov_inv = Mat::zeros(3,3,CV_64F);
+      tmp_cov = cv::Mat::zeros(3,3,CV_64F);
+      tmp_cov_inv = cv::Mat::zeros(3,3,CV_64F);
       
       // \hat{}\Sigma_{kl}} = a_{kl}\Sigma_{k}^{1} + (1 - a_{kl})\Sigma_{k}^{2}
       for (int m = 0; m < 3; ++m)
@@ -432,7 +465,7 @@ void CCD::refine_parameters(BSpline &bs)
         }
       }
 
-      tmp_cov_inv = tmp_cov.inv(DECOMP_SVD);
+      tmp_cov_inv = tmp_cov.inv(cv::DECOMP_SVD);
       // std::cout << "debug " << std::endl;
 
       // for (int m = 0; m < 18; ++m){
@@ -441,7 +474,7 @@ void CCD::refine_parameters(BSpline &bs)
 
       // std::cout << std::endl;
       
-      tmp_pixel_diff = Mat::zeros(3, 1, CV_64F);
+      tmp_pixel_diff = cv::Mat::zeros(3, 1, CV_64F);
 
       // std::cout << " pixel_diff: " ;
       //compute the difference between I_{kl} and \hat{I_{kl}}
@@ -462,7 +495,7 @@ void CCD::refine_parameters(BSpline &bs)
       // std::cout << std::endl;
       //compute jacobian matrix
         
-      tmp_jacobian = Mat::zeros(6,3,CV_64F);
+      tmp_jacobian = cv::Mat::zeros(6,3,CV_64F);
  
       for (int n = 0; n < 3; ++n)
       {
@@ -505,11 +538,11 @@ void CCD::refine_parameters(BSpline &bs)
     }
   }
 
-  cv::Mat Sigma_Phi_inv = Sigma_Phi.inv(DECOMP_SVD);
+  cv::Mat Sigma_Phi_inv = Sigma_Phi.inv(cv::DECOMP_SVD);
   hessian_E += Sigma_Phi_inv;
   nabla_E += 2*Sigma_Phi_inv*Phi;
 
-  cv::Mat hessian_E_inv = hessian_E.inv(DECOMP_SVD);
+  cv::Mat hessian_E_inv = hessian_E.inv(cv::DECOMP_SVD);
   delta_Phi = hessian_E_inv*nabla_E;
   // delta_Phi.at<double>(0,0) = 0.0;
   // delta_Phi.at<double>(1,0) = 0.0;
@@ -569,11 +602,11 @@ void CCD::run_ccd()
     }
 
     
-    nv = Mat::zeros(params_.resolution, 2, CV_64F);
-    mean_vic = Mat::zeros(params_.resolution, 6, CV_64F);
-    cov_vic = Mat::zeros(params_.resolution, 18, CV_64F);
-    nabla_E = Mat::zeros(6,1, CV_64F);
-    hessian_E = Mat::zeros(6,6, CV_64F);
+    nv = cv::Mat::zeros(params_.resolution, 2, CV_64F);
+    mean_vic = cv::Mat::zeros(params_.resolution, 6, CV_64F);
+    cov_vic = cv::Mat::zeros(params_.resolution, 18, CV_64F);
+    nabla_E = cv::Mat::zeros(6,1, CV_64F);
+    hessian_E = cv::Mat::zeros(6,6, CV_64F);
     // Phi.zeros(6,1,CV_64F);
 
     // create a new B-spline curve: degree =2
@@ -608,7 +641,7 @@ void CCD::run_ccd()
 	  {
 	    invalid = true;
 	    continue;
-	    std::cerr << "bs sample : " << bs[i].x << " " << bs[i].y << std::endl;
+	    // std::cerr << "bs sample : " << bs[i].x << " " << bs[i].y << std::endl;
 	  }
     }
     if (invalid)
@@ -630,9 +663,8 @@ void CCD::run_ccd()
         norm += delta_Phi.at<double>(i, 0)*delta_Phi.at<double>(i, 0);
     }
     norm = cv::sqrt(norm);
-    std::cerr << "iter: " << iter << "   tol: " << tol  << " norm: " << cv::norm(delta_Phi, NORM_L2)  << " norm_tmp:" << norm<< std::endl;
-    cv::imshow("Original", canvas);
-    
+    // std::cerr << "iter: " << iter << "   tol: " << tol  << " norm: " << cv::norm(delta_Phi, cv::NORM_L2)  << " norm_tmp:" << norm<< std::endl;
+    cv::imshow("CCD", canvas);    
     cv::waitKey(50);
 
 
@@ -661,4 +693,45 @@ void CCD::run_ccd()
     iter += 1;
     // bs.release();
   }while(!convergence);
+}
+
+void CCD::contour_sift()
+{
+  int row;
+  IplImage sift_tpl = tpl;
+  IplImage sift_tpl_img = canvas;
+  IplImage *tpl_ptr = &sift_tpl;
+  IplImage *tpl_img_ptr = &sift_tpl_img;
+  CvMat points_mat = sift_init(tpl_ptr, tpl_img_ptr, 30);
+  CvMat *points_mat_ptr = &points_mat;
+  double *ptr = points_mat_ptr->data.db;
+  int step = points_mat.step/sizeof(double);
+  for (row = 0; row < points_mat_ptr->rows; ++row)
+    pts.push_back(cv::Point2d((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]));
+  // cv::circle(my_ccd.canvas, cvPoint((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]), 2, CV_RGB(0,255,0), 2, 8, 0);
+
+  // cvReleaseImage(&tpl_ptr);
+  // cvReleaseImage(&tpl_img_ptr);
+  // cvReleaseMat(&points_mat_ptr);
+  // cvReleaseImageHeader(&tpl_ptr);
+  // cvReleaseImageHeader(&tpl_img_ptr);
+}
+
+
+void CCD::contour_manually()
+{
+  char key;
+  cv::namedWindow("CCD", 1);
+  // void (*cl_on_mouse)(int, int,int,int, void*) = on_mouse;
+  cv::setMouseCallback( "CCD", on_mouse,  (void*)this);
+  // for closed curves, we have to append 3 more points
+  // to the end, these 3 new points are the three one
+  // located in the head of the array
+  cv::imshow("CCD", canvas);
+  while (1)
+  {
+    key = cv::waitKey(10);
+    if (key == 27) break;
+  }
+  // std::cout << "size number: " << this->pts.size() << std::endl;
 }

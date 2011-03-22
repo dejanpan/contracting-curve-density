@@ -1,5 +1,3 @@
-#include <vector>
-#include <iostream>
 #include <cv.h>
 #include "ccd/bspline.h"
 double BSpline::basic(int i,
@@ -98,9 +96,9 @@ void BSpline::computeKnots()
 }
 
 void BSpline::computePoint(
-    std::vector<CvPoint2D64f> control,
-    CvPoint2D64f *output,
-    CvPoint2D64f *slope,
+    std::vector<cv::Point2d> control,
+    cv::Point2d *output,
+    cv::Point2d *slope,
     double *mat_ptr,
     double t,
     int degree)
@@ -126,14 +124,14 @@ BSpline::BSpline():curve_(NULL), tangent_(NULL){}
 
 BSpline::BSpline(int n,
                  int resolution,
-                 std::vector<CvPoint2D64f> control)
+                 std::vector<cv::Point2d> control)
     :basic_mat_(cv::Mat(resolution, control.size(), CV_64FC1)),
      knots(std::vector<int>(control.size()+n, 0)),
-     curve_((n>0 && resolution > 0)? new CvPoint[resolution]:NULL),
-     tangent_((n>0 && resolution > 0)? new CvPoint[resolution]:NULL)
+  curve_((n>0 && resolution > 0)? new cv::Point2i[resolution]:NULL),
+  tangent_((n>0 && resolution > 0)? new cv::Point2i[resolution]:NULL)
 {
   double increment, interval;
-  CvPoint2D64f tmp_point, tmp_tangent;
+  cv::Point2d tmp_point, tmp_tangent;
   int m = control.size() - 1;
   computeKnots();
   increment = (double) (m - n + 1)/resolution;
