@@ -7,7 +7,9 @@
 #include <opencv2/legacy/legacy.hpp>
 #include <opencv/highgui.h>
 #include <string.h>
+#include <iostream>
 #include <ccd/ccd.h>
+#include <ccd/bspline.h>
 
 //class ImageConverter {
 
@@ -52,41 +54,6 @@ public:
     }
 
 
-/** 
- * draw control points manually
- * 
- * @param event 
- * @param x 
- * @param y 
- * @param flags 
- * @param param 
- */
- static void on_mouse( int event, int x, int y, int flags, void* param )
-    {
-      //  MaskParams* params = (MaskParams*)_params;
-      CCD *ccd = (CCD*)param;
-      
-      if( ccd->canvas.empty())
-        return;
-      
-      //caution: check
-      // if( image1.at<double>() )
-      //   y = image1->height - y;
-      
-      switch( event )
-      {
-      case CV_EVENT_LBUTTONDOWN:
-        // std::cout << "Event = " << event << std::endl;
-        break;
-      case CV_EVENT_LBUTTONUP:
-        // std::cout << "Event = " << event << std::endl;
-        cv::circle(ccd->canvas,cv::Point(x,y),2,cv::Scalar(0,0,255),2);
-        ccd->pts.push_back(cvPoint2D64f(x,y));
-        // cvShowImage("Original",image1);
-        cv::imshow("Original", ccd->canvas);
-        break;
-      }
-}
 
   void imageCallback(const sensor_msgs::ImageConstPtr& msg_ptr)
     {
@@ -105,8 +72,8 @@ public:
       //canvas = imread("../data/ball.png", 1);
       cv_image.copyTo(ccd.canvas);
       cv_image.copyTo(ccd.image);
-      Mat_<Vec3b>& img = (Mat_<Vec3b>&)ccd.image;
-      std::cerr << "sample data: " << (int)img(356, 180)[0] << " " << (int)img(356, 180)[1] << " " << (int)img(356, 180)[2] << " "  << std::endl;
+      // Mat_<Vec3b>& img = (Mat_<Vec3b>&)ccd.image;
+      // std::cerr << "sample data: " << (int)img(356, 180)[0] << " " << (int)img(356, 180)[1] << " " << (int)img(356, 180)[2] << " "  << std::endl;
 
 
       std::cerr << "I got a new image" << std::endl;
@@ -117,7 +84,8 @@ public:
       {
         char key;
       
-        cvSetMouseCallback( "Original", on_mouse,  (void*)&this->ccd);
+        // cvSetMouseCallback( "Original", on_mouse,  (void*)&this->ccd);
+        ccd.init_pts(1);
         // cvShowImage("Original",img1);
         cv::imshow("Original", ccd.canvas);
         while (1)
@@ -136,14 +104,12 @@ public:
         // for (int i = 0; i < ccd.pts.size(); i++)
         //   std::cerr << "pts initialized: " << ccd.pts[i].x << " " << ccd.pts[i].y << std::endl;
         
-        BSpline bs(params[9], ccd.get_resolution(), ccd.pts);
-
-    
+        BSpline bs(params[9], ccd.get_resolution(), ccd.pts);    
 
         // for (int i = 0; i < ccd.get_resolution(); ++i)
         //   std::cerr << "pts bspline: " << bs[i].x << " " << bs[i].y << std::endl;
 
-        ccd.init_cov(bs, params[9]);
+        ccd.init_cov(bs, (int)params[9]);
         // bs.release();
         // bs.~BSpline();
       }
