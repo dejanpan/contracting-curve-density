@@ -1,6 +1,7 @@
 #include "opencv/cv.h"
 #include "opencv/highgui.h"
 #include <vector>
+#include <iostream>
 #include "ccd/sift_init.h"
 #include "ccd/bspline.h"
 #include "ccd/ccd.h"
@@ -45,10 +46,10 @@ void CCD::set_params(vector<double> &params)
   params_.gamma_4 = params[3];
   params_.kappa = params[4];
   params_.c = params[5];
-  params_.h = (int)params[6];
-  params_.delta_h = (int)params[7];
-  params_.resolution = (int)params[8];
-  params_.degree = (int)params[9];
+  params_.h = (int)(params[6]);
+  params_.delta_h = (int)(params[7]);
+  params_.resolution = (int)(params[8]);
+  params_.degree = (int)(params[9]);
 }
 
 void CCD::init_cov(BSpline &bs, int degree)
@@ -667,7 +668,18 @@ void CCD::run_ccd()
     norm = cv::sqrt(norm);
     // std::cerr << "iter: " << iter << "   tol: " << tol  << " norm: " << cv::norm(delta_Phi, cv::NORM_L2)  << " norm_tmp:" << norm<< std::endl;
     cv::imshow("CCD", canvas);    
-    cv::waitKey(50);
+    cv::waitKey(2);
+    // cout << params_.gamma_1 << " " ;
+    // cout << params_.gamma_2 << " " ;
+    // cout << params_.gamma_3 << " " ;
+    // cout << params_.gamma_4 << " " ;
+    // cout << params_.kappa << " " ;
+    // cout << params_.c << " " ;
+    // cout << params_.h << " " ;
+    // cout << params_.delta_h << " " ;
+    // cout << params_.resolution << " " ;
+    // cout << params_.degree << " " ;
+    // std::cout << std::endl;
 
 
     // if((tol - 0.0 < 0.001) && (norm < 0.01))
