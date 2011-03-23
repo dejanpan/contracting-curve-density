@@ -49,7 +49,7 @@ public:
   std::vector<cv::Point2d> pts;
 CCD():Phi(cv::Mat(6,1, CV_64F)),Sigma_Phi(cv::Mat(6,6, CV_64F)), delta_Phi(cv::Mat(6,1, CV_64F))
   {};
-  void set_params(vector<double> &params);
+  void set_params(std::vector<double> &params);
   void run_ccd();
   double get_resolution(){return params_.resolution;}
   inline void init_pts(int init_method);

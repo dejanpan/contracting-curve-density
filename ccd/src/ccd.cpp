@@ -2,6 +2,7 @@
 #include "opencv/highgui.h"
 #include <vector>
 #include <iostream>
+#include <algorithm>
 #include "ccd/sift_init.h"
 #include "ccd/bspline.h"
 #include "ccd/ccd.h"
@@ -38,7 +39,7 @@ void on_mouse(int event, int x, int y, int flags, void* param )
   }
 }
 
-void CCD::set_params(vector<double> &params)
+void CCD::set_params(std::vector<double> &params)
 {
   params_.gamma_1 = params[0];
   params_.gamma_2 = params[1];
@@ -151,7 +152,7 @@ void CCD::local_statistics(BSpline &bs)
   // normal direction as well as negative normal direction
   CvPoint tmp1, tmp2;
 
-  CvRNG rng;
+  CvRNG rng = cvRNG(0xffffffff);
   // store the distance from a point in normal(negative norml) direction
   // to the point on the curve
   CvPoint2D64f tmp_dis1, tmp_dis2;
@@ -233,7 +234,7 @@ void CCD::local_statistics(BSpline &bs)
       vic_ptr[10*k + 6] = -64*wp2*wp2*wp2*wp2 + 0.25;
 
       // W_p(d_p, simga_p) = c*max[0, exp(-d_p^2/2*sigma_p'^2) - exp(-gamma_2))]
-      vic_ptr[10*k + 7] = max((exp(-0.5*tmp_dis1.x*tmp_dis1.x/(sigma_hat*sigma_hat)) - exp(-params_.gamma_2)), 0.0);
+      vic_ptr[10*k + 7] = std::max((exp(-0.5*tmp_dis1.x*tmp_dis1.x/(sigma_hat*sigma_hat)) - exp(-params_.gamma_2)), 0.0);
 
       // W' = 0.5*exp(-|d_v= - d_p=|/alpha)/alpha
       vic_ptr[ 10*k + 8] = 0.5*exp(-abs(tmp_dis1.y)/alpha)/alpha;
@@ -285,7 +286,7 @@ void CCD::local_statistics(BSpline &bs)
       vic_ptr[10*negative_normal + 5] = -64*wp1*wp1*wp1*wp1 + 0.25;
       wp2 = (1 - vic_ptr[10*negative_normal + 4] - params_.gamma_1)/(1-params_.gamma_1);
       vic_ptr[10*negative_normal + 6] = wp2*wp2*wp2*wp2;
-      vic_ptr[10*negative_normal + 7] = max((exp(-0.5*tmp_dis2.x*tmp_dis2.x/(sigma_hat*sigma_hat)) - exp(-params_.gamma_2)), 0.0);
+      vic_ptr[10*negative_normal + 7] = std::max((exp(-0.5*tmp_dis2.x*tmp_dis2.x/(sigma_hat*sigma_hat)) - exp(-params_.gamma_2)), 0.0);
       vic_ptr[ 10*negative_normal + 8] = 0.5*exp(-abs(tmp_dis2.x)/alpha)/alpha;
       vic_ptr[ 10*negative_normal + 9] = exp(-tmp_dis2.x*tmp_dis2.x/(2*sigma*sigma))/(sqrt(2*CV_PI)*sigma);
       normalized_param.at<double>(i, 1) += vic_ptr[ 10*negative_normal + 7];
@@ -326,10 +327,10 @@ void CCD::local_statistics(BSpline &bs)
     double w1 =0.0 , w2 = 0.0;
 
     // store mean value near the curve
-    vector<double> m1(3,0.0), m2(3,0.0);
+    std::vector<double> m1(3,0.0), m2(3,0.0);
     
     // store the second mean value near the curve
-    vector<double> m1_o2(9,0.0), m2_o2(9,0.0);
+    std::vector<double> m1_o2(9,0.0), m2_o2(9,0.0);
 
     ////////////////////////////////////////////////////////////////////////
     // compute local statistics
@@ -667,8 +668,8 @@ void CCD::run_ccd()
     }
     norm = cv::sqrt(norm);
     // std::cerr << "iter: " << iter << "   tol: " << tol  << " norm: " << cv::norm(delta_Phi, cv::NORM_L2)  << " norm_tmp:" << norm<< std::endl;
-    cv::imshow("CCD", canvas);    
-    cv::waitKey(2);
+    // cv::imshow("CCD", canvas);    
+    // cv::waitKey(2);
     // cout << params_.gamma_1 << " " ;
     // cout << params_.gamma_2 << " " ;
     // cout << params_.gamma_3 << " " ;
