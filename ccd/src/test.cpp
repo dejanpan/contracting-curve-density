@@ -3,7 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include "sift_init.h"
+#include "ccd/sift_init.h"
 #include "ccd/bspline.h"
 #include "ccd/ccd.h"
 #include <fstream>
