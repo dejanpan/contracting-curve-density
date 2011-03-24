@@ -21,6 +21,8 @@ test:test.cpp $(OBJECTS) sift_init.o
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp sift_init.o $(OBJECTS) $(LDFLAGS)
 ccd_tracker:ccd_tracker.cpp $(OBJECTS) sift_init.o
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp sift_init.o $(OBJECTS) $(LDFLAGS)
+contour:contour.cpp sift_init.o
+	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp sift_init.o  $(LDFLAGS)
 
 sift_init.o:sift_init.c
 	$(GCC) $(INCDIR) $(CFLAGS) -c -o sift_init.o sift_init.c

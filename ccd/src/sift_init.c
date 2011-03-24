@@ -24,10 +24,7 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
   int n1, n2, k, i, m = 0;
 
     
-  int control_points_number = ceil((double)img1->height/inteval)*2+ ceil((double)img1->width/inteval)*2;
-  CvMat *coordinates = cvCreateMat(control_points_number, 3 , CV_64FC1);
-  CvMat *coordinates_t = cvCreateMat(3 ,control_points_number,  CV_64FC1);
-  
+
   stacked = stack_imgs( img1, img2 );
 
   n1 = sift_features( img1, &feat1 );
@@ -72,6 +69,7 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
   
   CvMat* H;
   IplImage* xformed;
+  CvMat *coordinates, *coordinates_t;
   H = ransac_xform( feat1, n1, FEATURE_FWD_MATCH, lsq_homog, 4, 0.01,
                     homog_xfer_err, 3.0, NULL, NULL );
   int row, col;
@@ -88,13 +86,26 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
      * }
      */
     /* printf("cont_n = %d\n", control_points_number); */
-    step = coordinates->step/sizeof(double);
-    double *ptr = coordinates->data.db;
+
+
     i = 0;
 
-    for (row = inteval; row < img1->height; row+=inteval){
-      (ptr+i*step)[0] = 0;
-      (ptr+i*step)[1] = row;
+    if(inteval <= 0)
+    {
+      CvFileStorage* fs= cvOpenFileStorage("contour.xml", 0, CV_STORAGE_READ);
+      coordinates= (CvMat*)cvReadByName(fs,  NULL, "contour_points", NULL);
+      coordinates_t = cvCreateMat(3 ,coordinates->rows,  CV_64FC1);
+    }
+    else
+    {
+      int control_points_number = ceil((double)img1->height/inteval)*2+ ceil((double)img1->width/inteval)*2;
+      coordinates = cvCreateMat(control_points_number, 3 , CV_64FC1);
+      coordinates_t = cvCreateMat(3 ,control_points_number,  CV_64FC1);
+      step = coordinates->step/sizeof(double);
+      double *ptr = coordinates->data.db;
+      for (row = inteval; row < img1->height; row+=inteval){
+        (ptr+i*step)[0] = 0;
+        (ptr+i*step)[1] = row;
       (ptr+i*step)[2] = 1;
       i++;
     }
@@ -134,6 +145,7 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
     (ptr+i*step)[1] = 0;
     (ptr+i*step)[2] = 1;
     i++;
+    }
     /* printf("i == %d \n", i); */
 
     
