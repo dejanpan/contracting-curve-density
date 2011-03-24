@@ -8,8 +8,8 @@
 #include <opencv/highgui.h>
 #include <string.h>
 #include <iostream>
-#include <ccd/ccd.h>
 #include <ccd/bspline.h>
+#include <ccd/ccd.h>
 
 //class ImageConverter {
 
@@ -32,19 +32,8 @@ public:
       n_.param("image_topic", image_topic_, std::string("/wide_stereo/left/image_rect"));
       image_sub_ = it_.subscribe(image_topic_, 1, &CCDNode::imageCallback, this);
       params = new double[9];
-      cv::namedWindow("Original", 1);
       ROS_INFO("CCDNode Ready, listening on topic %s", image_topic_.c_str());
-      params[0] = 0.5;
-      params[1] = 4;
-      params[2] = 4;
-      params[3] = 3;
-      params[4] = 0.5;
-      params[5] = 0.25;
-      params[6] = 40;
-      params[7] = 1;
-      params[8] = 50;
-      params[9] = 4;
-      ccd.set_params(params);
+      ccd.read_params(std::string("ccd_params.xml"));
       count_ = 0;
     }
 
@@ -82,38 +71,26 @@ public:
       // cv::imshow("Origianl", img);
       if (count_ == 1)
       {
-        char key;
-      
         // cvSetMouseCallback( "Original", on_mouse,  (void*)&this->ccd);
         ccd.init_pts(1);
         // cvShowImage("Original",img1);
-        cv::imshow("Original", ccd.canvas);
-        while (1)
-        {
-          key = cvWaitKey(10);
-          if (key == 27) 
-            break;
-        }
         // for closed curves, we have to append 3 more points
         // to the end, these 3 new points are the three one
         // located in the head of the array
-        if(ccd.pts.size() > params[9])
-          for (int i = 0; i < params[9]; ++i)
-            ccd.pts.push_back(ccd.pts[i]);
+        // if(ccd.pts.size() > params[9])
+        //   for (int i = 0; i < params[9]; ++i)
+        //     ccd.pts.push_back(ccd.pts[i]);
         
         // for (int i = 0; i < ccd.pts.size(); i++)
         //   std::cerr << "pts initialized: " << ccd.pts[i].x << " " << ccd.pts[i].y << std::endl;
         
-        BSpline bs(params[9], ccd.get_resolution(), ccd.pts);    
+        BSpline bs(ccd.degree(), ccd.resolution(), ccd.pts);    
 
         // for (int i = 0; i < ccd.get_resolution(); ++i)
         //   std::cerr << "pts bspline: " << bs[i].x << " " << bs[i].y << std::endl;
-
-        ccd.init_cov(bs, (int)params[9]);
-        // bs.release();
-        // bs.~BSpline();
+        
+        ccd.init_cov(bs, (int)ccd.degree());
       }
-      //ccd.init_pts(pts1);
       ccd.run_ccd();
       // cv::imshow("Original", ccd.canvas);
       // cv::waitKey(1);

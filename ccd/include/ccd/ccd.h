@@ -49,9 +49,10 @@ public:
   std::vector<cv::Point3d> pts;
 CCD():Phi(cv::Mat::zeros(8,1, CV_64F)),Sigma_Phi(cv::Mat::zeros(8,8, CV_64F)), delta_Phi(cv::Mat::zeros(8,1, CV_64F))
   {};
-  void read_params( const string& filename);
+  void read_params( const std::string& filename);
   void run_ccd();
-  double get_resolution(){return params_.resolution;}
+  double resolution(){return params_.resolution;}
+  double degree(){return params_.degree;}
   inline void init_pts(int init_method);
   void init_cov(BSpline &bs, int degree);
   ~CCD(){clear();}

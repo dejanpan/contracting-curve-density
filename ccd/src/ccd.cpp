@@ -39,9 +39,11 @@ void on_mouse(int event, int x, int y, int flags, void* param )
   }
 }
 
-void CCD::read_params( const string& filename)
+void CCD::read_params( const std::string& filename)
 {
   cv::FileStorage fs(filename, cv::FileStorage::READ);
+  if(!fs.isOpened())
+    std::cerr << "fuck my life" <<std::endl;
   params_.gamma_1 = double(fs["gamma_1"]);      
   params_.gamma_2 = double(fs["gamma_2"]);      
   params_.gamma_3 = double(fs["gamma_3"]);      
@@ -52,6 +54,17 @@ void CCD::read_params( const string& filename)
   params_.delta_h = int(fs["delta_h"]);      
   params_.resolution = int(fs["resolution"]);   
   params_.degree  = int(fs["degree"]);
+  std::cerr << params_.gamma_1 << std::endl;
+  std::cerr << params_.gamma_2 << std::endl;
+  std::cerr << params_.gamma_3 << std::endl;
+  std::cerr << params_.gamma_4 << std::endl;
+  std::cerr << params_.kappa << std::endl;
+  std::cerr << params_.c << std::endl;
+  std::cerr << params_.h << std::endl;
+  std::cerr << params_.delta_h << std::endl;
+  std::cerr << params_.resolution << std::endl;
+  std::cerr << params_.degree << std::endl;
+
 }
 
 void CCD::init_cov(BSpline &bs, int degree)
@@ -686,8 +699,9 @@ void CCD::run_ccd()
 // name << iter;
 // cv::imwrite(name.str() + ".png", canvas);
 
-    cv::imshow("CCD", canvas);    
-    cv::waitKey(2);
+    // cv::imshow("CCD", canvas);    
+    // cv::waitKey(2);
+
     // cerr << std::endl;
     // std::cerr << params_.gamma_1 << " " ;
     // std::cerr << params_.gamma_2 << " " ;
@@ -719,7 +733,7 @@ void CCD::run_ccd()
 
     //   break;
     // }
-    if(iter >= 40)
+    if(iter >= 20)
     {
       convergence = true;
       init_cov(bs, params_.degree);
