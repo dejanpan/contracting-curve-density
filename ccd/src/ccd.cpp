@@ -33,7 +33,7 @@ void on_mouse(int event, int x, int y, int flags, void* param )
       break;
     case CV_EVENT_LBUTTONUP:
       cv::circle(image,cv::Point(x,y),2,cv::Scalar(0,0,255),2);
-      my_ccd->pts.push_back(cv::Point2d(x,y));
+      my_ccd->pts.push_back(cv::Point3d(x,y,1));
       cv::imshow("CCD", image);
       break;
   }
@@ -57,7 +57,7 @@ void CCD::read_params( const string& filename)
 void CCD::init_cov(BSpline &bs, int degree)
 {
   int n_dim = (int)pts.size() - 3;
-  cv::Mat W = cv::Mat::zeros(2*n_dim,6, CV_64F);
+  cv::Mat W = cv::Mat::zeros(2*n_dim,8, CV_64F);
   cv::Mat U = cv::Mat::zeros(2*n_dim, 2*n_dim, CV_64F);
   for (int i = 0; i < n_dim; ++i)
   {
@@ -68,6 +68,8 @@ void CCD::init_cov(BSpline &bs, int degree)
     W_ptr[3] = 0;
     W_ptr[4] = 0;
     W_ptr[5] = pts[i].y;
+    W_ptr[6] = pts[i].z;
+    W_ptr[7] = 0;
     W_ptr = W.ptr<double>(i+params_.resolution);
     W_ptr[0] = 0;
     W_ptr[1] = 1;
@@ -75,6 +77,8 @@ void CCD::init_cov(BSpline &bs, int degree)
     W_ptr[3] = pts[i].y;
     W_ptr[4] = pts[i].x;
     W_ptr[5] = 0;
+    W_ptr[6] = 0;
+    W_ptr[7] = pts[i].z;
   }
 
   cv::Mat tmp_mat = cv::Mat::zeros(n_dim, n_dim, CV_64F);
@@ -154,17 +158,17 @@ void CCD::local_statistics(BSpline &bs)
 
   // temporary points used to store those points in the
   // normal direction as well as negative normal direction
-  cv::Point2d tmp1, tmp2;
+  cv::Point3d tmp1, tmp2;
 
   CvRNG rng;
   // store the distance from a point in normal(negative norml) direction
   // to the point on the curve
-  cv::Point2d tmp_dis1, tmp_dis2;
+  cv::Point3d tmp_dis1, tmp_dis2;
 
   cv::Scalar color = random_color(&rng);
   for(int i=0; i < params_.resolution;i++)
   {
-    cv::circle(canvas, bs[i], 1,color, 1);
+    cv::circle(canvas, cv::Point2d(bs[i].x, bs[i].y), 1,color, 1);
     
 #ifdef DEBUG
     std::cout << bs[i].x  << " " << bs[i].y << std::endl;
@@ -503,22 +507,25 @@ void CCD::refine_parameters(BSpline &bs)
       // std::cout << std::endl;
       //compute jacobian matrix
         
-      tmp_jacobian = cv::Mat::zeros(6,3,CV_64F);
+      tmp_jacobian = cv::Mat::zeros(8,3,CV_64F);
  
       for (int n = 0; n < 3; ++n)
       {
-        tmp_jacobian.at<double>(0,n) = vic_ptr[ 10*j + 9]*(mean_vic_ptr[ n] - mean_vic_ptr[n+3])*nv_ptr[0];
-        tmp_jacobian.at<double>(1,n) = vic_ptr[ 10*j + 9]*(mean_vic_ptr[ n] - mean_vic_ptr[n+3])*nv_ptr[1];
-        tmp_jacobian.at<double>(2,n) = vic_ptr[ 10*j + 9]*(mean_vic_ptr[ n] - mean_vic_ptr[n+3])*nv_ptr[0]*bs[i].x;
-        tmp_jacobian.at<double>(3,n) = vic_ptr[ 10*j + 9]*(mean_vic_ptr[ n] - mean_vic_ptr[n+3])*nv_ptr[1]*bs[i].y;
-        tmp_jacobian.at<double>(4,n) = vic_ptr[ 10*j + 9]*(mean_vic_ptr[ n] - mean_vic_ptr[n+3])*nv_ptr[1]*bs[i].x;
-        tmp_jacobian.at<double>(5,n) = vic_ptr[ 10*j + 9]*(mean_vic_ptr[ n] - mean_vic_ptr[n+3])*nv_ptr[0]*bs[i].y;
+        tmp_jacobian.at<double>(0,n) = vic_ptr[10*j + 9]*(mean_vic_ptr[n] - mean_vic_ptr[n+3])*nv_ptr[0];
+        tmp_jacobian.at<double>(1,n) = vic_ptr[10*j + 9]*(mean_vic_ptr[n] - mean_vic_ptr[n+3])*nv_ptr[1];
+        tmp_jacobian.at<double>(2,n) = vic_ptr[10*j + 9]*(mean_vic_ptr[n] - mean_vic_ptr[n+3])*nv_ptr[0]*bs[i].x;
+        tmp_jacobian.at<double>(3,n) = vic_ptr[10*j + 9]*(mean_vic_ptr[n] - mean_vic_ptr[n+3])*nv_ptr[1]*bs[i].y;
+        tmp_jacobian.at<double>(4,n) = vic_ptr[10*j + 9]*(mean_vic_ptr[n] - mean_vic_ptr[n+3])*nv_ptr[1]*bs[i].x;
+        tmp_jacobian.at<double>(5,n) = vic_ptr[10*j + 9]*(mean_vic_ptr[n] - mean_vic_ptr[n+3])*nv_ptr[0]*bs[i].y;
+        tmp_jacobian.at<double>(6,n) = vic_ptr[10*j + 9]*(mean_vic_ptr[n] - mean_vic_ptr[n+3])*nv_ptr[0]*bs[i].z;
+        tmp_jacobian.at<double>(7,n) = vic_ptr[10*j + 9]*(mean_vic_ptr[n] - mean_vic_ptr[n+3])*nv_ptr[1]*bs[i].z;
+
         // std::cout << mean_vic_ptr[n] << " " << mean_vic_ptr[n+3] << std::endl;
       }
 
 
 #ifdef DEBUG
-      for (int m = 0; m < 6; ++m)
+      for (int m = 0; m < 8; ++m)
       {
         for (int n = 0; n < 3; ++n)
         {
@@ -559,13 +566,15 @@ void CCD::refine_parameters(BSpline &bs)
   // delta_Phi.at<double>(4,0) = 0.0;
   // delta_Phi.at<double>(5,0) = 0.0;
   // #ifdef DEBUG
-    // std::cout << delta_Phi.at<double>(0,0) << " "
-    //           << delta_Phi.at<double>(1,0) << " " 
-    //           << delta_Phi.at<double>(2,0) << " " 
-    //           << delta_Phi.at<double>(3,0) << " " 
-    //           << delta_Phi.at<double>(4,0) << " " 
-    //           << delta_Phi.at<double>(5,0) << " " 
-    //           << std::endl;
+    std::cout << delta_Phi.at<double>(0,0) << " "
+              << delta_Phi.at<double>(1,0) << " " 
+              << delta_Phi.at<double>(2,0) << " " 
+              << delta_Phi.at<double>(3,0) << " " 
+              << delta_Phi.at<double>(4,0) << " " 
+              << delta_Phi.at<double>(5,0) << " " 
+              << delta_Phi.at<double>(6,0) << " " 
+              << delta_Phi.at<double>(7,0) << " " 
+              << std::endl;
   // #endif
   // cv::norm(delta_Phi);
   
@@ -584,7 +593,6 @@ void CCD::run_ccd()
 {
   // store the control points trasformed in the shape space
 
-  cv::Point2d pts_tmp;
   int iter = 0;
   double tol = 0.0;
   bool convergence = false;
@@ -605,18 +613,17 @@ void CCD::run_ccd()
       //     C = [                       ][\phi_0 \phi_1 \phi_2 \phi_3 \phi_4 \phi_5 ]^T + C_0
       //           0  1  0   y_0 x_0  0
       //
-      pts_tmp.x = Phi.at<double>(0,0) + (1+Phi.at<double>(2,0))*pts[i].x + Phi.at<double>(5,0)*pts[i].y;
-      pts_tmp.y = Phi.at<double>(1,0) + (1+Phi.at<double>(3,0))*pts[i].y + Phi.at<double>(4,0)*pts[i].x;
-      pts[i].x = round(pts_tmp.x);
-      pts[i].y = round(pts_tmp.y);
+      pts[i].x = Phi.at<double>(0,0) + (1+Phi.at<double>(2,0))*pts[i].x + Phi.at<double>(5,0)*pts[i].y + Phi.at<double>(6,0)*pts[i].z;
+      pts[i].y = Phi.at<double>(1,0) + (1+Phi.at<double>(3,0))*pts[i].y + Phi.at<double>(4,0)*pts[i].x + Phi.at<double>(7,0)*pts[i].z;
+      pts[i].z = 1;
     }
 
     
     nv = cv::Mat::zeros(params_.resolution, 2, CV_64F);
     mean_vic = cv::Mat::zeros(params_.resolution, 6, CV_64F);
     cov_vic = cv::Mat::zeros(params_.resolution, 18, CV_64F);
-    nabla_E = cv::Mat::zeros(6,1, CV_64F);
-    hessian_E = cv::Mat::zeros(6,6, CV_64F);
+    nabla_E = cv::Mat::zeros(8,1, CV_64F);
+    hessian_E = cv::Mat::zeros(8,8, CV_64F);
     // Phi.zeros(6,1,CV_64F);
 
     // create a new B-spline curve: degree =2
@@ -628,7 +635,7 @@ void CCD::run_ccd()
     for (int i = 0; i < params_.resolution; ++i)
     {
       //std::cout << bs[i].x << " " << bs[i].y << std::endl;
-      cv::circle(canvas, bs[i], 2 ,CV_RGB(0,255,0), 2); 
+      cv::circle(canvas, cv::Point2d(bs[i].x, bs[i].y), 1 ,CV_RGB(0,255,0), 1); 
     }
 
     // converge condition
@@ -729,14 +736,14 @@ void CCD::contour_sift()
   IplImage sift_tpl_img = canvas;
   IplImage *tpl_ptr = &sift_tpl;
   IplImage *tpl_img_ptr = &sift_tpl_img;
+  // CvMat points_mat = sift_init(tpl_ptr, tpl_img_ptr, 30);
   CvMat points_mat = sift_init(tpl_ptr, tpl_img_ptr, 30);
-  // CvMat points_mat = sift_init(tpl_ptr, tpl_img_ptr, 0);
   CvMat *points_mat_ptr = &points_mat;
   double *ptr = points_mat_ptr->data.db;
   int step = points_mat.step/sizeof(double);
   for (row = 0; row < points_mat_ptr->rows; ++row)
   {
-    pts.push_back(cv::Point2d((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]));
+    pts.push_back(cv::Point3d((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2], 1));
     // cv::circle(my_ccd.canvas, cvPoint((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]), 2, CV_RGB(0,255,0), 2, 8, 0);
   }
   //clean..........

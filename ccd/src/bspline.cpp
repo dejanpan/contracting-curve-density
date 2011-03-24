@@ -96,9 +96,9 @@ void BSpline::computeKnots()
 }
 
 void BSpline::computePoint(
-    std::vector<cv::Point2d> control,
-    cv::Point2d *output,
-    cv::Point2d *slope,
+    std::vector<cv::Point3d> control,
+    cv::Point3d *output,
+    cv::Point3d *slope,
     double *mat_ptr,
     double t,
     int degree)
@@ -107,8 +107,10 @@ void BSpline::computePoint(
   // initialize the variables that will hold our outputted point
   output->x=0;
   output->y=0;
+  output->z=0;
   slope->x = 0;
   slope->y = 0;
+  slope->z = 0;
   for (size_t i = 0; i < control.size(); i++)
   {
     // b = basic(i, n_order_, t);
@@ -116,22 +118,24 @@ void BSpline::computePoint(
     mat_ptr[i] = b;
     output->x += control[i].x * b;
     output->y += control[i].y * b;
+    output->z += control[i].z * b;
     slope->x += (control[i]).x * bp;
     slope->y += (control[i]).y * bp;
+    slope->z += (control[i]).z * bp;
   }
 }  
 BSpline::BSpline():curve_(NULL), tangent_(NULL){}
 
 BSpline::BSpline(int n,
                  int resolution,
-                 std::vector<cv::Point2d> control)
+                 std::vector<cv::Point3d> control)
     :basic_mat_(cv::Mat(resolution, control.size(), CV_64FC1)),
      knots(std::vector<int>(control.size()+n, 0)),
-  curve_((n>0 && resolution > 0)? new cv::Point2d[resolution]:NULL),
-  tangent_((n>0 && resolution > 0)? new cv::Point2d[resolution]:NULL)
+  curve_((n>0 && resolution > 0)? new cv::Point3d[resolution]:NULL),
+  tangent_((n>0 && resolution > 0)? new cv::Point3d[resolution]:NULL)
 {
   double increment, interval;
-  cv::Point2d tmp_point, tmp_tangent;
+  cv::Point3d tmp_point, tmp_tangent;
   int m = control.size() - 1;
   computeKnots();
   increment = (double) (m - n + 1)/resolution;
@@ -144,11 +148,13 @@ BSpline::BSpline(int n,
     computePoint(control, &tmp_point, &tmp_tangent, mat_ptr, interval, n);
     curve_[i].x = tmp_point.x;
     curve_[i].y = tmp_point.y;
+    curve_[i].z = tmp_point.z;
     // if(i<20)
     //   std::cout << interval <<"i: " <<i << " x " << round(tmp_point.x) << " y "<< round(tmp_point.y) << std::endl;
     // std::cout <<  interval << "       i: " << i << " x " << curve_[i].x << " y "<< curve_[i].y << std::endl;
     tangent_[i].x = tmp_tangent.x;
     tangent_[i].y = tmp_tangent.y;
+    tangent_[i].z = tmp_tangent.z;
     // double min = (double)(100%((int)round(increment*100)))/100.0;
     // std::cout <<"increment: " << (int)round(increment*100) <<  " min = " << min << " interval - round(interval) : " << abs(interval - round(interval))<< std::endl;
 

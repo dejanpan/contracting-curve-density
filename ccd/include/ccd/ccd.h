@@ -46,8 +46,8 @@ class CCD
 {
 public:
   cv::Mat image, canvas, tpl;
-  std::vector<cv::Point2d> pts;
-CCD():Phi(cv::Mat::zeros(6,1, CV_64F)),Sigma_Phi(cv::Mat::zeros(6,6, CV_64F)), delta_Phi(cv::Mat::zeros(6,1, CV_64F))
+  std::vector<cv::Point3d> pts;
+CCD():Phi(cv::Mat::zeros(8,1, CV_64F)),Sigma_Phi(cv::Mat::zeros(8,8, CV_64F)), delta_Phi(cv::Mat::zeros(8,1, CV_64F))
   {};
   void read_params( const string& filename);
   void run_ccd();
