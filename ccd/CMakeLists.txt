@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.4.6)
-
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+
 # Set the build type.  Options are:
 #  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
 #  Debug          : w/ debug symbols, w/o optimization
@@ -20,9 +20,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_genmsg()
 #uncomment if you have defined services
 #rosbuild_gensrv()
-include_directories(${PROJECT_SOURCE_DIR}/../sift/include)
-
-LINK_LIBRARIES(${PROJECT_SOURCE_DIR}/../sift/lib/libfeat.a)
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
@@ -37,9 +34,10 @@ LINK_LIBRARIES(${PROJECT_SOURCE_DIR}/../sift/lib/libfeat.a)
 #rosbuild_add_executable(snake src/snake.cpp src/bspline.cpp)
 #rosbuild_add_executable(ros_to_openCV src/bspline.cpp src/ros_to_openCv.cpp)
 #rosbuild_add_executable(ccd src/bspline.cpp src/ccd.cpp)
-#rosbuild_add_executable(test_ccd src/bspline.cpp src/ccd.cpp src/test.cpp)
-#rosbuild_add_executable(opencv_to_ros_node src/openCV_to_ros.cpp)
-rosbuild_add_executable(ccd_node2 src/ccd.cpp src/bspline.cpp src/sift_init.c src/ccd_node2.cpp)
+rosbuild_add_executable(test_ccd src/bspline.cpp src/ccd.cpp src/test.cpp)
+rosbuild_add_executable(opencv_to_ros_node src/openCV_to_ros.cpp)
+rosbuild_add_executable(ccd_node2 src/ccd.cpp src/bspline.cpp
+src/ccd_node2.cpp)
 #rosbuild_add_executable(ccd_node3 src/ccd.cpp src/bspline.cpp
 #src/ccd_node3.cpp)
-#rosbuild_add_executable(sift src/sift.cpp)
+rosbuild_add_executable(sift src/sift.cpp)

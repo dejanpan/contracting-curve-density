@@ -47,9 +47,9 @@ class CCD
 public:
   cv::Mat image, canvas, tpl;
   std::vector<cv::Point2d> pts;
-CCD():Phi(cv::Mat(6,1, CV_64F)),Sigma_Phi(cv::Mat(6,6, CV_64F)), delta_Phi(cv::Mat(6,1, CV_64F))
+CCD():Phi(cv::Mat::zeros(6,1, CV_64F)),Sigma_Phi(cv::Mat::zeros(6,6, CV_64F)), delta_Phi(cv::Mat::zeros(6,1, CV_64F))
   {};
-  void set_params(std::vector<double> &params);
+  void read_params( const string& filename);
   void run_ccd();
   double get_resolution(){return params_.resolution;}
   inline void init_pts(int init_method);

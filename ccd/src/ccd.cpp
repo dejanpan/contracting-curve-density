@@ -39,18 +39,19 @@ void on_mouse(int event, int x, int y, int flags, void* param )
   }
 }
 
-void CCD::set_params(std::vector<double> &params)
+void CCD::read_params( const string& filename)
 {
-  params_.gamma_1 = params[0];
-  params_.gamma_2 = params[1];
-  params_.gamma_3 = params[2];
-  params_.gamma_4 = params[3];
-  params_.kappa = params[4];
-  params_.c = params[5];
-  params_.h = (int)(params[6]);
-  params_.delta_h = (int)(params[7]);
-  params_.resolution = (int)(params[8]);
-  params_.degree = (int)(params[9]);
+  cv::FileStorage fs(filename, cv::FileStorage::READ);
+  params_.gamma_1 = double(fs["gamma_1"]);      
+  params_.gamma_2 = double(fs["gamma_2"]);      
+  params_.gamma_3 = double(fs["gamma_3"]);      
+  params_.gamma_4 = double(fs["gamma_4"]);      
+  params_.kappa   = double(fs["kappa"]);        
+  params_.c       = double(fs["c"]);            
+  params_.h       = int(fs["h"]);            
+  params_.delta_h = int(fs["delta_h"]);      
+  params_.resolution = int(fs["resolution"]);   
+  params_.degree  = int(fs["degree"]);
 }
 
 void CCD::init_cov(BSpline &bs, int degree)
@@ -86,9 +87,7 @@ void CCD::init_cov(BSpline &bs, int degree)
     {
       double *tmp_mat_ptr = tmp_mat.ptr<double>(m);
       for (int n = 0; n < n_dim; ++n)
-      {
         tmp_mat_ptr[n] += basic_mat_ptr[m]*basic_mat_ptr[n];
-      }
     }
   }
   
@@ -111,23 +110,28 @@ void CCD::init_cov(BSpline &bs, int degree)
   // cov = Nx/rou_0^2 * H
   // cov = 6/25*cov;
   // clean....
-  // W.release();
-  // U.release();
-  // tmp_mat.release();
+  W.release();
+  U.release();
+  tmp_cov.release();
+  tmp_mat.release();
 }
 
 
 void CCD::clear()
 {
-  bs_old.release();
-  Phi.release();
-  Sigma_Phi.release();
-  nv.release();
+  vic.release();
   mean_vic.release();
   cov_vic.release();
+  nv.release();
+  Phi.release();
+  Sigma_Phi.release();
   delta_Phi.release();
+  bs_old.release();
   nabla_E.release();
   hessian_E.release();
+  image.release();
+  canvas.release();
+  if(!tpl.empty()) tpl.release();
 }
 
 
@@ -150,12 +154,12 @@ void CCD::local_statistics(BSpline &bs)
 
   // temporary points used to store those points in the
   // normal direction as well as negative normal direction
-  CvPoint tmp1, tmp2;
+  cv::Point2i tmp1, tmp2;
 
-  CvRNG rng = cvRNG(0xffffffff);
+  CvRNG rng;
   // store the distance from a point in normal(negative norml) direction
   // to the point on the curve
-  CvPoint2D64f tmp_dis1, tmp_dis2;
+  cv::Point2d tmp_dis1, tmp_dis2;
 
   cv::Scalar color = random_color(&rng);
   for(int i=0; i < params_.resolution;i++)
@@ -555,13 +559,13 @@ void CCD::refine_parameters(BSpline &bs)
   // delta_Phi.at<double>(4,0) = 0.0;
   // delta_Phi.at<double>(5,0) = 0.0;
   // #ifdef DEBUG
-  //   std::cout << delta_Phi.at<double>(0,0) << " "
-  //             << delta_Phi.at<double>(1,0) << " " 
-  //             << delta_Phi.at<double>(2,0) << " " 
-  //             << delta_Phi.at<double>(3,0) << " " 
-  //             << delta_Phi.at<double>(4,0) << " " 
-  //             << delta_Phi.at<double>(5,0) << " " 
-  //             << std::endl;
+    // std::cout << delta_Phi.at<double>(0,0) << " "
+    //           << delta_Phi.at<double>(1,0) << " " 
+    //           << delta_Phi.at<double>(2,0) << " " 
+    //           << delta_Phi.at<double>(3,0) << " " 
+    //           << delta_Phi.at<double>(4,0) << " " 
+    //           << delta_Phi.at<double>(5,0) << " " 
+    //           << std::endl;
   // #endif
   // cv::norm(delta_Phi);
   
@@ -579,7 +583,7 @@ void CCD::refine_parameters(BSpline &bs)
 void CCD::run_ccd()
 {
   // store the control points trasformed in the shape space
-  CvPoint2D64f pts_tmp;
+  cv::Point2d pts_tmp;
   int iter = 0;
   double tol = 0.0;
   bool convergence = false;
@@ -617,11 +621,11 @@ void CCD::run_ccd()
 
 
     BSpline bs(params_.degree , params_.resolution, pts);
-
+    
     // std::cout << "BSPLINE POINTS:" << std::endl;
     for (int i = 0; i < params_.resolution; ++i)
     {
-      // std::cout << bs[i].x << " " << bs[i].y << std::endl;
+      //std::cout << bs[i].x << " " << bs[i].y << std::endl;
       cv::circle(canvas, bs[i], 2 ,CV_RGB(0,255,0), 2); 
     }
 
@@ -667,20 +671,26 @@ void CCD::run_ccd()
         norm += delta_Phi.at<double>(i, 0)*delta_Phi.at<double>(i, 0);
     }
     norm = cv::sqrt(norm);
-    // std::cerr << "iter: " << iter << "   tol: " << tol  << " norm: " << cv::norm(delta_Phi, cv::NORM_L2)  << " norm_tmp:" << norm<< std::endl;
-    // cv::imshow("CCD", canvas);    
-    // cv::waitKey(2);
-    // cout << params_.gamma_1 << " " ;
-    // cout << params_.gamma_2 << " " ;
-    // cout << params_.gamma_3 << " " ;
-    // cout << params_.gamma_4 << " " ;
-    // cout << params_.kappa << " " ;
-    // cout << params_.c << " " ;
-    // cout << params_.h << " " ;
-    // cout << params_.delta_h << " " ;
-    // cout << params_.resolution << " " ;
-    // cout << params_.degree << " " ;
-    // std::cout << std::endl;
+    std::cerr << "iter: " << iter << "   tol: " << tol  << " norm: " << cv::norm(delta_Phi, cv::NORM_L2)  << " norm_tmp:" << norm<< std::endl;
+
+// std::stringstream name;
+// name << iter;
+// cv::imwrite(name.str() + ".png", canvas);
+
+    cv::imshow("CCD", canvas);    
+    cv::waitKey(2);
+    // cerr << std::endl;
+    // std::cerr << params_.gamma_1 << " " ;
+    // std::cerr << params_.gamma_2 << " " ;
+    // std::cerr << params_.gamma_3 << " " ;
+    // std::cerr << params_.gamma_4 << " " ;
+    // std::cerr << params_.kappa << " " ;
+    // std::cerr << params_.c << " " ;
+    // std::cerr << params_.h << " " ;
+    // std::cerr << params_.delta_h << " " ;
+    // std::cerr << params_.resolution << " " ;
+    // std::cerr << params_.degree << " " ;
+    // std::cerr << std::endl;
 
 
     // if((tol - 0.0 < 0.001) && (norm < 0.01))

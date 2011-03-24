@@ -1,2 +1,13 @@
-0.5 4 4 3 0.5 0.25 40 1 150 4
-
+<?xml version="1.0"?>
+<opencv_storage>
+<gamma_1>0.5</gamma_1>
+<gamma_2>4</gamma_2>
+<gamma_3>4</gamma_3>
+<gamma_4>3</gamma_4>
+<kappa>0.5</kappa>
+<c>0.25</c>
+<h>40</h>
+<delta_h>1</delta_h>
+<resolution>100</resolution>
+<degree>4</degree>
+</opencv_storage>
