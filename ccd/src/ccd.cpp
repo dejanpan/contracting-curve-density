@@ -154,7 +154,7 @@ void CCD::local_statistics(BSpline &bs)
 
   // temporary points used to store those points in the
   // normal direction as well as negative normal direction
-  cv::Point2i tmp1, tmp2;
+  cv::Point2d tmp1, tmp2;
 
   CvRNG rng;
   // store the distance from a point in normal(negative norml) direction
@@ -679,8 +679,8 @@ void CCD::run_ccd()
 // name << iter;
 // cv::imwrite(name.str() + ".png", canvas);
 
-    // cv::imshow("CCD", canvas);    
-    // cv::waitKey(2);
+    cv::imshow("CCD", canvas);    
+    cv::waitKey(2);
     // cerr << std::endl;
     // std::cerr << params_.gamma_1 << " " ;
     // std::cerr << params_.gamma_2 << " " ;
@@ -712,7 +712,7 @@ void CCD::run_ccd()
 
     //   break;
     // }
-    if(iter >= 20)
+    if(iter >= 40)
     {
       convergence = true;
       init_cov(bs, params_.degree);
@@ -730,6 +730,7 @@ void CCD::contour_sift()
   IplImage *tpl_ptr = &sift_tpl;
   IplImage *tpl_img_ptr = &sift_tpl_img;
   CvMat points_mat = sift_init(tpl_ptr, tpl_img_ptr, 30);
+  // CvMat points_mat = sift_init(tpl_ptr, tpl_img_ptr, 0);
   CvMat *points_mat_ptr = &points_mat;
   double *ptr = points_mat_ptr->data.db;
   int step = points_mat.step/sizeof(double);

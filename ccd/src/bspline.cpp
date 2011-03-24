@@ -127,8 +127,8 @@ BSpline::BSpline(int n,
                  std::vector<cv::Point2d> control)
     :basic_mat_(cv::Mat(resolution, control.size(), CV_64FC1)),
      knots(std::vector<int>(control.size()+n, 0)),
-  curve_((n>0 && resolution > 0)? new cv::Point2i[resolution]:NULL),
-  tangent_((n>0 && resolution > 0)? new cv::Point2i[resolution]:NULL)
+  curve_((n>0 && resolution > 0)? new cv::Point2d[resolution]:NULL),
+  tangent_((n>0 && resolution > 0)? new cv::Point2d[resolution]:NULL)
 {
   double increment, interval;
   cv::Point2d tmp_point, tmp_tangent;
@@ -142,8 +142,8 @@ BSpline::BSpline(int n,
   for (int i = 0; i < resolution; ++i){
     double *mat_ptr = basic_mat_.ptr<double>(i);
     computePoint(control, &tmp_point, &tmp_tangent, mat_ptr, interval, n);
-    curve_[i].x = round(tmp_point.x);
-    curve_[i].y = round(tmp_point.y);
+    curve_[i].x = tmp_point.x;
+    curve_[i].y = tmp_point.y;
     // if(i<20)
     //   std::cout << interval <<"i: " <<i << " x " << round(tmp_point.x) << " y "<< round(tmp_point.y) << std::endl;
     // std::cout <<  interval << "       i: " << i << " x " << curve_[i].x << " y "<< curve_[i].y << std::endl;

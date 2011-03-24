@@ -15,17 +15,17 @@ public:
    */
 
   /* void clear(){delete [] basic_mat_; delete [] curve_; delete [] tangent_;} */
-  inline cv::Point2i& operator[](const size_t index)
+  inline cv::Point2d& operator[](const size_t index)
   {
     return curve_[index];
   }
 
-  inline const cv::Point2i& operator[](const size_t index) const
+  inline const cv::Point2d& operator[](const size_t index) const
   {
     return curve_[index];
   }
 
-  inline cv::Point2i& dt(const size_t index)
+  inline cv::Point2d& dt(const size_t index)
   {
     return tangent_[index];
   }
@@ -41,6 +41,6 @@ private:
   double basic(int k, int t, double v);
   double basic(int i, int degree, double t, double *bp);
   std::vector<int> knots;
-  cv::Point2i *curve_;
-  cv::Point2i *tangent_;
+  cv::Point2d *curve_;
+  cv::Point2d *tangent_;
 };

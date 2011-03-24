@@ -89,12 +89,15 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
 
 
     i = 0;
-
+    double *ptr;
     if(inteval <= 0)
     {
       CvFileStorage* fs= cvOpenFileStorage("contour.xml", 0, CV_STORAGE_READ);
       coordinates= (CvMat*)cvReadByName(fs,  NULL, "contour_points", NULL);
       coordinates_t = cvCreateMat(3 ,coordinates->rows,  CV_64FC1);
+      printf("contour_points number : %d\n", coordinates->rows);
+      step = coordinates->step/sizeof(double);
+      ptr = coordinates->data.db;
     }
     else
     {
@@ -102,7 +105,7 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
       coordinates = cvCreateMat(control_points_number, 3 , CV_64FC1);
       coordinates_t = cvCreateMat(3 ,control_points_number,  CV_64FC1);
       step = coordinates->step/sizeof(double);
-      double *ptr = coordinates->data.db;
+      ptr = coordinates->data.db;
       for (row = inteval; row < img1->height; row+=inteval){
         (ptr+i*step)[0] = 0;
         (ptr+i*step)[1] = row;
@@ -157,17 +160,19 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
                        CV_INTER_LINEAR + CV_WARP_FILL_OUTLIERS,
                        cvScalarAll( 0 ) );
     cvTranspose(coordinates_t, coordinates);
-    /* 
-     * for (row = 0; row < coordinates->rows; ++row){
-     *   cvCircle(xformed, cvPoint((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]), 2, CV_RGB(0,255,0), 2, 8, 0);
-     * }
-     */
+    for (row = 0; row < coordinates->rows; ++row){
+      cvCircle(xformed, cvPoint((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]), 2, CV_RGB(0,255,0), 2, 8, 0);
+    }
     cvReleaseMat(&coordinates_t);
-	/* 
-     * cvNamedWindow( "Xformed", 1 );
-	 * cvShowImage( "Xformed", xformed );
-	 * cvWaitKey( 0 );
-     */
+    
+	cvNamedWindow( "CCD", 1 );
+	cvShowImage( "CCD", xformed );
+    char key;
+    while (1)
+    {
+      key = cvWaitKey(10);
+      if (key == 27) break;
+    }    
 	cvReleaseImage( &xformed );
 	cvReleaseMat( &H );
   }
