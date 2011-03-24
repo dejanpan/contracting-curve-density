@@ -3,7 +3,7 @@ GCC= gcc
 EXTRA = 
 INCDIR =-I. `pkg-config --cflags opencv` -I../include -I../../sift/include -I../include
 LDDIR = -L./lib -L../../sift/lib
-CFLAGS = -g3 -Wall -DLINUX $(EXTRA) $(LDDIR)
+CFLAGS = -O2 -g3 -Wall -DLINUX $(EXTRA) $(LDDIR)
 LDLIBS =
 LDFLAGS = $(LDLIBS) -lm `pkg-config --libs opencv` ../../sift/lib/libfeat.a
 OBJECTS=bspline.o ccd.o
@@ -19,6 +19,9 @@ snake:snake.cpp
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $< $(LDFLAGS)
 test:test.cpp $(OBJECTS) sift_init.o
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp sift_init.o $(OBJECTS) $(LDFLAGS)
+ccd_tracker:ccd_tracker.cpp $(OBJECTS) sift_init.o
+	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp sift_init.o $(OBJECTS) $(LDFLAGS)
+
 sift_init.o:sift_init.c
 	$(GCC) $(INCDIR) $(CFLAGS) -c -o sift_init.o sift_init.c
 draw:draw.cpp $(OBJECTS)

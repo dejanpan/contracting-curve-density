@@ -110,10 +110,10 @@ void CCD::init_cov(BSpline &bs, int degree)
   // cov = Nx/rou_0^2 * H
   // cov = 6/25*cov;
   // clean....
-  W.release();
-  U.release();
-  tmp_cov.release();
-  tmp_mat.release();
+  // W.release();
+  // U.release();
+  // tmp_cov.release();
+  // tmp_mat.release();
 }
 
 
@@ -583,11 +583,13 @@ void CCD::refine_parameters(BSpline &bs)
 void CCD::run_ccd()
 {
   // store the control points trasformed in the shape space
+
   cv::Point2d pts_tmp;
   int iter = 0;
   double tol = 0.0;
   bool convergence = false;
   double norm = 0.0;
+
   do{ 
     // update model parameters
     // for (int i = 0; i < 6; ++i)
@@ -642,18 +644,18 @@ void CCD::run_ccd()
     }
     
     //HACK!!!!!
-    bool invalid = false;
-    for (int i = 0; i < params_.resolution; i++)
-    {
-      if (abs(bs[i].x) > 640 || abs(bs[i].y) > 480)
-	  {
-	    invalid = true;
-	    continue;
-	    // std::cerr << "bs sample : " << bs[i].x << " " << bs[i].y << std::endl;
-	  }
-    }
-    if (invalid)
-      continue;
+    // bool invalid = false;
+    // for (int i = 0; i < params_.resolution; i++)
+    // {
+    //   if (abs(bs[i].x) > 640 || abs(bs[i].y) > 480)
+	//   {
+	//     invalid = true;
+	//     continue;
+	//     // std::cerr << "bs sample : " << bs[i].x << " " << bs[i].y << std::endl;
+	//   }
+    // }
+    // if (invalid)
+    //   continue;
     //END HACK!!!!!
 
     local_statistics(bs);
@@ -677,8 +679,8 @@ void CCD::run_ccd()
 // name << iter;
 // cv::imwrite(name.str() + ".png", canvas);
 
-    cv::imshow("CCD", canvas);    
-    cv::waitKey(2);
+    // cv::imshow("CCD", canvas);    
+    // cv::waitKey(2);
     // cerr << std::endl;
     // std::cerr << params_.gamma_1 << " " ;
     // std::cerr << params_.gamma_2 << " " ;
