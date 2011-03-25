@@ -86,15 +86,13 @@ int main (int argc, char * argv[])
   // std::cout << "hellooooooo" << std::endl;
   my_ccd.read_params(params_file_path);
   
+  my_ccd.run_ccd();
   cv::imshow("CCD", my_ccd.canvas);
   while (1)
   {
     key = cv::waitKey(10);
     if (key == 27) break;
   }
-  
-  my_ccd.run_ccd();
-
   // double interval = (pts.size() - params[9])/params[8];
   // std::cout << "resolution: " << params[8] << " pts_number - degree: " << (pts.size() - params[9]) << " increment: " <<  interval  << " interval " << params[8]/(pts.size() - params[9]) << std::endl;
   return 0;

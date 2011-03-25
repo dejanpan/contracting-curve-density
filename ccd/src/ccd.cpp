@@ -48,22 +48,23 @@ void CCD::read_params( const std::string& filename)
   params_.gamma_2 = double(fs["gamma_2"]);      
   params_.gamma_3 = double(fs["gamma_3"]);      
   params_.gamma_4 = double(fs["gamma_4"]);      
+  params_.alpha   = double(fs["alpha"]);        
   params_.kappa   = double(fs["kappa"]);        
   params_.c       = double(fs["c"]);            
   params_.h       = int(fs["h"]);            
   params_.delta_h = int(fs["delta_h"]);      
   params_.resolution = int(fs["resolution"]);   
   params_.degree  = int(fs["degree"]);
-  std::cerr << params_.gamma_1 << std::endl;
-  std::cerr << params_.gamma_2 << std::endl;
-  std::cerr << params_.gamma_3 << std::endl;
-  std::cerr << params_.gamma_4 << std::endl;
-  std::cerr << params_.kappa << std::endl;
-  std::cerr << params_.c << std::endl;
-  std::cerr << params_.h << std::endl;
-  std::cerr << params_.delta_h << std::endl;
-  std::cerr << params_.resolution << std::endl;
-  std::cerr << params_.degree << std::endl;
+  // std::cerr << params_.gamma_1 << std::endl;
+  // std::cerr << params_.gamma_2 << std::endl;
+  // std::cerr << params_.gamma_3 << std::endl;
+  // std::cerr << params_.gamma_4 << std::endl;
+  // std::cerr << params_.kappa << std::endl;
+  // std::cerr << params_.c << std::endl;
+  // std::cerr << params_.h << std::endl;
+  // std::cerr << params_.delta_h << std::endl;
+  // std::cerr << params_.resolution << std::endl;
+  // std::cerr << params_.degree << std::endl;
 
 }
 
@@ -156,7 +157,7 @@ void CCD::local_statistics(BSpline &bs)
 {
   cv::Mat_<cv::Vec3b>& img = (cv::Mat_<cv::Vec3b>&)image;
   // std::cout << params_.gamma_1 << " " << params_.gamma_2 << " " << params_.gamma_3 << " " << params_.gamma_4 << std::endl;
-  double sigma = params_.h/(1.3*params_.gamma_3);
+  double sigma = params_.h/(params_.alpha*params_.gamma_3);
   // sigma_hat = gamma_3 * sigma
   //  double sigma_hat = max(h/sqrt(2*gamma_2), gamma_4);
   double sigma_hat = params_.gamma_3*sigma + params_.gamma_4;
@@ -460,7 +461,7 @@ void CCD::refine_parameters(BSpline &bs)
   cv::Mat_<cv::Vec3b>& img = (cv::Mat_<cv::Vec3b>&)image;
   cv::Mat tmp_cov(3,3,CV_64F);
   cv::Mat tmp_cov_inv(3,3,CV_64F);
-  cv::Mat tmp_jacobian(6,3,CV_64F);
+  cv::Mat tmp_jacobian(8,3,CV_64F);
   cv::Mat tmp_pixel_diff(3, 1, CV_64F);
   
   for (int i = 0; i < params_.resolution; ++i)
@@ -628,7 +629,7 @@ void CCD::run_ccd()
       //
       pts[i].x = Phi.at<double>(0,0) + (1+Phi.at<double>(2,0))*pts[i].x + Phi.at<double>(5,0)*pts[i].y + Phi.at<double>(6,0)*pts[i].z;
       pts[i].y = Phi.at<double>(1,0) + (1+Phi.at<double>(3,0))*pts[i].y + Phi.at<double>(4,0)*pts[i].x + Phi.at<double>(7,0)*pts[i].z;
-      pts[i].z = 1;
+      pts[i].z = pts[i].z;
     }
 
     
@@ -647,7 +648,7 @@ void CCD::run_ccd()
     // std::cout << "BSPLINE POINTS:" << std::endl;
     for (int i = 0; i < params_.resolution; ++i)
     {
-      //std::cout << bs[i].x << " " << bs[i].y << std::endl;
+      // std::cout << bs[i].x << " " << bs[i].y << " " <<bs[i].z << std::endl;
       cv::circle(canvas, cv::Point2d(bs[i].x, bs[i].y), 1 ,CV_RGB(0,255,0), 1); 
     }
 
@@ -686,7 +687,7 @@ void CCD::run_ccd()
     refine_parameters(bs);
 
     norm =  0.0;
-    for (int i = 0; i < 6; ++i){
+    for (int i = 0; i < 8; ++i){
       if(i == 0 || i == 1)
         norm += delta_Phi.at<double>(i, 0)*delta_Phi.at<double>(i, 0)/10000;
       else
@@ -699,8 +700,8 @@ void CCD::run_ccd()
 // name << iter;
 // cv::imwrite(name.str() + ".png", canvas);
 
-    // cv::imshow("CCD", canvas);    
-    // cv::waitKey(2);
+    cv::imshow("CCD", canvas);    
+    cv::waitKey(2);
 
     // cerr << std::endl;
     // std::cerr << params_.gamma_1 << " " ;
@@ -733,7 +734,7 @@ void CCD::run_ccd()
 
     //   break;
     // }
-    if(iter >= 20)
+    if(iter >= 50)
     {
       convergence = true;
       init_cov(bs, params_.degree);
