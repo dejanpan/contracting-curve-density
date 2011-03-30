@@ -488,13 +488,183 @@ performed as
   c\mathbf{\Sigma}_{\mathbf{\Phi}} - (1-c)(\mathcal{H}_{\mathbf{\Phi}}
   \mathcal{Q})^{-1}
 \end{eqnarray}
-with $c = \frac{1}{4}$ in our implementation, note the covariance
-matrix is updated as well by an exponential decay rule.
+with $c = \frac{1}{4}$ in our implementation. Note the covariance
+matrix is updated as well by an exponential decay rule. Coefficient $c$ specifies the
+maximum decrease of the covariance within one iteration step[Hanek's
+paper]. If $c$ is very large, due the slow reduction of covariance the
+convergence process will be very slow. On the other hand, if $c$ is
+very small, it might converge to a wrong solution.
 
-\subsection{Validation gate}
+We can investigate the iteration process of  the CCD algorithm by
+comparing with the counterpart of k-means or EM algorithms, both of
+which also include two stages. First it is required to choose some
+inital values for the parameters governing the posterior
+distribution. Then in the E (expectation) step, minimizing some cost
+function while keeping the parameters fixed. In the M (maximization)
+step, calculate the new values of the parameters while keeping the
+expectation values fixed. This two-stage optimization is then repeated
+until convergence. 
+
+% In the beginning of iteration, due to the accuracy of the
+% estimate of $\mathbf{m}_{\mathbf{\Phi}}$ and
+% $\mathbf{\Sigma}_{\mathbf{\Phi}}$. 
+
+The two stages of the CCD algorithm are iterated until the convergence
+criterion is satisfied. After each iteration step, there are two
+model parameters vector $\mathbf{m}_{\mathbf{\Phi}}^{old}$ and
+$\mathbf{m}_{\mathbf{\Phi}}^{\mathrm{new}}$, which correspond two
+spline curves $\mathbf{C}^{\mathrm{old}}$ and
+$\mathbf{C}^{\mathrm{new}}$ respectively. Which kind of convergence
+criterion should we choose? Two options, one is using the norm of
+difference between $\mathbf{m}_{\mathbf{\Phi}}^{old}$ and
+$\mathbf{m}_{\mathbf{\Phi}}^{\mathrm{new}}$, another is by measuring
+the displacement between too spline curves, $\mathbf{C}^{\mathrm{old}}$ and
+$\mathbf{C}^{\mathrm{new}}$. Experiments show that the measure of
+curve difference using the norm is sensitive to parametrization, and
+computation of the normal curve-displacement measure $D(\mathbf{C}^{new},
+\mathbf{C}^{old})$  is feasible is feasible if we are content with
+local, rather than global minimization. The normal curve-displacement
+between two points on $\mathbf{C}^{new}(u)$ and $\mathbf{C}^{old}(u)$ is given by 
+\begin{equation}
+  \label{eq:5.32}
+  D(u) \approx
+  [C^{new}(u) - C^{old}(u)] \cdot \mathbf{n}(u)
+\end{equation}
+
+Where the total displacement $C^{new}(u) - C^{old}(u)$
+ at a point represents the sum of components along
+the curve tangent and normal respectively. The tangential component
+approximate the displacement along the curve
+$\mathbf{C}^{old}$, which reflects the variation of parameterisation
+between curves . If the tangential component is eliminated, the normal
+component will represents purely the distance between curves. (AC) The
+use of normal displacement is a standard technique in Computer Vision
+and can be explained intuitively. 
+Traversing all points on curves, the curve-displacement holds
+\begin{equation}
+  \label{eq:5.33}
+  D(\mathbf{C}^{new}, \mathbf{C}^{old})  = \sum_{i=0}^{N_{C}-1} [C_{i}^{new} - C_{i}^{old})] \cdot \mathbf{n}_{i}
+\end{equation}
+In the implementation of this thesis, we use the $\mathbf{C}^{new},
+\mathbf{C}^{old})$ as the convergence criterion of the
+iteration. Moreover, the curve-displacement can also be used to detect
+and delete rogue data or outliers.(AC)
+
+Finally, the best recorded estimate
+$\mathbf{m}_{\mathbf{\Phi}}^{best}$ and
+$\mathbf{\Sigma}_{\mathbf{\Phi}}^{best}$ will be given as output the
+CCD algorithm.
+
+
+\section{The CCD tracker}
 \label{sec:vg}
 
+We have derived the CCD algorithm in the previous section. Generally,
+it is used to cope with the curve-fitting problem in a single
+image. Like some other model-based segmentation algorithms, the CCD
+algorithm can also be used to handle object tracking problem in a
+sequence of images captured at successive time-steps. Some
+distinguishing characteristics of make it stable and efficient.
 
+In this section we describe a naive tracking algorithm based the CCD
+algorithm.
+
+A sequence of images for example, video data, consist of neighboring 2-D slices of a
+higher-dimensional volume. Usually tow neighboring frames have similar
+information and features and might only be distinguished by
+investigation in detail. Hence, a naive CCD tracking algorithm can be
+ be obtained by applying the CCD algorithm to each frame
+ independently, and the output of parameters obtained from  the
+ previous frame can be used in the next frame of image. However, such
+ a tracker would be of limited use because the expense of computation
+ will be intolerable in a practical environment which require high
+ performance and efficiency. Furthermore, without exploiting
+ statistical dependencies between successive images, the tracker can
+ not work if a radical change or big perturbation happened while
+ switching into a new frame. A real-time CCD tracker exploiting the
+ coherence of curve motion and the temporal coherence of pixel values
+ is proposed in (Hanek's thesis). 
+
+
+\section{Summary of the CCD algorithm and its variant}
+\label{sec:sccd}
+In this section,  for sake of clarity, a sketch of the naive CCD
+tracker is below given. Note we only consider the manual
+implementation.  
+% \newcommand{\redvline}{\color{red} \vrule width 4pt}
+\begin{table}[htbp]
+  \caption{Algorithm: the naive Contracting Curve Density (CCD) tracker}
+  \label{summary of CCD}
+  \centering
+  \begin{tabular*}{0.9\textwidth}{!{\color{red} \vrule width 4pt}l}
+\textbf{Input}:\parbox{13cm}{ 
+  \begin{enumerate}
+  \item Sequence image data $\mathbf{I}(t)$, $t$ denotes the time-step
+  \item A set of control points:  $\mathbf{P} = \{P_{0}, \ldots, P_{N_{cp}}\}$,
+$N_{cp}$ is the number of control points.
+  \end{enumerate}
+}
+\\
+\textbf{Output}: 
+\parbox{13cm}{
+  \begin{enumerate}
+  \item estimated model parameters vectors $\mathbf{m}_{\mathbf{\Phi}}^{best}$ 
+  \item corresponding covariance matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}^{best}$
+  \end{enumerate}
+}
+\\
+\textbf{Initialization}:\parbox{13cm}
+{
+  \begin{enumerate}
+  \item Apply some pre-processing methods to the image data to
+    $\mathbf{I}(0)$, $0$ denotes the first frame
+  \item Compute the B-spline curve $\mathbf{C}_{0}(u)$ and
+    corresponding normal and tangent vectors 
+  \item Initialize $\mathbf{\Sigma}_{\mathbf{\Phi}}(0)$ as zero vector
+  \item Compute the $\mathbf{\Sigma}_{\mathbf{\Phi}}(0)$
+  \end{enumerate}
+}\\
+\textbf{Main loop}: 
+\parbox{13cm}
+{
+if the time-step $t > 0$, execute the \textit{initialization} step for
+the frame of image. Firstly do pre-processing, then initialize $\mathbf{\Sigma}_{\mathbf{\Phi}}(t)$ as
+$\mathbf{\Sigma}_{\mathbf{\Phi}}^{best}(t-1)$, and generate a new
+B-spline curve using $\mathbf{\Sigma}_{\mathbf{\Phi}}(t)$,
+last compute the $\mathbf{\Sigma}_{\mathbf{\Phi}}(0)$. After these
+initialization steps, go into loop of  two stages of the CCD algorithm.
+}\\
+
+\parbox{2cm}{$\quad$}\parbox{13cm}
+{
+  \begin{enumerate}
+  \item Compute the uncertainty norm segment length $h$ in terms of
+    current estimate
+  \item Collect the pixels $\mathrm{v}_{k,l}$ according to the $h$ and
+    assign weight to these pixels.
+  \item Compute the local statistics $\mathbf{m}_{k,s}$ and $\mathbf{\Sigma}_{k,s}$
+  \item Evaluated the observe model parameters
+    $\hat{\mathbf{m}}_{k,l}$ and $\hat{\mathbf{\Sigma}}_{k,l}$
+  \item Compute the gradient $\nabla_{\mathbf{\Phi}}\mathcal{Q}$ and the Hessian $\mathcal{H}_{\mathbf{\Phi}}\mathcal{Q}$
+  \item Apply optimization algorithm to the  $\mathcal{Q}$ in order to
+    to compute the $\mathbf{m}_{\mathbf{\Phi}}^{new}$ and $\mathbf{\Sigma}_{\mathbf{\Phi}}^{new}$
+  \item Compute the curve-displacement $\mathbf{D}(\mathbf{C}^{new},
+    \mathbf{C}^{old})$, if it is satisfied with the convergence
+    criterion, accept the $\mathbf{m}_{\mathbf{\Phi}}^{best}(t)$ and
+    $\mathbf{\Sigma}_{\mathbf{\Phi}}^{best}$. Otherwise, go to step 1
+    and until convergence.
+  \end{enumerate}
+}
+\\
+\parbox{2cm}{$\quad$}\parbox{13cm}
+{
+if convergence condition is satisfied,
+$\mathbf{m}_{\mathbf{\Phi}}^{best}(t)$ and
+$\mathbf{\Phi}_{\mathbf{\Phi}}^{best}(t)$ are obtained. Then read a
+new frame of image and go to the beginning of main loop.
+}
+  \end{tabular*}
+\end{table}
 \section{Efficiency and complexity}
 \label{sec:eff}
 

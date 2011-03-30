@@ -1,3 +1,6 @@
+#pragma warning (disable:981)        
+#pragma warning (disable:383)
+#pragma warning (disable:15)
 struct CCDParams
 {
  CCDParams(): gamma_1(0.5), gamma_2(4), gamma_3(4), gamma_4(3),alpha(1.3), kappa(0.5),c(0.25), h(40), delta_h(1),resolution(100), degree(4)
@@ -91,3 +94,5 @@ inline void CCD::init_pts(int init_method)
       pts.push_back(pts[i]);
   }
 }
+
+void on_mouse(int event, int x, int y, int flags, void* param );

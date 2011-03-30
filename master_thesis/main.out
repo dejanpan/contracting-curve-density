@@ -28,11 +28,13 @@
 \BOOKMARK [2][-]{subsection.5.2.1}{Collecting local information}{section.5.2}% 28
 \BOOKMARK [2][-]{subsection.5.2.2}{Learning local statistics}{section.5.2}% 29
 \BOOKMARK [1][-]{section.5.3}{Refine parameters}{chapter.5}% 30
-\BOOKMARK [2][-]{subsection.5.3.1}{Validation gate}{section.5.3}% 31
-\BOOKMARK [1][-]{section.5.4}{Efficiency and complexity}{chapter.5}% 32
-\BOOKMARK [0][-]{chapter.6}{Applications in Robotics}{}% 33
-\BOOKMARK [1][-]{section.6.1}{Perception}{chapter.6}% 34
-\BOOKMARK [1][-]{section.6.2}{Tracking}{chapter.6}% 35
-\BOOKMARK [1][-]{section.6.3}{Refinement of 3D percepts \(Point Cloud\)}{chapter.6}% 36
-\BOOKMARK [0][-]{chapter.7}{Experiments and Results}{}% 37
-\BOOKMARK [0][-]{chapter.8}{Conclusion and Future Work}{}% 38
+\BOOKMARK [1][-]{section.5.4}{The CCD tracker}{chapter.5}% 31
+\BOOKMARK [1][-]{section.5.5}{Summary of the CCD algorithm and its variant}{chapter.5}% 32
+\BOOKMARK [1][-]{section.5.6}{Efficiency and complexity}{chapter.5}% 33
+\BOOKMARK [0][-]{chapter.6}{Applications in Robotics}{}% 34
+\BOOKMARK [1][-]{section.6.1}{Perception}{chapter.6}% 35
+\BOOKMARK [1][-]{section.6.2}{Tracking}{chapter.6}% 36
+\BOOKMARK [1][-]{section.6.3}{Refinement of 3D percepts \(Point Cloud\)}{chapter.6}% 37
+\BOOKMARK [0][-]{chapter.7}{Experiments and Results}{}% 38
+\BOOKMARK [1][-]{section.7.1}{Experiments of segmentation}{chapter.7}% 39
+\BOOKMARK [0][-]{chapter.8}{Conclusion and Future Work}{}% 40

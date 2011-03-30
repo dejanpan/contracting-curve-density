@@ -1,7 +1,7 @@
 class BSpline{
 public:
   BSpline();
-  BSpline(const BSpline &bs){}
+  /* BSpline(const BSpline &bs){} */
   BSpline(int n, int resolution, std::vector<cv::Point3d> control_points);
   ~BSpline();
   /* 

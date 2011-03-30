@@ -32,11 +32,13 @@
 \contentsline {subsection}{\numberline {5.2.1}Collecting local information}{17}{subsection.5.2.1}
 \contentsline {subsection}{\numberline {5.2.2}Learning local statistics}{18}{subsection.5.2.2}
 \contentsline {section}{\numberline {5.3}Refine parameters}{20}{section.5.3}
-\contentsline {subsection}{\numberline {5.3.1}Validation gate}{21}{subsection.5.3.1}
-\contentsline {section}{\numberline {5.4}Efficiency and complexity}{21}{section.5.4}
-\contentsline {chapter}{\numberline {6}Applications in Robotics}{23}{chapter.6}
-\contentsline {section}{\numberline {6.1}Perception}{23}{section.6.1}
-\contentsline {section}{\numberline {6.2}Tracking}{23}{section.6.2}
-\contentsline {section}{\numberline {6.3}Refinement of 3D percepts (Point Cloud)}{23}{section.6.3}
-\contentsline {chapter}{\numberline {7}Experiments and Results}{25}{chapter.7}
-\contentsline {chapter}{\numberline {8}Conclusion and Future Work}{27}{chapter.8}
+\contentsline {section}{\numberline {5.4}The CCD tracker}{22}{section.5.4}
+\contentsline {section}{\numberline {5.5}Summary of the CCD algorithm and its variant}{23}{section.5.5}
+\contentsline {section}{\numberline {5.6}Efficiency and complexity}{23}{section.5.6}
+\contentsline {chapter}{\numberline {6}Applications in Robotics}{25}{chapter.6}
+\contentsline {section}{\numberline {6.1}Perception}{25}{section.6.1}
+\contentsline {section}{\numberline {6.2}Tracking}{25}{section.6.2}
+\contentsline {section}{\numberline {6.3}Refinement of 3D percepts (Point Cloud)}{25}{section.6.3}
+\contentsline {chapter}{\numberline {7}Experiments and Results}{27}{chapter.7}
+\contentsline {section}{\numberline {7.1}Experiments of segmentation}{27}{section.7.1}
+\contentsline {chapter}{\numberline {8}Conclusion and Future Work}{31}{chapter.8}

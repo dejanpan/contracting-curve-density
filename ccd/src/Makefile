@@ -1,4 +1,4 @@
-CC = g++
+CC = gcc
 GCC= gcc
 EXTRA = 
 INCDIR =-I. `pkg-config --cflags opencv` -I../include -I../../sift/include -I../include
@@ -26,8 +26,8 @@ contour:contour.cpp sift_init.o
 
 sift_init.o:sift_init.c
 	$(GCC) $(INCDIR) $(CFLAGS) -c -o sift_init.o sift_init.c
-draw:draw.cpp $(OBJECTS)
-	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
+sift:sift.cpp sift_init.o
+	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp sift_init.o $(LDFLAGS)
 ccd:ccd.cpp ccd.h $(OBJECTS)
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
 ccd_panin:ccd_panin.cpp ccd_panin.h $(OBJECTS)

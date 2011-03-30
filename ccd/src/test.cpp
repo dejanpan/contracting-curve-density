@@ -11,7 +11,7 @@
 using namespace cv;
 using namespace std;
 
-int print_help()
+static int print_help()
 {
   cout << "Usage:\n ./test -m init_method [-t template_image] -i input_image params.xml"<< endl;
   return 0;
@@ -19,7 +19,7 @@ int print_help()
 
 int main (int argc, char * argv[]) 
 {
-  char key;
+  int key;
   std::vector<cv::Point2d> pts;
 
 
@@ -77,7 +77,7 @@ int main (int argc, char * argv[])
   // double *params = new double[10];
 
   
-  CCD my_ccd;  
+  CCD my_ccd;
   my_ccd.canvas = cv::imread(image_path, 1);
   my_ccd.image = cv::imread(image_path, 1);
   if(template_path != "")

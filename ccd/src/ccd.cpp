@@ -14,19 +14,17 @@ inline cv::Scalar random_color(CvRNG* rng)
 }
 
 
-void on_mouse(int event, int x, int y, int flags, void* param )
+void on_mouse(int event, int x, int y, int flags, void *param )
 {
   //  MaskParams* params = (MaskParams*)_params;
-  
   CCD *my_ccd = (CCD *)param;
   cv::Mat image = my_ccd->canvas;
   if( image.empty())
-    return;
+    return ;
 
   //caution: check
   // if( image1.at<double>() )
   //   y = image1->height - y;
-
   switch( event )
   {
     case CV_EVENT_LBUTTONDOWN:
@@ -42,8 +40,6 @@ void on_mouse(int event, int x, int y, int flags, void* param )
 void CCD::read_params( const std::string& filename)
 {
   cv::FileStorage fs(filename, cv::FileStorage::READ);
-  if(!fs.isOpened())
-    std::cerr << "fuck my life" <<std::endl;
   params_.gamma_1 = double(fs["gamma_1"]);      
   params_.gamma_2 = double(fs["gamma_2"]);      
   params_.gamma_3 = double(fs["gamma_3"]);      
@@ -174,15 +170,15 @@ void CCD::local_statistics(BSpline &bs)
   // normal direction as well as negative normal direction
   cv::Point3d tmp1, tmp2;
 
-  CvRNG rng;
   // store the distance from a point in normal(negative norml) direction
   // to the point on the curve
   cv::Point3d tmp_dis1, tmp_dis2;
 
+  CvRNG rng;
   cv::Scalar color = random_color(&rng);
   for(int i=0; i < params_.resolution;i++)
   {
-    cv::circle(canvas, cv::Point2d(bs[i].x, bs[i].y), 1,color, 1);
+    // cv::circle(canvas, cv::Point2d(bs[i].x, bs[i].y), 1,color, 1);
     
 #ifdef DEBUG
     std::cout << bs[i].x  << " " << bs[i].y << std::endl;
@@ -297,7 +293,7 @@ void CCD::local_statistics(BSpline &bs)
       // start compute the size in the direction of -(n_x, n_y)
       tmp_dis2.x = (tmp2.x-bs[i].x)*nv_ptr[0] + (tmp2.y-bs[i].y)*nv_ptr[1];
       tmp_dis2.y = (tmp2.x-bs[i].x)*nv_ptr[1] - (tmp2.y-bs[i].y)*nv_ptr[0];
-      int negative_normal = k+ floor(params_.h/params_.delta_h);
+      int negative_normal = k + (int)floor(params_.h/params_.delta_h);
       vic_ptr[10*negative_normal + 0] = tmp2.y;
       vic_ptr[10*negative_normal + 1] = tmp2.x;
       vic_ptr[10*negative_normal + 2] = tmp_dis2.x;
@@ -366,7 +362,7 @@ void CCD::local_statistics(BSpline &bs)
     for (int j = params_.delta_h; j <= params_.h; j += params_.delta_h, k++)
     {
       wp1 = 0.0, wp2 = 0.0;
-      int negative_normal = k + floor(params_.h/params_.delta_h);
+      int negative_normal = k + (int)floor(params_.h/params_.delta_h);
       
       // wp1 = w(a_{k,l})*w(d_{k,l})*w(d)
       wp1 = vic_ptr[ 10*k+ 5]*vic_ptr[ 10*k+ 7]/normalized_param.at<double>(i,0);
@@ -644,11 +640,15 @@ void CCD::run_ccd()
 
 
     BSpline bs(params_.degree , params_.resolution, pts);
-    
+    // cv::Mat canvas_tmp;
+    // canvas.copyTo(canvas_tmp);
     // std::cout << "BSPLINE POINTS:" << std::endl;
     for (int i = 0; i < params_.resolution; ++i)
     {
       // std::cout << bs[i].x << " " << bs[i].y << " " <<bs[i].z << std::endl;
+       // int j = (i+1)%params_.resolution;
+       // cv::line(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 0, 0, 255 ),1,8,0);
+      // cv::circle(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y), 1 ,CV_RGB(0,255,0), 1); 
       cv::circle(canvas, cv::Point2d(bs[i].x, bs[i].y), 1 ,CV_RGB(0,255,0), 1); 
     }
 
@@ -695,13 +695,20 @@ void CCD::run_ccd()
     }
     norm = cv::sqrt(norm);
     std::cerr << "iter: " << iter << "   tol: " << tol  << " norm: " << cv::norm(delta_Phi, cv::NORM_L2)  << " norm_tmp:" << norm<< std::endl;
+    if(iter == 19)
+      for (int i = 0; i < params_.resolution; ++i){
+        int j = (i+1)%params_.resolution;
+        cv::line(canvas, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 0, 0, 255 ),2,8,0);        
+      }
 
-// std::stringstream name;
-// name << iter;
-// cv::imwrite(name.str() + ".png", canvas);
+std::stringstream name;
+name << iter;
+//cv::imwrite(name.str() + ".png", canvas_tmp);
+// canvas_tmp.release();
+cv::imwrite(name.str() + ".png", canvas);
 
-    cv::imshow("CCD", canvas);    
-    cv::waitKey(2);
+    // cv::imshow("CCD", canvas);    
+    // cv::waitKey(2);
 
     // cerr << std::endl;
     // std::cerr << params_.gamma_1 << " " ;
@@ -734,7 +741,7 @@ void CCD::run_ccd()
 
     //   break;
     // }
-    if(iter >= 50)
+    if(iter >= 20)
     {
       convergence = true;
       init_cov(bs, params_.degree);
@@ -772,7 +779,7 @@ void CCD::contour_sift()
 
 void CCD::contour_manually()
 {
-  char key;
+  int key;
   cv::namedWindow("CCD", 1);
   cv::setMouseCallback( "CCD", on_mouse,  (void*)this);
   cv::imshow("CCD", canvas);
