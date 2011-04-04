@@ -22,7 +22,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_gensrv()
 include_directories(${PROJECT_SOURCE_DIR}/../sift/include)
 
-LINK_LIBRARIES(${PROJECT_SOURCE_DIR}/../sift/lib/libfeat.a)
+LINK_LIBRARIES(${PROJECT_SOURCE_DIR}/../sift/lib/libfeat64.a)
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)

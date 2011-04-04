@@ -1,3 +1,10 @@
+ifeq ($(shell arch), i686)
+BIT = 32
+endif
+ifeq ($(shell arch), x86_64)
+BIT = 64
+endif
+
 CC = g++
 GCC= gcc
 EXTRA = 
@@ -5,7 +12,7 @@ INCDIR =-I. `pkg-config --cflags opencv` -I../include -I../../sift/include -I../
 LDDIR = -L./lib -L../../sift/lib
 CFLAGS = -O2 -g3 -Wall -DLINUX $(EXTRA) $(LDDIR)
 LDLIBS =
-LDFLAGS = $(LDLIBS) -lm `pkg-config --libs opencv` `pkg-config --libs gtk+-2.0` ../../sift/lib/libfeat.a
+LDFLAGS = $(LDLIBS) -lm `pkg-config --libs opencv` `pkg-config --libs gtk+-2.0` ../../sift/lib/libfeat$(BIT).a
 OBJECTS=bspline.o ccd.o
 $(OBJECTS): %.o: %.cpp
 	$(CC) $(INCDIR) -c $(CFLAGS) $< -o $@
