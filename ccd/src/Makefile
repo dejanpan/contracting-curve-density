@@ -1,11 +1,11 @@
-CC = gcc
+CC = g++
 GCC= gcc
 EXTRA = 
 INCDIR =-I. `pkg-config --cflags opencv` -I../include -I../../sift/include -I../include
 LDDIR = -L./lib -L../../sift/lib
 CFLAGS = -O2 -g3 -Wall -DLINUX $(EXTRA) $(LDDIR)
 LDLIBS =
-LDFLAGS = $(LDLIBS) -lm `pkg-config --libs opencv` ../../sift/lib/libfeat.a
+LDFLAGS = $(LDLIBS) -lm `pkg-config --libs opencv` `pkg-config --libs gtk+-2.0` ../../sift/lib/libfeat.a
 OBJECTS=bspline.o ccd.o
 $(OBJECTS): %.o: %.cpp
 	$(CC) $(INCDIR) -c $(CFLAGS) $< -o $@
