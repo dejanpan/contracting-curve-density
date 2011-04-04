@@ -3,7 +3,7 @@
 #pragma warning (disable:15)
 struct CCDParams
 {
- CCDParams(): gamma_1(0.5), gamma_2(4), gamma_3(4), gamma_4(3),alpha(1.3), kappa(0.5),c(0.25), h(40), delta_h(1),resolution(100), degree(4)
+ CCDParams(): gamma_1(0.5), gamma_2(4), gamma_3(4), gamma_4(3),alpha(1.3), kappa(0.5),c(0.25), h(40), delta_h(1),resolution(100), degree(4), phi_dim(8)
   {
   }
   CCDParams(double p1,
@@ -16,7 +16,8 @@ struct CCDParams
             int p8,
             int p9,
             int p10,
-            int p11
+            int p11,
+            int p12
             )
   {
     gamma_1 = p1;
@@ -30,6 +31,7 @@ struct CCDParams
     delta_h = p9;
     resolution = p10;
     degree = p11;
+    phi_dim = p12;
   }
 
   ~CCDParams()
@@ -46,6 +48,7 @@ struct CCDParams
   int delta_h;
   int resolution;
   int degree;
+  int phi_dim;
 };
 
 class CCD
@@ -53,9 +56,16 @@ class CCD
 public:
   cv::Mat image, canvas, tpl;
   std::vector<cv::Point3d> pts;
-CCD():Phi(cv::Mat::zeros(8,1, CV_64F)),Sigma_Phi(cv::Mat::zeros(8,8, CV_64F)), delta_Phi(cv::Mat::zeros(8,1, CV_64F))
-  {};
+  /* 
+   * CCD()
+   * {
+   *   Phi = cv::Mat::zeros(params_.phi_dim,1, CV_64F);
+   *   Sigma_Phi = cv::Mat::zeros(params_.phi_dim,params_.phi_dim, CV_64F);
+   *   delta_Phi = cv::Mat::zeros(params_.phi_dim,1, CV_64F);
+   * }
+   */
   void read_params( const std::string& filename);
+  void init_mat();
   void run_ccd();
   double resolution(){return params_.resolution;}
   double degree(){return params_.degree;}

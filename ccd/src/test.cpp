@@ -85,6 +85,7 @@ int main (int argc, char * argv[])
   my_ccd.init_pts(init_method);
   // std::cout << "hellooooooo" << std::endl;
   my_ccd.read_params(params_file_path);
+  my_ccd.init_mat();
   
   my_ccd.run_ccd();
   cv::imshow("CCD", my_ccd.canvas);

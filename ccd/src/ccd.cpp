@@ -14,9 +14,9 @@ inline cv::Scalar random_color(CvRNG* rng)
 }
 
 
+
 void on_mouse(int event, int x, int y, int flags, void *param )
 {
-  //  MaskParams* params = (MaskParams*)_params;
   CCD *my_ccd = (CCD *)param;
   cv::Mat image = my_ccd->canvas;
   if( image.empty())
@@ -51,23 +51,20 @@ void CCD::read_params( const std::string& filename)
   params_.delta_h = int(fs["delta_h"]);      
   params_.resolution = int(fs["resolution"]);   
   params_.degree  = int(fs["degree"]);
-  // std::cerr << params_.gamma_1 << std::endl;
-  // std::cerr << params_.gamma_2 << std::endl;
-  // std::cerr << params_.gamma_3 << std::endl;
-  // std::cerr << params_.gamma_4 << std::endl;
-  // std::cerr << params_.kappa << std::endl;
-  // std::cerr << params_.c << std::endl;
-  // std::cerr << params_.h << std::endl;
-  // std::cerr << params_.delta_h << std::endl;
-  // std::cerr << params_.resolution << std::endl;
-  // std::cerr << params_.degree << std::endl;
+  params_.phi_dim  = int(fs["phi_dim"]);
+}
 
+void CCD::init_mat()
+{
+  Phi = cv::Mat::zeros(params_.phi_dim,1, CV_64F);
+  Sigma_Phi = cv::Mat::zeros(params_.phi_dim,params_.phi_dim, CV_64F);
+  delta_Phi = cv::Mat::zeros(params_.phi_dim,1, CV_64F);
 }
 
 void CCD::init_cov(BSpline &bs, int degree)
 {
   int n_dim = (int)pts.size() - 3;
-  cv::Mat W = cv::Mat::zeros(2*n_dim,8, CV_64F);
+  cv::Mat W = cv::Mat::zeros(2*n_dim, params_.phi_dim, CV_64F);
   cv::Mat U = cv::Mat::zeros(2*n_dim, 2*n_dim, CV_64F);
   for (int i = 0; i < n_dim; ++i)
   {
@@ -78,8 +75,11 @@ void CCD::init_cov(BSpline &bs, int degree)
     W_ptr[3] = 0;
     W_ptr[4] = 0;
     W_ptr[5] = pts[i].y;
-    W_ptr[6] = pts[i].z;
-    W_ptr[7] = 0;
+    if(params_.phi_dim == 8)
+    {
+      W_ptr[6] = pts[i].z;
+      W_ptr[7] = 0;
+    }
     W_ptr = W.ptr<double>(i+params_.resolution);
     W_ptr[0] = 0;
     W_ptr[1] = 1;
@@ -87,8 +87,11 @@ void CCD::init_cov(BSpline &bs, int degree)
     W_ptr[3] = pts[i].y;
     W_ptr[4] = pts[i].x;
     W_ptr[5] = 0;
-    W_ptr[6] = 0;
-    W_ptr[7] = pts[i].z;
+    if(params_.phi_dim == 8)
+    {
+      W_ptr[6] = 0;
+      W_ptr[7] = pts[i].z;
+    }
   }
 
   cv::Mat tmp_mat = cv::Mat::zeros(n_dim, n_dim, CV_64F);
@@ -155,6 +158,7 @@ void CCD::local_statistics(BSpline &bs)
   // std::cout << params_.gamma_1 << " " << params_.gamma_2 << " " << params_.gamma_3 << " " << params_.gamma_4 << std::endl;
   double sigma = params_.h/(params_.alpha*params_.gamma_3);
   // sigma_hat = gamma_3 * sigma
+  
   //  double sigma_hat = max(h/sqrt(2*gamma_2), gamma_4);
   double sigma_hat = params_.gamma_3*sigma + params_.gamma_4;
 
@@ -179,12 +183,6 @@ void CCD::local_statistics(BSpline &bs)
   for(int i=0; i < params_.resolution;i++)
   {
     // cv::circle(canvas, cv::Point2d(bs[i].x, bs[i].y), 1,color, 1);
-    
-#ifdef DEBUG
-    std::cout << bs[i].x  << " " << bs[i].y << std::endl;
-    //ROS_DEBUG_STREAM(bs[i].x  << " " << bs[i].y);
-#endif
-
     double *nv_ptr = nv.ptr<double>(i);
     // normal vector (n_x, n_y)
     // tagent vector (nv.at<double>(i,1), -n_x)
@@ -308,20 +306,7 @@ void CCD::local_statistics(BSpline &bs)
       vic_ptr[ 10*negative_normal + 8] = 0.5*exp(-abs(tmp_dis2.x)/alpha)/alpha;
       vic_ptr[ 10*negative_normal + 9] = exp(-tmp_dis2.x*tmp_dis2.x/(2*sigma*sigma))/(sqrt(2*CV_PI)*sigma);
       normalized_param.at<double>(i, 1) += vic_ptr[ 10*negative_normal + 7];
-      // cv::circle(img1, tmp2, 1, CV_RGB(0, 255, 255), 1, 8 , 0);
-      // for (int m = 0; m < 3; ++m)
-      // {
-      //   vic_pixels.at<Vec3b>(i, negative_normal)[m] = img(tmp2.y, tmp2.x)[m];          
-      // }
     }
-    // std::cout
-    //     << m1_debug[0]/normal_points_number << " " 
-    //     << m1_debug[1]/normal_points_number << " " 
-    //     << m1_debug[2]/normal_points_number << " " 
-    //     << m2_debug[0]/normal_points_number << " " 
-    //     << m2_debug[1]/normal_points_number << " " 
-    //     << m2_debug[2]/normal_points_number << " " 
-    //     << std::endl;
   }
 
 
@@ -406,12 +391,12 @@ void CCD::local_statistics(BSpline &bs)
       w1 += wp1;
       w2 += wp2;
       
-      m1[0] += wp1*img(vic_ptr[ 10*negative_normal + 0 ], vic_ptr[ 10*negative_normal + 1 ])[0];
-      m1[1] += wp1*img(vic_ptr[ 10*negative_normal + 0 ], vic_ptr[ 10*negative_normal + 1 ])[1];
-      m1[2] += wp1*img(vic_ptr[ 10*negative_normal + 0 ], vic_ptr[ 10*negative_normal + 1 ])[2];
-      m2[0] += wp2*img(vic_ptr[ 10*negative_normal + 0 ], vic_ptr[ 10*negative_normal + 1 ])[0];
-      m2[1] += wp2*img(vic_ptr[ 10*negative_normal + 0 ], vic_ptr[ 10*negative_normal + 1 ])[1];
-      m2[2] += wp2*img(vic_ptr[ 10*negative_normal + 0 ], vic_ptr[ 10*negative_normal + 1 ])[2];
+      m1[0] += wp1*img(vic_ptr[10*negative_normal+0], vic_ptr[10*negative_normal+1])[0];
+      m1[1] += wp1*img(vic_ptr[10*negative_normal+0], vic_ptr[10*negative_normal+1])[1];
+      m1[2] += wp1*img(vic_ptr[10*negative_normal+0], vic_ptr[10*negative_normal+1])[2];
+      m2[0] += wp2*img(vic_ptr[10*negative_normal+0], vic_ptr[10*negative_normal+1])[0];
+      m2[1] += wp2*img(vic_ptr[10*negative_normal+0], vic_ptr[10*negative_normal+1])[1];
+      m2[2] += wp2*img(vic_ptr[10*negative_normal+0], vic_ptr[10*negative_normal+1])[2];
       
       for (int m = 0; m < 3; ++m)
       {
@@ -424,15 +409,14 @@ void CCD::local_statistics(BSpline &bs)
         }
       }
     }
-
     // std::cout << "w1: " << "              w2:" << std::endl;
     // std::cout << "w1 == " << w1 << "  w2== " << w2 << std::endl;
-    mean_vic_ptr[ 0] = m1[0]/w1;
-    mean_vic_ptr[ 1] = m1[1]/w1;
-    mean_vic_ptr[ 2] = m1[2]/w1;
-    mean_vic_ptr[ 3] = m2[0]/w2;
-    mean_vic_ptr[ 4] = m2[1]/w2;
-    mean_vic_ptr[ 5] = m2[2]/w2;
+    mean_vic_ptr[0] = m1[0]/w1;
+    mean_vic_ptr[1] = m1[1]/w1;
+    mean_vic_ptr[2] = m1[2]/w1;
+    mean_vic_ptr[3] = m2[0]/w2;
+    mean_vic_ptr[4] = m2[1]/w2;
+    mean_vic_ptr[5] = m2[2]/w2;
     
     for (int m = 0; m < 3; ++m)
     {
@@ -455,17 +439,15 @@ void CCD::local_statistics(BSpline &bs)
 void CCD::refine_parameters(BSpline &bs)
 {
   cv::Mat_<cv::Vec3b>& img = (cv::Mat_<cv::Vec3b>&)image;
-  cv::Mat tmp_cov(3,3,CV_64F);
-  cv::Mat tmp_cov_inv(3,3,CV_64F);
-  cv::Mat tmp_jacobian(8,3,CV_64F);
-  cv::Mat tmp_pixel_diff(3, 1, CV_64F);
+  cv::Mat tmp_cov = cv::Mat::zeros(3,3,CV_64F);
+  cv::Mat tmp_cov_inv = cv::Mat::zeros(3,3,CV_64F);
+  cv::Mat tmp_jacobian = cv::Mat::zeros(params_.phi_dim,3,CV_64F);
+  cv::Mat tmp_pixel_diff = cv::Mat::zeros(3, 1, CV_64F);
+
+  // std::cout << "dimension: " << Sigma_Phi.cols << " " << Sigma_Phi.rows << std::endl;
   
   for (int i = 0; i < params_.resolution; ++i)
   {
-
-    // vic_pixels.at<Vec3b>(i,normal_points_number)[0] = img(bs[i].x, bs[i].y)[0];
-    // vic_pixels.at<Vec3b>(i,normal_points_number)[1] = img(bs[i].x, bs[i].y)[1];
-    // vic_pixels.at<Vec3b>(i,normal_points_number)[2] = img(bs[i].x, bs[i].y)[2];
     double *vic_ptr = vic.ptr<double>(i);
     double *nv_ptr = nv.ptr<double>(i);
     double *mean_vic_ptr = mean_vic.ptr<double>(i);
@@ -476,48 +458,39 @@ void CCD::refine_parameters(BSpline &bs)
       tmp_cov = cv::Mat::zeros(3,3,CV_64F);
       tmp_cov_inv = cv::Mat::zeros(3,3,CV_64F);
       
-      // \hat{}\Sigma_{kl}} = a_{kl}\Sigma_{k}^{1} + (1 - a_{kl})\Sigma_{k}^{2}
       for (int m = 0; m < 3; ++m)
       {
         double *tmp_cov_ptr = tmp_cov.ptr<double>(m);
         for (int n = 0; n < 3; ++n)
         {
-          tmp_cov_ptr[n] = vic_ptr[10*j+4] * cov_vic_ptr[m*3+n]
-                                     +(1-vic_ptr[10*j+4])* cov_vic_ptr[m*3+n+9];
+          tmp_cov_ptr[n] = vic_ptr[10*j+4] * cov_vic_ptr[m*3+n] +(1-vic_ptr[10*j+4])* cov_vic_ptr[m*3+n+9];
         }
       }
 
-      tmp_cov_inv = tmp_cov.inv(cv::DECOMP_SVD);
       // std::cout << "debug " << std::endl;
 
-      // for (int m = 0; m < 18; ++m){
-      //   std::cout << cov_vic_ptr[m] << " " ;
+      // for (int m = 0; m < 3; ++m){
+      //   double *tmp_cov_ptr = tmp_cov.ptr<double>(m);
+      //   for (int n =0; n < 3; ++n){
+      //     std::cout << tmp_cov_ptr[n] << " " ;   
+      //   }
+      //   std::cout<< std::endl;
       // }
-
-      // std::cout << std::endl;
       
+      tmp_cov_inv = tmp_cov.inv(cv::DECOMP_SVD);
+ 
       tmp_pixel_diff = cv::Mat::zeros(3, 1, CV_64F);
 
       // std::cout << " pixel_diff: " ;
       //compute the difference between I_{kl} and \hat{I_{kl}}
       for (int m = 0; m < 3; ++m)
       {
-        // if(j < normal_points_number)
-        //   vic_pixels.at<Vec3b>(i, j)[m] = img(vic_ptr[10*j+0], vic_ptr[10*j+1])[m];
-        // else if(j >= normal_points_number)
-        // {
-        //   vic_pixels.at<Vec3b>(i, j+1)[m] = img(vic_ptr[10*j+0], vic_ptr[10*j+1])[m];
-        //   if ( m ==0 )
-        //     std::cout << "i = " << i << " bs.x " << bs[i].x << " bs.y " << bs[i].y << " vic.x "<<  vic_ptr[10*j+0]<< " vic.y " << vic_ptr[10*j+1] <<std::endl;
-        // }
-
-          
         tmp_pixel_diff.at<double>(m,0) = img(vic_ptr[10*j+0], vic_ptr[10*j+1])[m]- vic_ptr[10*j+4] * mean_vic_ptr[m]- (1-vic_ptr[10*j+4])* mean_vic_ptr[m+3];
       }
       // std::cout << std::endl;
       //compute jacobian matrix
         
-      tmp_jacobian = cv::Mat::zeros(8,3,CV_64F);
+      tmp_jacobian = cv::Mat::zeros(params_.phi_dim,3,CV_64F);
  
       for (int n = 0; n < 3; ++n)
       {
@@ -527,35 +500,14 @@ void CCD::refine_parameters(BSpline &bs)
         tmp_jacobian.at<double>(3,n) = vic_ptr[10*j + 9]*(mean_vic_ptr[n] - mean_vic_ptr[n+3])*nv_ptr[1]*bs[i].y;
         tmp_jacobian.at<double>(4,n) = vic_ptr[10*j + 9]*(mean_vic_ptr[n] - mean_vic_ptr[n+3])*nv_ptr[1]*bs[i].x;
         tmp_jacobian.at<double>(5,n) = vic_ptr[10*j + 9]*(mean_vic_ptr[n] - mean_vic_ptr[n+3])*nv_ptr[0]*bs[i].y;
-        tmp_jacobian.at<double>(6,n) = vic_ptr[10*j + 9]*(mean_vic_ptr[n] - mean_vic_ptr[n+3])*nv_ptr[0]*bs[i].z;
-        tmp_jacobian.at<double>(7,n) = vic_ptr[10*j + 9]*(mean_vic_ptr[n] - mean_vic_ptr[n+3])*nv_ptr[1]*bs[i].z;
-
+        if(params_.phi_dim == 8)
+        {
+          tmp_jacobian.at<double>(6,n) = vic_ptr[10*j + 9]*(mean_vic_ptr[n] - mean_vic_ptr[n+3])*nv_ptr[0]*bs[i].z;
+          tmp_jacobian.at<double>(7,n) = vic_ptr[10*j + 9]*(mean_vic_ptr[n] - mean_vic_ptr[n+3])*nv_ptr[1]*bs[i].z;
+        }
         // std::cout << mean_vic_ptr[n] << " " << mean_vic_ptr[n+3] << std::endl;
       }
-
-
-#ifdef DEBUG
-      for (int m = 0; m < 8; ++m)
-      {
-        for (int n = 0; n < 3; ++n)
-        {
-          std::cout << tmp_jacobian.at<double>(m,n) << " ";
-        }
-        std::cout << std::endl;
-      }
-      std::cout << std::endl;
       
-      for (int m = 0; m < 3; ++m)
-      {
-        for (int n = 0; n < 3; ++n)
-        {
-          std::cout << tmp_cov_inv.at<double>(m,n) << " ";
-        }
-        std::cout << std::endl;
-      }
-      std::cout << std::endl;
-#endif
-
       //\nabla{E_2} = \sum J * \Sigma_{kl}^{-1} * (I_{kl} - \hat{I_{kl}})
       nabla_E += tmp_jacobian*tmp_cov_inv*tmp_pixel_diff;
       //Hessian{E_2} = \sum J * \Sigma_{kl}^{-1} * J
@@ -569,22 +521,19 @@ void CCD::refine_parameters(BSpline &bs)
 
   cv::Mat hessian_E_inv = hessian_E.inv(cv::DECOMP_SVD);
   delta_Phi = hessian_E_inv*nabla_E;
-  // delta_Phi.at<double>(0,0) = 0.0;
-  // delta_Phi.at<double>(1,0) = 0.0;
-  // delta_Phi.at<double>(2,0) = 0.0;
-  // delta_Phi.at<double>(3,0) = 0.0;
-  // delta_Phi.at<double>(4,0) = 0.0;
-  // delta_Phi.at<double>(5,0) = 0.0;
   // #ifdef DEBUG
-    std::cout << delta_Phi.at<double>(0,0) << " "
-              << delta_Phi.at<double>(1,0) << " " 
-              << delta_Phi.at<double>(2,0) << " " 
-              << delta_Phi.at<double>(3,0) << " " 
-              << delta_Phi.at<double>(4,0) << " " 
-              << delta_Phi.at<double>(5,0) << " " 
-              << delta_Phi.at<double>(6,0) << " " 
-              << delta_Phi.at<double>(7,0) << " " 
-              << std::endl;
+  // std::cout << delta_Phi.at<double>(0,0) << " "
+  //           << delta_Phi.at<double>(1,0) << " " 
+  //           << delta_Phi.at<double>(2,0) << " " 
+  //           << delta_Phi.at<double>(3,0) << " " 
+  //           << delta_Phi.at<double>(4,0) << " " 
+  //           << delta_Phi.at<double>(5,0) << " ";
+  // if(params_.phi_dim == 8)
+  // {
+  //   std::cout<< delta_Phi.at<double>(6,0) << " " 
+  //            << delta_Phi.at<double>(7,0) << " ";
+  // }
+  // std::cout<< std::endl;
   // #endif
   // cv::norm(delta_Phi);
   
@@ -602,7 +551,6 @@ void CCD::refine_parameters(BSpline &bs)
 void CCD::run_ccd()
 {
   // store the control points trasformed in the shape space
-
   int iter = 0;
   double tol = 0.0;
   bool convergence = false;
@@ -614,8 +562,7 @@ void CCD::run_ccd()
     //   Phi.at<double>(i,0) = Phi.at<double>(i,0) - delta_Phi.at<double>(i,0);
 
     // update the control points in terms of the change of
-    // model parameters
-    
+    // model parameters    
     for (size_t i = 0; i < pts.size(); ++i)
     {
       // C = W*\Phi + C_0
@@ -623,8 +570,12 @@ void CCD::run_ccd()
       //     C = [                       ][\phi_0 \phi_1 \phi_2 \phi_3 \phi_4 \phi_5 ]^T + C_0
       //           0  1  0   y_0 x_0  0
       //
-      pts[i].x = Phi.at<double>(0,0) + (1+Phi.at<double>(2,0))*pts[i].x + Phi.at<double>(5,0)*pts[i].y + Phi.at<double>(6,0)*pts[i].z;
-      pts[i].y = Phi.at<double>(1,0) + (1+Phi.at<double>(3,0))*pts[i].y + Phi.at<double>(4,0)*pts[i].x + Phi.at<double>(7,0)*pts[i].z;
+      pts[i].x = Phi.at<double>(0,0) + (1+Phi.at<double>(2,0))*pts[i].x + Phi.at<double>(5,0)*pts[i].y;
+      if(params_.phi_dim == 8)
+        pts[i].x +=  Phi.at<double>(6,0)*pts[i].z;
+      pts[i].y = Phi.at<double>(1,0) + (1+Phi.at<double>(3,0))*pts[i].y + Phi.at<double>(4,0)*pts[i].x;
+      if(params_.phi_dim == 8)
+        pts[i].y += Phi.at<double>(7,0)*pts[i].z;
       pts[i].z = pts[i].z;
     }
 
@@ -632,22 +583,17 @@ void CCD::run_ccd()
     nv = cv::Mat::zeros(params_.resolution, 2, CV_64F);
     mean_vic = cv::Mat::zeros(params_.resolution, 6, CV_64F);
     cov_vic = cv::Mat::zeros(params_.resolution, 18, CV_64F);
-    nabla_E = cv::Mat::zeros(8,1, CV_64F);
-    hessian_E = cv::Mat::zeros(8,8, CV_64F);
-    // Phi.zeros(6,1,CV_64F);
+    nabla_E = cv::Mat::zeros(params_.phi_dim,1, CV_64F);
+    hessian_E = cv::Mat::zeros(params_.phi_dim,params_.phi_dim, CV_64F);
 
-    // create a new B-spline curve: degree =2
-
-
+    // create a new B-spline curve
     BSpline bs(params_.degree , params_.resolution, pts);
-    // cv::Mat canvas_tmp;
-    // canvas.copyTo(canvas_tmp);
-    // std::cout << "BSPLINE POINTS:" << std::endl;
+
     for (int i = 0; i < params_.resolution; ++i)
     {
       // std::cout << bs[i].x << " " << bs[i].y << " " <<bs[i].z << std::endl;
-       // int j = (i+1)%params_.resolution;
-       // cv::line(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 0, 0, 255 ),1,8,0);
+      // int j = (i+1)%params_.resolution;
+      // cv::line(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 0, 0, 255 ),1,8,0);
       // cv::circle(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y), 1 ,CV_RGB(0,255,0), 1); 
       cv::circle(canvas, cv::Point2d(bs[i].x, bs[i].y), 1 ,CV_RGB(0,255,0), 1); 
     }
@@ -664,30 +610,13 @@ void CCD::run_ccd()
       }
     }
     
-    //HACK!!!!!
-    // bool invalid = false;
-    // for (int i = 0; i < params_.resolution; i++)
-    // {
-    //   if (abs(bs[i].x) > 640 || abs(bs[i].y) > 480)
-	//   {
-	//     invalid = true;
-	//     continue;
-	//     // std::cerr << "bs sample : " << bs[i].x << " " << bs[i].y << std::endl;
-	//   }
-    // }
-    // if (invalid)
-    //   continue;
-    //END HACK!!!!!
 
     local_statistics(bs);
-
     
-    // img1.release();
-
     refine_parameters(bs);
 
     norm =  0.0;
-    for (int i = 0; i < 8; ++i){
+    for (int i = 0; i < params_.phi_dim; ++i){
       if(i == 0 || i == 1)
         norm += delta_Phi.at<double>(i, 0)*delta_Phi.at<double>(i, 0)/10000;
       else
@@ -695,53 +624,22 @@ void CCD::run_ccd()
     }
     norm = cv::sqrt(norm);
     std::cerr << "iter: " << iter << "   tol: " << tol  << " norm: " << cv::norm(delta_Phi, cv::NORM_L2)  << " norm_tmp:" << norm<< std::endl;
-    if(iter == 19)
-      for (int i = 0; i < params_.resolution; ++i){
-        int j = (i+1)%params_.resolution;
-        cv::line(canvas, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 0, 0, 255 ),2,8,0);        
-      }
+    // if(iter == 19)
+    //   for (int i = 0; i < params_.resolution; ++i){
+    //     int j = (i+1)%params_.resolution;
+    //     cv::line(canvas, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 0, 0, 255 ),2,8,0);        
+    //   }
 
-std::stringstream name;
-name << iter;
-//cv::imwrite(name.str() + ".png", canvas_tmp);
-// canvas_tmp.release();
-cv::imwrite(name.str() + ".png", canvas);
+    // std::stringstream name;
+    // name << iter;
+    //cv::imwrite(name.str() + ".png", canvas_tmp);
+    // canvas_tmp.release();
+    // cv::imwrite(name.str() + ".png", canvas);
 
-    // cv::imshow("CCD", canvas);    
-    // cv::waitKey(2);
+    cv::imshow("CCD", canvas);    
+    cv::waitKey(2);
 
-    // cerr << std::endl;
-    // std::cerr << params_.gamma_1 << " " ;
-    // std::cerr << params_.gamma_2 << " " ;
-    // std::cerr << params_.gamma_3 << " " ;
-    // std::cerr << params_.gamma_4 << " " ;
-    // std::cerr << params_.kappa << " " ;
-    // std::cerr << params_.c << " " ;
-    // std::cerr << params_.h << " " ;
-    // std::cerr << params_.delta_h << " " ;
-    // std::cerr << params_.resolution << " " ;
-    // std::cerr << params_.degree << " " ;
-    // std::cerr << std::endl;
-
-
-    // if((tol - 0.0 < 0.001) && (norm < 0.01))
-    // {
-    //   convergence = true;
-    //   char key;
-      
-    //   // while (1)
-    //   // {
-    //   //   key = cvWaitKey(10);
-    //   //   if (key == 27)
-    //   //   {
-    //   //     std::cerr<< "key = " << (int)key << std::endl;
-    //   //     break;          
-    //   //   }
-    //   // }
-
-    //   break;
-    // }
-    if(iter >= 20)
+    if(iter >= 50)
     {
       convergence = true;
       init_cov(bs, params_.degree);
@@ -769,11 +667,6 @@ void CCD::contour_sift()
     // cv::circle(my_ccd.canvas, cvPoint((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]), 2, CV_RGB(0,255,0), 2, 8, 0);
   }
   //clean..........
-  // cvReleaseImage(&tpl_ptr);
-  // cvReleaseImage(&tpl_img_ptr);
-  // cvReleaseMat(&points_mat_ptr);
-  // cvReleaseImageHeader(&tpl_ptr);
-  // cvReleaseImageHeader(&tpl_img_ptr);
 }
 
 

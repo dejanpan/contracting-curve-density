@@ -42,6 +42,7 @@ int process(VideoCapture& capture) {
     {
       my_ccd.init_pts(1);
       my_ccd.read_params("ccd_params.xml");
+      my_ccd.init_mat();
     }
 
   // std::cout << "hellooooooo" << std::endl;
