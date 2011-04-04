@@ -636,10 +636,10 @@ void CCD::run_ccd()
     // canvas_tmp.release();
     // cv::imwrite(name.str() + ".png", canvas);
 
-    cv::imshow("CCD", canvas);    
-    cv::waitKey(2);
+    // cv::imshow("CCD", canvas);    
+    // cv::waitKey(2);
 
-    if(iter >= 50)
+    if(iter >= 20)
     {
       convergence = true;
       init_cov(bs, params_.degree);

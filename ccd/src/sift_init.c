@@ -22,7 +22,12 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
   CvPoint pt1, pt2;
   double d0, d1;
   int n1, n2, k, i, m = 0;
-
+  CvMat* H;
+  CvMat *coordinates = 0, *coordinates_t = 0;
+  IplImage* xformed;
+  double *ptr;
+  int row, col;
+  char key;
     
 
   stacked = stack_imgs( img1, img2 );
@@ -66,13 +71,8 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
      
      is important for the RANSAC function to work.
   */
-  
-  CvMat* H;
-  IplImage* xformed;
-  CvMat *coordinates, *coordinates_t;
   H = ransac_xform( feat1, n1, FEATURE_FWD_MATCH, lsq_homog, 4, 0.01,
                     homog_xfer_err, 3.0, NULL, NULL );
-  int row, col;
   if( H )
   {
     int   step  = H->step/sizeof(double);
@@ -89,7 +89,6 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
 
 
     i = 0;
-    double *ptr;
     if(inteval <= 0)
     {
       CvFileStorage* fs= cvOpenFileStorage("contour.xml", 0, CV_STORAGE_READ);
@@ -167,7 +166,6 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
     
 	cvNamedWindow( "CCD", 1 );
 	cvShowImage( "CCD", xformed );
-    char key;
     while (1)
     {
       key = cvWaitKey(10);
