@@ -33,21 +33,9 @@ contour:contour.cpp sift_init.o
 
 sift_init.o:sift_init.c
 	$(GCC) $(INCDIR) $(CFLAGS) -c -o sift_init.o sift_init.c
-sift:sift.cpp sift_init.o
-	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp sift_init.o $(LDFLAGS)
+sift:sift.c sift_init.o
+	$(GCC) $(INCDIR) $(CFLAGS)  -o $@ $@.c sift_init.o $(LDFLAGS)
 ccd:ccd.cpp ccd.h $(OBJECTS)
-	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
-ccd_panin:ccd_panin.cpp ccd_panin.h $(OBJECTS)
-	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
-ccd2:ccd2.cpp ccd2.h $(OBJECTS)
-	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
-ccd_circle:ccd_circle.cpp ccd.h $(OBJECTS)
-	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
-poly:poly.cpp $(OBJECTS)
-	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
-cov:cov.cpp $(OBJECTS)
-	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
-curve:curve.cpp $(OBJECTS)
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
 matrix:matrix.cpp $(OBJECTS)
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp $(OBJECTS) $(LDFLAGS)
