@@ -31,10 +31,12 @@
 \BOOKMARK [1][-]{section.5.4}{The CCD tracker}{chapter.5}% 31
 \BOOKMARK [1][-]{section.5.5}{Summary of the CCD algorithm and its variant}{chapter.5}% 32
 \BOOKMARK [1][-]{section.5.6}{Efficiency and complexity}{chapter.5}% 33
-\BOOKMARK [0][-]{chapter.6}{Applications in Robotics}{}% 34
-\BOOKMARK [1][-]{section.6.1}{Perception}{chapter.6}% 35
-\BOOKMARK [1][-]{section.6.2}{Tracking}{chapter.6}% 36
-\BOOKMARK [1][-]{section.6.3}{Refinement of 3D percepts \(Point Cloud\)}{chapter.6}% 37
-\BOOKMARK [0][-]{chapter.7}{Experiments and Results}{}% 38
-\BOOKMARK [1][-]{section.7.1}{Experiments of segmentation}{chapter.7}% 39
-\BOOKMARK [0][-]{chapter.8}{Conclusion and Future Work}{}% 40
+\BOOKMARK [0][-]{chapter.6}{Experiments and Results}{}% 34
+\BOOKMARK [1][-]{section.6.1}{Contour convergence on still image}{chapter.6}% 35
+\BOOKMARK [2][-]{subsection.6.1.1}{Segmenation of a ball}{section.6.1}% 36
+\BOOKMARK [2][-]{subsection.6.1.2}{Segmenation of a 3-D obejct}{section.6.1}% 37
+\BOOKMARK [2][-]{subsection.6.1.3}{Segmenation of a transparent obejct}{section.6.1}% 38
+\BOOKMARK [2][-]{subsection.6.1.4}{Fitting a deformable object}{section.6.1}% 39
+\BOOKMARK [1][-]{section.6.2}{Tracking initialization from sift features}{chapter.6}% 40
+\BOOKMARK [1][-]{section.6.3}{Tracking initialization from 3D point cloud}{chapter.6}% 41
+\BOOKMARK [0][-]{chapter.7}{Conclusion and Future Work}{}% 42

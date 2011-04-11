@@ -6,6 +6,7 @@
 #include "ccd/sift_init.h"
 #include "ccd/bspline.h"
 #include "ccd/ccd.h"
+    cv::Mat canvas_tmp;
 
 inline cv::Scalar random_color(CvRNG* rng)
 {
@@ -30,7 +31,7 @@ void on_mouse(int event, int x, int y, int flags, void *param )
     case CV_EVENT_LBUTTONDOWN:
       break;
     case CV_EVENT_LBUTTONUP:
-      cv::circle(image,cv::Point(x,y),2,cv::Scalar(0,0,255),2);
+      cv::circle(image,cv::Point(x,y),1,cv::Scalar(0,0,255),1);
       my_ccd->pts.push_back(cv::Point3d(x,y,1));
       cv::imshow("CCD", image);
       break;
@@ -222,6 +223,8 @@ void CCD::local_statistics(BSpline &bs)
       // y_{k,l}
       tmp1.y = round(bs[i].y + j*nv_ptr[1]);
 
+      cv::circle(canvas_tmp, cv::Point2d(tmp1.x, tmp1.y), 1, CV_RGB(0,255,0), 1);
+
       // distance between x_{k,l} and x_{k,0} in the normal direction
       // appoximately it is l*h, l = {1,2,3,.....}
       tmp_dis1.x = (tmp1.x-bs[i].x)*nv_ptr[0] + (tmp1.y-bs[i].y)*nv_ptr[1];
@@ -282,7 +285,7 @@ void CCD::local_statistics(BSpline &bs)
       /////////////////////////////////////////////////////////////////////////////////////////      
       tmp2.x = round(bs[i].x - j*nv_ptr[0]);
       tmp2.y = round(bs[i].y - j*nv_ptr[1]);
-
+      cv::circle(canvas_tmp, cv::Point2d(tmp2.x, tmp2.y), 1, CV_RGB(0,255,0), 1);
 #ifdef DEBUG
       if(i == 0)
         std::cout << "tmp2 " << tmp2.x  << " " << tmp2.y << std::endl;
@@ -553,10 +556,11 @@ void CCD::run_ccd()
   // store the control points trasformed in the shape space
   int iter = 0;
   double tol = 0.0;
+  double tol_old = 0.0;
   bool convergence = false;
   double norm = 0.0;
 
-  do{ 
+  do{
     // update model parameters
     // for (int i = 0; i < 6; ++i)
     //   Phi.at<double>(i,0) = Phi.at<double>(i,0) - delta_Phi.at<double>(i,0);
@@ -589,13 +593,15 @@ void CCD::run_ccd()
     // create a new B-spline curve
     BSpline bs(params_.degree , params_.resolution, pts);
 
+    image.copyTo(canvas_tmp);
+    
     for (int i = 0; i < params_.resolution; ++i)
     {
       // std::cout << bs[i].x << " " << bs[i].y << " " <<bs[i].z << std::endl;
-      // int j = (i+1)%params_.resolution;
-      // cv::line(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 0, 0, 255 ),1,8,0);
-      // cv::circle(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y), 1 ,CV_RGB(0,255,0), 1); 
-      cv::circle(canvas, cv::Point2d(bs[i].x, bs[i].y), 1 ,CV_RGB(0,255,0), 1); 
+      int j = (i+1)%params_.resolution;
+      cv::line(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 0, 0, 255 ),2,8,0);
+      // cv::circle(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y), 2 ,CV_RGB(255,0,0), 2); 
+      // cv::circle(canvas, cv::Point2d(bs[i].x, bs[i].y), 1 ,CV_RGB(0,255,0), 1); 
     }
 
     // converge condition
@@ -608,9 +614,10 @@ void CCD::run_ccd()
         tol += pow((bs[k].x - bs_old.at<double>(k, 0))*bs_old.at<double>(k, 2) +
                    (bs[k].y - bs_old.at<double>(k, 1))*bs_old.at<double>(k, 3), 2);
       }
+      if(iter > 1)
+      params_.h = std::max(params_.h/log(tol_old/tol),10.0);
+      tol_old = tol;
     }
-    
-
     local_statistics(bs);
     
     refine_parameters(bs);
@@ -630,16 +637,16 @@ void CCD::run_ccd()
     //     cv::line(canvas, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 0, 0, 255 ),2,8,0);        
     //   }
 
-    // std::stringstream name;
-    // name << iter;
-    //cv::imwrite(name.str() + ".png", canvas_tmp);
-    // canvas_tmp.release();
+    std::stringstream name;
+    name << iter;
+    cv::imwrite(name.str() + ".png", canvas_tmp);
+    canvas_tmp.release();
     // cv::imwrite(name.str() + ".png", canvas);
 
-    // cv::imshow("CCD", canvas);    
-    // cv::waitKey(2);
+    cv::imshow("CCD", canvas);    
+    cv::waitKey(200);
 
-    if(iter >= 20)
+    if(iter >= 30)
     {
       convergence = true;
       init_cov(bs, params_.degree);
