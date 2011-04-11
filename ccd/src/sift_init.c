@@ -56,11 +56,9 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
     free( nbrs );
   }
 
-  /* 
-   * fprintf( stderr, "Found %d total matches\n", m );
-   * display_big_img( stacked, "Matches" );
-   * cvWaitKey( 0 );
-   */
+  fprintf( stderr, "Found %d total matches\n", m );
+  display_big_img( stacked, "Matches" );
+  cvWaitKey( 0 );
 
   /* 
      UNCOMMENT BELOW TO SEE HOW RANSAC FUNCTION WORKS

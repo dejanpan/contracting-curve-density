@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <ros/node_handle.h>
 #include "sensor_msgs/Image.h"
+#include <sensor_msgs/image_encodings.h>
 #include "image_transport/image_transport.h"
 #include "cv_bridge/CvBridge.h"
 #include <opencv/cv.h>
@@ -28,11 +29,13 @@ class CCDNode
   n_(n), it_(n_)
   {
     // n_.param("image_topic", image_topic_, std::string("/narrow_stereo/left/image_rect"));
-    n_.param("image_topic", image_topic_, std::string("/wide_stereo/left/image_rect"));
+    // n_.param("image_topic", image_topic_, std::string("/wide_stereo/left/image_rect_color"));
+    n_.param("image_topic", image_topic_, std::string("/prosilica/image_raw"));
     n_.param("init_method", init_method_, 1);
     image_sub_ = it_.subscribe(image_topic_, 1, &CCDNode::imageCallback, this);
     ROS_INFO("CCDNode Ready, listening on topic %s", image_topic_.c_str());
     ccd.read_params(std::string("ccd_params.xml"));
+    ROS_INFO("HELLOOOOOO %d", init_method_);
     ccd.init_mat();
     count_ = 0;
   }
@@ -43,17 +46,73 @@ class CCDNode
 
   void imageCallback(const sensor_msgs::ImageConstPtr& msg_ptr)
   {
+    // std::cerr << msg_ptstep << std::endl;
+    // ROS_INFO("Step: %d", msg_ptr->step);
+    // ROS_INFO("Width: %d", msg_ptr->width);
+ 	// ROS_INFO("Height: %d", msg_ptr->height);
+    // count_++;
+    // // float bytesPerPixel = msg_ptr->step / msg_ptr->width;
+    // IplImage *tmp_image = cvCreateImage(cvSize(msg_ptr->width, msg_ptr->height), IPL_DEPTH_8U, 1);;
+    // ROS_INFO("step: %d", tmp_image->widthStep);
+    // ROS_INFO("size: %d", tmp_image->imageSize);
+    // tmp_image->widthStep = msg_ptr->width;
+    // cv::Mat cv_image;
+    // try
+    // {
+    //   tmp_image = bridge_.imgMsgToCv(msg_ptr,"mono8");
+    // }
+    // catch (sensor_msgs::CvBridgeException error)
+    // {
+    //   ROS_ERROR("error");
+    // }
+    // catch (cv::Exception& ex)
+ 	// {
+	// 	ROS_ERROR("Error: %s", ex.err);
+	// 	return;
+ 	//
+    //    }
     count_++;
-    //IplImage *cv_image = NULL;
-    cv::Mat cv_image;
-    try
-    {
-      cv_image = bridge_.imgMsgToCv(msg_ptr);
-    }
-    catch (sensor_msgs::CvBridgeException error)
-    {
-      ROS_ERROR("error");
-    }
+    cv::Mat camera_image;
+    cv::Mat cv_image = cv::Mat(1024, 768, CV_8UC3);
+    if (msg_ptr->encoding.find("bayer") != std::string::npos)
+      {
+        const std::string& raw_encoding = msg_ptr->encoding;
+        int raw_type = CV_8UC1;
+        if (raw_encoding == sensor_msgs::image_encodings::BGR8 || raw_encoding == sensor_msgs::image_encodings::RGB8)
+          raw_type = CV_8UC3;
+        const cv::Mat raw(msg_ptr->height, msg_ptr->width, raw_type,
+                          const_cast<uint8_t*>(&msg_ptr->data[0]), msg_ptr->step);
+
+        // Convert to color BGR
+        int code = 0;
+        if (msg_ptr->encoding == sensor_msgs::image_encodings::BAYER_RGGB8)
+          code = CV_BayerBG2BGR;
+        else if (msg_ptr->encoding == sensor_msgs::image_encodings::BAYER_BGGR8)
+          code = CV_BayerRG2BGR;
+        else if (msg_ptr->encoding == sensor_msgs::image_encodings::BAYER_GBRG8)
+          code = CV_BayerGR2BGR;
+        else if (msg_ptr->encoding == sensor_msgs::image_encodings::BAYER_GRBG8)
+          code = CV_BayerGB2BGR;
+        else
+        {
+          ROS_ERROR("[image_proc] Unsupported encoding '%s'", msg_ptr->encoding.c_str());
+          return;
+        }
+        cv::cvtColor(raw, camera_image, code);
+
+        // cv::Mat tmp2;
+        // cv::cvtColor(tmpImage, tmp2, CV_BGR2GRAY);
+        cv::resize(camera_image, cv_image, cv::Size(1024,768),0,0,cv::INTER_LINEAR);
+      }
+      else
+      {
+        cv_image = bridge_.imgMsgToCv(msg_ptr, "bgr8");
+      }
+      printf("\n\n");
+      ROS_INFO("Image received!");
+
+      // cv::Mat cv_image = cv::Mat(tmpImage);
+    
     //ccd.pts.clear();
     //canvas = imread("../data/ball.png", 1);
     cv_image.copyTo(ccd.canvas);
@@ -66,9 +125,10 @@ class CCDNode
 
     if (count_ == 1)
     {
-      ccd.tpl = cv::imread("../data/book.png", 1);
-      ccd.init_pts(init_method_);
-        
+      ccd.tpl = cv::imread("data/book.png", 1);
+
+      ccd.init_pts(2);
+
       BSpline bs(ccd.degree(), ccd.resolution(), ccd.pts);    
 
       // for (int i = 0; i < ccd.get_resolution(); ++i)

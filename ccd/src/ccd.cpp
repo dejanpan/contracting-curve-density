@@ -53,6 +53,17 @@ void CCD::read_params( const std::string& filename)
   params_.resolution = int(fs["resolution"]);   
   params_.degree  = int(fs["degree"]);
   params_.phi_dim  = int(fs["phi_dim"]);
+  std::cerr<< params_.gamma_1<< " ";
+  std::cerr<< params_.gamma_2<< " ";
+  std::cerr<< params_.gamma_3<< " ";
+  std::cerr<< params_.gamma_4<< " ";
+  std::cerr<< params_.alpha<< " ";
+  std::cerr<< params_.kappa<< " ";
+  std::cerr<< params_.c<< " ";
+  std::cerr<< params_.delta_h<< " ";
+  std::cerr<< params_.resolution<< " ";
+  std::cerr<< params_.degree<< " ";
+  std::cerr<< params_.phi_dim<< std::endl;
 }
 
 void CCD::init_mat()
@@ -223,7 +234,7 @@ void CCD::local_statistics(BSpline &bs)
       // y_{k,l}
       tmp1.y = round(bs[i].y + j*nv_ptr[1]);
 
-      cv::circle(canvas_tmp, cv::Point2d(tmp1.x, tmp1.y), 1, CV_RGB(0,255,0), 1);
+      // cv::circle(canvas_tmp, cv::Point2d(tmp1.x, tmp1.y), 1, CV_RGB(0,255,0), 1);
 
       // distance between x_{k,l} and x_{k,0} in the normal direction
       // appoximately it is l*h, l = {1,2,3,.....}
@@ -285,7 +296,7 @@ void CCD::local_statistics(BSpline &bs)
       /////////////////////////////////////////////////////////////////////////////////////////      
       tmp2.x = round(bs[i].x - j*nv_ptr[0]);
       tmp2.y = round(bs[i].y - j*nv_ptr[1]);
-      cv::circle(canvas_tmp, cv::Point2d(tmp2.x, tmp2.y), 1, CV_RGB(0,255,0), 1);
+      // cv::circle(canvas_tmp, cv::Point2d(tmp2.x, tmp2.y), 1, CV_RGB(0,255,0), 1);
 #ifdef DEBUG
       if(i == 0)
         std::cout << "tmp2 " << tmp2.x  << " " << tmp2.y << std::endl;
@@ -643,10 +654,10 @@ void CCD::run_ccd()
     canvas_tmp.release();
     // cv::imwrite(name.str() + ".png", canvas);
 
-    cv::imshow("CCD", canvas);    
-    cv::waitKey(200);
+    // cv::imshow("CCD", canvas);    
+    // cv::waitKey(200);
 
-    if(iter >= 30)
+    if(iter >= 20)
     {
       convergence = true;
       init_cov(bs, params_.degree);
