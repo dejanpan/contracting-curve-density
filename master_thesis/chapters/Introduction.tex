@@ -117,62 +117,66 @@ view curving fitting problem from a probabilistic perspective and talk
 us towards to Bayesian treatment.
 
 We assume a parametric curve model is governed by a prior distribution
-over the model parameters $\Phi$ (usually a $D$-dimensional vector). For simplicity, let us consider a
-Gaussian distribution of the form.
+over the model parameters $\Phi$ (usually a $D$-dimensional
+vector). There exists a range of probability distributions which can
+be used to model the distribution of shapes. In this thesis, for
+simplicity, let us consider a Gaussian distribution, which is commonly
+used in computer vison because of its several outstanding features.
 
-\begin{equation}
-  \label{eq:1.1}
-  p(\mathbf{\Phi} | \mathbf{m}_{\mathbf{\Phi}}, \mathbf{\mathbf{\Sigma}}_{\mathbf{\Phi}}) = \mathcal{N}(\mathbf{\Phi} |
-  \mathbf{m}_{\mathbf{\Phi}},\mathbf{\Sigma}_{\mathbf{\Phi}}) =
-  \frac{1}{(2\pi )^{D/2}} \frac{1}{|\mathbf{\Sigma}_{\mathbf{\Phi}}|^{1/2}}
-\mathrm{exp} \left\{ -\frac{1}{2} (\mathbf{\Phi} -
-  \mathbf{\Sigma}_{\mathbf{\Phi}})^T \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} (\mathbf{\Phi} -
-  \mathbf{\Sigma}_{\mathbf{\Phi}}) \right\}
-\end{equation}
-where the $D$-dimensional vector $\mathbf{m}_{\mathbf{\Phi}}$ is
-called the mean, the $D \times D$ matrix
-$ \mathbf{\Sigma}_{\mathbf{\Phi}} $ is called
-the covariance, and $|\mathbf{\Sigma}_{\mathbf{\Phi}}|$ denotes the
-determinant of $\mathbf{\Sigma}_{\mathbf{\Phi}}$
+% \begin{equation}
+%   \label{eq:1.1}
+%   p(\mathbf{\Phi} | \mathbf{m}_{\mathbf{\Phi}}, \mathbf{\mathbf{\Sigma}}_{\mathbf{\Phi}}) = \mathcal{N}(\mathbf{\Phi} |
+%   \mathbf{m}_{\mathbf{\Phi}},\mathbf{\Sigma}_{\mathbf{\Phi}}) =
+%   \frac{1}{(2\pi )^{D/2}} \frac{1}{|\mathbf{\Sigma}_{\mathbf{\Phi}}|^{1/2}}
+% \mathrm{exp} \left\{ -\frac{1}{2} (\mathbf{\Phi} -
+%   \mathbf{\Sigma}_{\mathbf{\Phi}})^T \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} (\mathbf{\Phi} -
+%   \mathbf{\Sigma}_{\mathbf{\Phi}}) \right\}
+% \end{equation}
+% where the $D$-dimensional vector $\mathbf{m}_{\mathbf{\Phi}}$ is
+% called the mean, the $D \times D$ matrix
+% $ \mathbf{\Sigma}_{\mathbf{\Phi}} $ is called
+% the covariance, and $|\mathbf{\Sigma}_{\mathbf{\Phi}}|$ denotes the
+% determinant of $\mathbf{\Sigma}_{\mathbf{\Phi}}$
 
-We now use local image pixels $\mathcal{L}$ as the training data to
+Defining the prior distribution is only the part of the problem. Prior knowledge
+defines the possibility of shape in an image, if we want to know what
+shape is presented in a given image, we must find the posterior
+distribution. According the Bayesian theorem, posterior distribution
+is proportional to the product of prior distribution and likelihood
+function. Hence, the next step is define the likelihood function.
+
+In the implementation of the CCD algorithm, it is suggested to use local image pixels $\mathcal{L}$ as the training data to
 determine the likelihood function. If the data are assumed to be drawn
-independently from the distribution, then the likelihood function is
-given by
-
-\begin{equation}
-  \label{eq:1.2}
-p(\mathbf{\mathcal{L}} |\mathbf{\Phi}) = \prod_{n=1}^N \mathcal{N}(l_n | \mathbf{\Phi})
-\end{equation}
-
-where $n$ denotes the number of groups of local discrete image
-pixels. The goal in the curve fitting problem is to be able to
-determine the posterior distribution for model parameters
-$\mathbf{\Phi}$. 
-
+ independently from the distribution, then the likelihood function is
+given by the accumulation of all components.
 In this paper, by pixel value we denote the vector containing the local single-or multichannel
 image data associated to a pixel. In our experiments, we directly use the sensed RGB
 values as pixel values. However, other types of local features computed in a pre-processing
-step may also be used, e.g. texture descriptors or color values in other color spaces
+step may also be used, e.g. texture descriptors or color values in
+other color spaces.
 
-Using Bayes'
-theorem, the posterior distribution for $\mathbf{\Phi}$ is
-proportional to the product of the prior distribution and the
-likelihood function
-
-\begin{equation}
-  \label{eq:1.3}
-  p(\mathbf{\Phi}|\mathbf{\mathcal{L}}) \propto p(\mathbf{\mathcal{L}} |\mathbf{\Phi})p(\mathbf{\Phi} | \mathbf{m}_{\mathbf{\Phi}}, \mathbf{\mathbf{\Sigma}}_{\mathbf{\Phi}})
-\end{equation}
-
-We can now determine $\hat{\mathbf{\Phi}}$ by finding the most probable
+With the prior distribution and posterior distribution, now we can
+apply the Bayesian treatment to the curve fitting problem.
+We determine $\hat{\mathbf{\Phi}}$ by finding the most probable
 value of $\mathbf{\Phi}$ given the data, in other words by maximizing
 the posterior distribution. This technique is called maximum
 posterior, or simply MAP.
-\begin{equation}
-  \label{eq:1.4}
-  \hat{\mathbf{\Phi}} = \underset{\mathbf{\Phi}}{\arg\max} \ p(\mathbf{\Phi}|\mathbf{\mathcal{L}})
-\end{equation}
+
+There are several methods to estimate the MAP.
+\begin{itemize}
+\item in some special case, posterior distribution can be given in
+  closed form analytically. This requires conjugate priors.
+\item numerical optimization such as the conjugate gradient method or
+  Newton's method.
+\item modification of an expectation-maximization (EM) algorithm,
+  which does not require to derive the posterior density.
+\item Monte Carlo method using simulated annealing
+\end{itemize}
+
+In this thesis, we adopt the second method to obtain the MAP estimate.
+Usually, the result is some parameters (e.g. mean and covariance) to
+govern the posterior distribution. With the resulting parameters we
+can predict what shape is actually likely to be present in a particular image.
 
 
 \subsection{Possible problems}

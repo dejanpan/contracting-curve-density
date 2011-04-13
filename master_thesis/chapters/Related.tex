@@ -132,3 +132,18 @@ perpendiculars. The CCD tracker \cite{hanek2004fitting} uses only
 pixels on some perpendiculars like the condensation algorithm, but
 focuses on the vicinity of the contour. This means the CCD tracker can
 save time and improve performance.
+
+In the CCD algorithm and its variations, the curve fitting probelm is
+often converted to an optimization one. The optimization step is
+outstanding import for the CCD approach. There are many methods to
+deal with optimization, which can be classified into  into two
+categories, one is global optimization and another is local
+optimization\cite{hanek2004fitting}. The later one is used in the CCD
+approach. First, a smoothed objective function is obtained by fitting
+the curve model to a large scale description. Then the windows size is
+gradually reduced. During the process, many kinds of  numerical
+optimization  methods such as  conjugate gradient method , Newton's
+method, Gaussian-Newton and Levenberg-Marquardt algorithm
+\cite{contourpanin2011} can be used.
+
+

@@ -7,15 +7,99 @@ Robo Operation System. The PR2 robot will be presented in section
 
 \section{The Robot Operation System (ROS)}
 \label{sec:ros}
+% provides libraries and tools to help
+% software developers create robot applications. It provides hardware
+% abstraction, device drivers, libraries, visualizers, message-passing,
+% package management, and more.
+ROS is an open-source, meta-operating framework for robot software
+development. Ros was originally developed in 2007 by Stanford Artificial Intelligence Laboratory in support of the Stanford AI Robot\cite{quigley2007stair}. Like an ordinary operating system, it consists of  robot
+hardware resouces management, low-level device control, implementation
+of commonly-used functionality, interprocesses comunication (IPC), and package
+management. Ros is based on a pere-to-peer network architecture where
+processing takes palce in nodes that may receive, post and 
+multiplex sensor, control, state, planning, actuator and other
+messages. There are several different styles of communication
+, including synchronous RPC-style communication over services, asynchronous
+streaming of data over topics, and storage of data on a Parameter
+Server.
+Moreover, ROS provides tools and libraries for obtaining, building, writing, and
+running code across multiple computers.
 
+ROS is composed of operation system wide library \textbf{ros} and
+\textbf{ros-pkg}. The former one is a fundamental library as described
+above and the later one is a suit of user contributed packages which
+are organized into sets called \textbf{stacks}. The stacks includes
+many application areas, such as  perception, object identification,
+segmentation and recognition, face recognition, motion tracking ,
+stereopsis Stereo vision, control, planning, grasping and so on. Ros
+hs been ported to many robots and boards.
 
+The goal of ROS is "to support code reuse in robotics research and
+development"\cite{rosintroduction}.  it is designed to enable easily
+share and collaborate among developers. Moreover, ROS has many
+features, such as compact framwork, language independence, easy
+testing and scalability.
+
+ROS currently run on on Unix-like operation systems towards which the libary is
+geared. Currenty Ubuntu Linux is greatly supported. Moreover, The core
+ROS system and its tools and libraries are regularly released as a ROS
+Distribution\cite{rosintroduction} under the terms of the BSD license.
 
 \section{PR2}
 \label{sec:pr2}
+Personal Robot 2 (PR2) is a personal robitics research and development
+platform.  It is developed by Willow Garage.  PR2 has two 7-DOF arms and a mobile
+base, and its size  is similar to a human. Its sensors system consists of a 5
+megapixel camera, a tilting laser range finder, and an inertial
+measurement unit. The "texture projector" on PR2 can project a pattern
+on the environment to create 3D information captured by the
+cameras. PR2 is equiped with 16 CPU cores with 48 Gigabytes of
+RAM. Its battery system consists of 16 laptop batteries. PR2 is
+controled with ROS system as described  in \ref{sec:ros} which
+consistes of a series of libraries for perception, navigation and
+manipulation.
+The experiments of this thesis are partly delivered in PR2 system.
 
-\section{OpenCV library}
+\section{OpenCV Library}
 \label{sec:opencv}
 
+OpenCV (Open Source Computer Vision Library) is a library of
+programming functions mainly aimed at real time computer vision. It is
+originally developed by Intel and now maintained by Willow Garage. It
+is free for both academic and commercial usage and released  under the
+open source BSD license. The library is cross-platform, which supports
+Windows, Linux and MacOX,  in the latest version 2.2, the Android
+system is supported.
 
+OpenCV is originally written by C but now full C++ and Python
+interfaces are provided. The library is wildly used in the filed of
+computer vision, such as Human-Computer Interaction (HCI); Object
+Identification, Segmentation and Recognition; Face Recognition;
+Gesture Recognition; Motion Tracking, Ego Motion, Motion
+Understanding, Stereo and Multi-Camera
+Calibration and Depth Computation, Mobile Robotics (e.g. Android
+system).
+
+\begin{figure}[htbp]
+  \centering
+\includegraphics[width=\linewidth]{images/bsopencv.png}
+  \caption{The basic structure of OpenCV\cite{bradski2008learning}}
+  \label{fig:bsopencv}
+\end{figure}
+
+Currently, OpenCV consisted of following five main components\cite{bradski2008learning}.
+\begin{itemize}
+\item \textbf{Cv}: image processing and vision algorithms
+\item \textbf{MLL}: machine learning library, including statistical classifiers and clustering tools
+\item \textbf{HighGUI}: Graphic user interface and Input/Output
+  routines for image and video.
+\item \textbf{CvCore}: the basic data structures and content
+\item \textbf{CvAux}: containsdefunct areas (embedded HMM face
+  recognition) and experimental algorithms (background/foreground
+  segmentation).
+\end{itemize}
+
+The B-spline and CCD algorithm in this thesis is implemented using the
+OpenCV library.
 
 
