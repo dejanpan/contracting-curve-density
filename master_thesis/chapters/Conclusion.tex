@@ -15,46 +15,106 @@ parametric model curve, we have analyzed the core of the algorithm and
 proposed some improvement and optimization on it. Then we apply the
 algorithm on some challenging computer vision problems, such as curve
 fitting, object segmentation and tracking, 3-D pose estimation.  We
-delivered some experiments on PR2 and show satisfactory results. The
-experimental analysis shows that the CCD approach is capable of
-achieving high sub-pixel accuracy and robustness even in the presence
-of heavy texture, clutter, partial occlusion and severe changes of
-illumination.
+delivered some experiments on PR2 and show satisfactory results. 
 
 The CCD algorithm is a iterative procedure to refine an
 a prior distribution of the model parameters to a Gaussian
 approximation of the posterior distribution. It aims to extract the
 contour of a object based a prior model. A MAP estimate need to be
-evaluated by apply an effective optimization methods in order to get
+evaluated by applying an effective local optimization method in order to get
 the mean of model parameters and covariance matrices which govern the
 posterior distribution and determine the shape of model. Likelihood is 
+obtained from local statistics of the vicinity of the expected
+curve. The local statistics provides locally adapted criteria for
+adjacent image regions seperated by a contour. This criteria is stable
+and effective than those relying on homogeneous image regions or
+specific edge properties. The local statistics is outstanding
+important for the CCD algorithm, in this thesis we design a new weight
+function as criteria for separating adjacent image regions. 
+ In order to improve the performance and
+reduce computing cost, a blurred curve model
+\cite{hanek2004contracting} is applied as an efficient means for
+iteratively optimization. In the iteration process, after the
+algorithm starts to converge, the area of
+convergence becomes smaller and smaller, this has two great
+advantages, one is that the pixels used to learn the local statistic
+are scaled, thus computing cost is decreased; Another one is that it
+leads a high level sub-pixel accuracy. The rate of decreasing of the
+convergence area is significant, if too fast, the algorithm will stop
+converge, on the other hand, if too slow, it is difficult to achieve
+notably performance improvement. We investigate the relation between
+the rate and the convergence speed in this thesis.
+Beside, some features and improvement are integrated in to the
+developed system.
+\begin{itemize}
+\item model the parametric curve is implemented using the quadratic or
+cubic B-spline curve  to avoid the Runge phenomenon without increasing
+the degree.
+\item support both planar affine and non-planar affine
+  shape-space. This leads that the system is viewpoint invariant.
+\item Full automatic initialization of contour is developed to avoid
+  intervention from human.
+\item Initialization from point cloud.
+\end{itemize}
 
-The separation criteria are iteratively
-obtained from local statistics of the curve's vicinity. Pixels, which
-are intersected by the curve are modeled by a mixture of two local
-distributions corresponding to the two sides of the curve. This
-locally adapted statistical modeling allows for separating the two
-sides of the curve with high sub-pixel accuracy even in the presence
-of severe texture, shading, clutter, partial occlusion, and strong
-changes of illumination.
+Due to the robustness, stability and high performance, one main
+application of the CCD algorithm is on the development of real-time
+object tracking system. The CCD tracker is presented and developed in
+this thesis, and simulation and experimental of results have been presented, through a
+stand-alone implementation running both on
+standard hardware and PR2.
 
+We demonstrate the experimental results and compare it with other
+segmentation or tracking algorithm from some aspects such as
+robustness, performance and accuracy. quantitative and qualitative
+results are presented in this thesis.
 
-The CCD algorithm employs a blurred curve model as a means for
-iteratively optimizing the fit. The algorithm optimizes the MAP
-criteria not only for a single vector of model parameters but for a
-distribution of model parameter vectors defining a blurred
-curve. During the iterative process not only the model parameters are
-refined but also the associated covariance matrix. From the covariance
-matrix the local uncertainties of the curve are obtained, which
-provide the basis for the automatic and local scale selection. Our
-experiments show that the CCD algorithm achieves high sub-pixel
-accuracy and a large area of convergence even for challenging
-scenes. Hanek (2003) proposed an extension of the CCD algorithm called
-CCD tracker. The CCD tracker fits a curve to a sequence of images. The
-conducted experiments show that the CCD tracker outperforms other
-state-of-the-art trackers in terms of accuracy, robustness, and
-runtime (Hanek, 2003).
+The experimental analysis shows that the CCD approach is capable of
+achieving high sub-pixel accuracy and robustness even in the presence
+of heavy texture, clutter, partial occlusion and severe changes of
+illumination. It could be used in  visual-guided robot
+manipulation, robot navigation (self-localization) and target
+tracking.
 
 \section{Feature work}
 \label{sec:feature}
+We can improve the CCD algorithm from many aspects in order to make it
+more stable on personal robotics.
 
+Future developments of the system include the integration
+into a more complex tracking framework, that
+will allow more complex applications like as body parts
+(faces, hands) or full-body tracking, automatic assembly
+procedures for mechanical parts, and many others as well
+\begin{itemize}
+\item
+\item
+\item
+\item
+\item
+\item
+\item
+\item
+\item
+\item
+\item
+\item 
+\end{itemize}
+
+Moreover, Some possible application of the CCD approach could be
+investigated.
+\begin{itemize}
+\item
+\item
+\item
+\item
+\item
+\item
+\item
+\item
+\item
+\item
+\item
+\item
+\item 
+\end{itemize}
