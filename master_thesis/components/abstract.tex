@@ -4,7 +4,7 @@
 
 \clearemptydoublepage
 \phantomsection
-\addcontentsline{toc}{chapter}{Abstract}	
+\addcontentsline{toc}{chapter}{Abstract}        
 
 
 
@@ -16,4 +16,55 @@
 \end{center}
 \vspace{1cm}
 
-An abstracts abstracts the thesis!
+This master's thesis investigates an extended and optimized
+implementation of a state-of-the-art local curve fitting algorithm,
+the the Contracting Curve Density (CCD).
+In particular, we investigate
+the application of the CCD algorithm and its variant the CCD tracker
+on personal robotics (e.g. PR2).
+
+We developed an application program based on the OpenCV library, which
+is a cross-platform computer vision library. Based on the
+design conception of the CCD algortihm, some
+additional features are integrated into the developed program in order to
+achieve stability and robustness. First, the quadratic (degree-2) or
+cubic (degree-3) B-spline curve is used to model the parametric curve
+to avoid the Runge phenomenon without increasing the degree of the
+B-spline. secondly, the system supports both planar affine (6-DOF) and
+non-planar affine (8-DOF) shape-space. The extended affine space can avoid
+mismatch of curve cauased by minor viewpoint changes. Moreover, in
+order to avoid manual intervention from the user, the developed system
+also supports robust global initialization modules based on both keypoint
+feature matching and 3-Dimensional point cloud. At last, the CCD
+algorithm solves the curve fitting problem by converting it to a
+problem in pattern recognition, and maximum a posteriori probability
+(MAP) estimate is an important but time-cost step. We proposed some
+changes and optimization based on it.
+
+The developed system mainly consists of two functional parts, the CCD
+algorthm to fit model curve in still images and the CCD tracker to
+track model in sequential-frame video. We apply the CCD algorithm to
+serval image segmentation and object tracking problems. Some experiments with RGB
+images and videos are delivered on Personal Robot 2 (PR2), and the
+performance is examined on two tasks listed above.  It is shown that
+the CCD algorithm achieves robustness and subpixel accuracy even in the
+presence of clutter, partial occlusion, and changes of
+illumination. We present results for some curve-ftting problems, such
+as image segmentation, 3-D pose estimation, object tracking based on
+both manual intervention and automatical initialization.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
