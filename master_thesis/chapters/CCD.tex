@@ -65,7 +65,7 @@ intelligent initialization methods are proposed to extract the
 contour.
 In this paper, a initial contour estimation method is described and
 implemented by employing the well-known SIFT algorithm (source) for
-keypoint detection and matching. Chapter 6.1(?) be discussed this in
+keypoint detection and matching. Section \ref{sift_init} be discussed this in
 detail.
 
 \subsection{Model parametrization}
@@ -87,7 +87,7 @@ vector with 6 real elements $\mathbf{\Phi}$, namely model
 parameters. From the perspective of probability, the hypothetical
 curve gives a uncertainty, the solution of the curving problem is
 therefore no longer just a single curve, but a whole family of
-possible curves. The Gaussian probability density for these possible
+possible curves (\ref{fig:prior}). The Gaussian probability density for these possible
 curves in shape-space $\mathcal{S}$ is:
 
 \begin{equation}
@@ -97,6 +97,17 @@ curves in shape-space $\mathcal{S}$ is:
   \mathbf{\Sigma}_{\mathbf{\Phi}})^T \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} (\mathbf{\Phi} -
   \mathbf{\Sigma}_{\mathbf{\Phi}}) \right\}
 \end{equation}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=10cm]{images/prior.png}
+\caption[Sampling from curve families\cite{blake1998active}]{top
+  figure is the mean shape, left represents the euclidean similarities, right
+  sketch some samples in affine space. All these are governed by a
+  Gaussian distribution in shape-space with root-mean-square
+  displacement of 0.3 length units}
+\label{fig:prior}
+\end{figure}
 
 As claimed in chapter 1, $\mathbf{\Sigma}_{\mathbf{\Phi}}$ is a $6 \times 6$ 
 covariance matrix, which measure the variability of
@@ -236,8 +247,26 @@ defined as
     \gamma_1}{1-\gamma_2}\right)^4 \left[e^{-d_{k,l}/(2\hat{\sigma}^2)} - e^{-\gamma_2}\right]^+
 \end{equation}
 
+
 where $\gamma_1$ holds $0.5$ (disjoint weight assignment) and $\gamma_2$
-holds $4$ for the truncated Gaussian in (5). In addition, the standard
+holds $4$ for the truncated Gaussian \cite{hanek2004contracting}. 
+
+\begin{figure} 
+  \begin{minipage}[t]{0.45\linewidth} 
+    \centering 
+        \subfloat[]{\includegraphics[width=2.0in]{images/weight1.png}}
+  \end{minipage}% 
+  \begin{minipage}[t]{0.45\linewidth} 
+    \centering 
+    \subfloat[]{\includegraphics[width=2.0in]{images/weight2.png}}
+  \end{minipage} 
+\caption{the weight functions of the two sides of the contour, a) the
+  weight function along the positive direction (outside) in the normal of the
+  contour. b) the weight function along the negative direction (inside) }
+\label{fig:weight}
+\end{figure}
+
+In addition, the standard
 deviation is chosen in order to cover the specified distance $h$,
 which yields 
 \begin{equation}
@@ -667,6 +696,14 @@ new frame of image and go to the beginning of main loop.
 \end{table}
 \section{Efficiency and complexity}
 \label{sec:eff}
-
-
+In this section, We discuss the complexity of the CCD algorithm. 
+The time complexity of calculating the local statistics is
+$\mathcal{O}(N_{C}\times L)$, where $N_{C}$ is the number of sampled
+points along the contour, $2L$ is the number of pixels in the vicinity
+of the contour. The time consumed for Gaussian-Newton method is still
+$\mathcal{O}(N_{C}\times L)$. Because of the special structure used to
+calculate the local statistics, the runtime only increases with the
+scale of observed object in a image, and experiments show that the algorithm
+works well even when keeping small number of points along the contour for
+high resolution images, and in the process, runtime does not increase.
 

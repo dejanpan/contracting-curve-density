@@ -53,12 +53,20 @@ data and a parametric curve model with a prior distribution of the model
 parameters, through curving fitting process we estimate the model
 parameters which determine the approximation of the posterior
 distribution in order to make the curve model best match the image data.
-Figure 1 depicts a curve-fitting problem and the corresponding solution obtained by the
-CCD algorithm. 
+\ref{fig:fitting} depicts a curve-fitting problem and the corresponding solution obtained by the
+CCD algorithm.
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=10cm]{images/ball.png}
-  \caption{\label{fig:1}}
+  \includegraphics[width=10cm]{images/fitting.png}
+  \caption[The description of curve-fitting problem]{: a) given a input
+    image, here we do not show the pre-processing step. b) A series of
+    parametric curve model contours which can be used to evaluate the
+    prior distribution. These contours are only a small part of
+    possible shapes of the ball. c) The curve-fitting problem aims to estimate the model
+    parameters determining the posterior distribution. During the
+    fitting process, the uncertainty of contours of the ball is widely
+    reduced}
+  \label{fig:fitting}
 \end{figure}
 
 
@@ -73,7 +81,8 @@ requirements, such as Robustness,
 accuracy, efficiency, any-time property and versatility, should be
 considered when a novel approach is designed and implemented.
 However, in the computer vision community, solving object segmentation and the
-related object contour tracking problem are always challenging, especially in natural and unconstrained scenes. Due to clutter,
+related object contour tracking problem are always challenging,
+especially in natural and unconstrained scenes. Due to clutter,
 shading, texture, and highlights it is very difficulty to segment
 an object from an inhomogeneous background. Furthermore, some physical
 conditions, such as the illumination or surface properties, will
@@ -85,7 +94,7 @@ for all parts of an object boundary.
 Among the currently available methodologies, the CCD algorithm is an
 interest one. It is developed and presented in as a state-of-the-art
 improvement over other advanced techniques such as the condensation
-algorithm (panin 2006). In the CCD approach, curve fitting problem is
+algorithm \cite{panin2006fully}. In the CCD approach, curve fitting problem is
 put in the context of probabilistic framework and converted to a
 regression one in the field of pattern recognition. It is especially
 helpful to touch the nature of curving fitting problem. By introducing
@@ -100,13 +109,20 @@ accuracy. The CCD algorithm achieves a high level of robustness and subpixel
 accuracy even in the presence of severe texture, shading, clutter,
 partial occlusion, and strong changes of illumination.(modify)
 
+The robustness, fast and accuracy of the CCD algorithm enable it 
+to be used on personal robot  because many applications in the field
+of personal robotics are time-constrained. The object's contour
+obtained by the CCD algorithm can be used to locate the object and
+establish a set of safe grasps on the observed object\cite{hanek2000vision}.
+
+
 
 
 \section{The Contracting Curve Density (CCD) Approach}
 \label{sec:sketch}
 
-\subsection{Math description}
-\label{sec:md}
+\subsection{Overview}
+\label{sec:overview}
 
 In the field of pattern recognition, the key concept is that of
 uncertainty. In a image, the uncertainty arises both
@@ -236,32 +252,32 @@ are computed, one set for each side of the curve. The local statistics are obtai
 pixels that are close to pixel $nu$ and most likely lie on the corresponding side of the curve,
 according to the current estimate of the model parameters. The resulting local statistics
 represent an expectation of "what the two sides of the curve look
-like".(Hanek's paper)
+like"\cite{hanek2004contracting}.
 
-The CCD algorithm has some interesting similarities to the Expectation-Maximization
-(EM) algorithm (Dempster et al., 1977), which is often used for clustering-based image
-segmentation, a subset of region-based image segmentation (Hermes et al., 2002; Belongie
-et al., 1998). The first step computes local statistics defining an expectation of the pixel
-values (E-step). The second step maximizes this expectation
-(M-step). The CCD algorithm differs mainly by: 1.) using local
-statistics, 2.) exploiting a curve model and optimizing model
-parameters rather than pixel classifications.
+% The CCD algorithm has some interesting similarities to the Expectation-Maximization
+% (EM) algorithm (Dempster et al., 1977), which is often used for clustering-based image
+% segmentation, a subset of region-based image segmentation (Hermes et al., 2002; Belongie
+% et al., 1998). The first step computes local statistics defining an expectation of the pixel
+% values (E-step). The second step maximizes this expectation
+% (M-step). The CCD algorithm differs mainly by: 1.) using local
+% statistics, 2.) exploiting a curve model and optimizing model
+% parameters rather than pixel classifications.
 
 
 \section{Overview of the Thesis}
 \label{sec:overview}
-The remainder of this paper is organized as follows. In Chapter 2,
-related work on PR2, Robot Operation System (ROS), active contour,
-some curve-fitting ,image segmentation and tracking algorithms will be
-introduced. Details on shape-space models and parametric
-B-Spline curves are discussed in chapter 3. In chapter 4 , we give a brief introduction of software
+The remainder of this paper is organized as
+follows. Chapter \ref{chapter:related} describes related work on active contour,
+curve-fitting, image segmentation, object tracking and optimization methods will be
+introduced . In chapter \ref{chapter:SHI}, we give a brief introduction of software
 and hardware infrastructure used in the implementation of the CCD
-approach. We will concern the OpenCV library, ROS and PR2, and chapter
-5 explain the CCD approach in detail. This will be followed by a
-description of the application of the CCD approach in
-robotics. In chapter 7, experiments and results are given. In
+approach. We will concern the OpenCV library, ROS and PR2. Details on shape-space models and parametric
+B-Spline curves are discussed in chapter \ref{chapter:bspline},  and
+chapter \ref{chapter:ccd} explains the CCD approach in detail. 
+In chapter \ref{chapter:experiments}, experiments and results are demonstrated. In
 addition, we evaluate the performance of the CCD algorithm and the CCD
-tracker in terms of robustness, accuracy, and runtime. In chapter 8,
+tracker in terms of robustness, accuracy, and runtime. In chapter \ref{chapter:conclusion},
 the work of this thesis is concluded with the future work for improvement.
+
 
 

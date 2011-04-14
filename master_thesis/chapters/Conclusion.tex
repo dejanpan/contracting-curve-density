@@ -78,43 +78,54 @@ tracking.
 
 \section{Feature work}
 \label{sec:feature}
-We can improve the CCD algorithm from many aspects in order to make it
-more stable on personal robotics.
 
-Future developments of the system include the integration
-into a more complex tracking framework, that
-will allow more complex applications like as body parts
-(faces, hands) or full-body tracking, automatic assembly
-procedures for mechanical parts, and many others as well
+Thougth the CCD algorithm is powerful local curve fitting algorithm,
+like other computer vision algorithms, it is not a general solution to
+the image segmentation and curve fitting problem. There are following
+limitations or shortcomings.
 \begin{itemize}
-\item
-\item
-\item
-\item
-\item
-\item
-\item
-\item
-\item
-\item
-\item
-\item 
+\item Current implementation strongly depends on values of pixels in
+  images, it is a algorithm relying on RGB statistics. Therefore, it
+  does not work well for gray-scale images.
+\item In many cases, automation global initialization of contours does
+  not work, manual intervention has to be executed in the beginning or
+  in case of tracking loss.
+\item For a object like a ring, there are two extremely similar
+  contours which are very close. The separating criteria, local
+  statistics, sometimes is not capable of distinguish two contours.
+\item In the process of optimization, the algorithm might converge to
+  local minimum which leads to a failure. For an instance, sometimes the
+  contour of the shadow is similar to the object being studied, the
+  CCD algorithm could not obtain perfect result in this case.
 \end{itemize}
 
-Moreover, Some possible application of the CCD approach could be
+We can improve the CCD algorithm from many aspects in order to make it
+more stable for the application of personal robotics.
+\begin{itemize}
+\item Besides the RGB statistics, statistics base on the feature
+  descriptors, color values in other color space could be used as
+  local feature. This will make the algorithm adaptable.
+\item Current 6-DOF and 8-DOF shape-space could not cope with all
+  cases. When perspective effects are strong, approximation error
+may be appreciable. Therefore, some more complex model representations
+should be designed.
+\item In order to avoid the local minimum, some advanced optimization
+  methods should be investigated.
+\item In the CCD algorithm, we do not take account of
+  the coupling of different group of pixels on perpendiculars. We also
+  do not consider the statistical dependencies between successive
+  images in the CCD tracker. Despite that fact that it is more
+  complicated when considering these factors, a performance and
+  stability enhancement could be achieved.
+\end{itemize}
+
+Moreover, Some possible applications of the CCD approach could be
 investigated.
 \begin{itemize}
-\item
-\item
-\item
-\item
-\item
-\item
-\item
-\item
-\item
-\item
-\item
-\item
-\item 
+\item The CCD algorithm could be integrated into a more complex
+  tracking framework by combining it with some other efficient
+  algorithms to implement complex applications.
+\item Take into account the advantages of the CCD algorithm,
+  robustness, stability and accuracy, it is usable for object
+  localization and recognition.
 \end{itemize}
