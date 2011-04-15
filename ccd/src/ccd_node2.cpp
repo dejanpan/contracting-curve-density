@@ -130,6 +130,7 @@ class CCDNode
       count_++;
       cv::Mat cv_image = readImage(msg_ptr);
       std::cerr << "col: " <<cv_image.cols << "  rows:" <<  cv_image.rows<< std::endl;
+      std::cerr << "init_method_: " << init_method_ << std::endl;
       cv_image.copyTo(ccd.canvas);
       cv_image.copyTo(ccd.image);
       if (count_ == 1)
@@ -144,7 +145,12 @@ class CCDNode
         else if (init_method_ == 2) //initialized from projected Point Cloud
         {
           while (!got_polygon_)
-            sleep(1);
+          {
+            //std::cerr << "in while loop" << std::endl;            
+            //sleep(1);
+            count_ = 0;
+            return;
+          }
         }
         else
         {
@@ -176,11 +182,12 @@ class CCDNode
     {
       if (!got_polygon_)
       {
-        for (uint i = 0; i < msg_ptr->polygon.points.size(); i++)
+        for (uint i = 0; i < msg_ptr->polygon.points.size(); i = i+7)
         {
-          ROS_INFO("Polygon: %f, %f", msg_ptr->polygon.points[i].x, msg_ptr->polygon.points[i].y);
+//          ROS_INFO("Polygon: %f, %f", msg_ptr->polygon.points[i].x, msg_ptr->polygon.points[i].y);
           pts_.push_back(cv::Point3d(msg_ptr->polygon.points[i].x, msg_ptr->polygon.points[i].y, 1));
         }
+        ROS_INFO("pts_: %ld", pts_.size());
         got_polygon_ = true;
       }
     }
@@ -210,15 +217,15 @@ class CCDNode
 
 int main(int argc, char** argv)
 {
-  if(argc != 3)
+  if(argc != 2)
   {
+    std::cout << "usage: ros_to_openCv init_method (0-manual, 1-SIFT, 2-PointCloud)" << std::endl;
     exit(-1);
-    std::cout << "usage: ros_to_openCv topic init_method (0-manual, 1-SIFT, 2-PointCloud)" << std::endl;
   }
 
   ros::init(argc, argv, "ros_to_openCv");
   ros::NodeHandle n("~");
-  CCDNode ccd_node(n, atoi(argv[2]));
+  CCDNode ccd_node(n, atoi(argv[1]));
   //  ccd_node.canvas = imread(argv[1], 1);
   //  ccd_node.img = imread(argv[1], 1);
   ros::spin();
