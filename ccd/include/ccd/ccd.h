@@ -71,7 +71,7 @@ public:
   void run_ccd();
   double resolution(){return params_.resolution;}
   double degree(){return params_.degree;}
-  inline void init_pts(int init_method);
+  /* inline void init_pts(int init_method); */
   void init_cov(BSpline &bs, int degree);
   ~CCD(){clear();}
 private:
@@ -94,17 +94,19 @@ private:
   cv::Mat hessian_E;
 };
 
-inline void CCD::init_pts(int init_method)
-{
-  if(init_method == 1)    
-    contour_manually();
-  else if(init_method == 2)
-    contour_sift();
-  if((int)pts.size() > params_.degree)
-  {
-    for (int i = 0; i < params_.degree; ++i)
-      pts.push_back(pts[i]);
-  }
-}
+/* 
+ * inline void CCD::init_pts(int init_method)
+ * {
+ *   if(init_method == 1)
+ *     contour_manually();
+ *   else if(init_method == 2)
+ *     contour_sift();
+ *   if((int)pts.size() > params_.degree)
+ *   {
+ *     for (int i = 0; i < params_.degree; ++i)
+ *       pts.push_back(pts[i]);
+ *   }
+ * }
+ */
 
 void on_mouse(int event, int x, int y, int flags, void* param );

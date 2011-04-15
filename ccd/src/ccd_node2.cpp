@@ -9,6 +9,7 @@
 #include <opencv/highgui.h>
 #include <string.h>
 #include <iostream>
+#include "ccd/sift_init.h"
 #include <ccd/bspline.h>
 #include <ccd/ccd.h>
 
@@ -22,6 +23,7 @@ class CCDNode
   image_transport::Subscriber image_sub_;
   sensor_msgs::CvBridge bridge_;
   std::string image_topic_;
+  std::vector<cv::Point3d> pts_;
   CCD ccd;
   int count_;
   int init_method_;
@@ -44,39 +46,14 @@ class CCDNode
 
 
 
-  void imageCallback(const sensor_msgs::ImageConstPtr& msg_ptr)
+  cv::Mat readImage(const sensor_msgs::ImageConstPtr& msg_ptr)
   {
-    // std::cerr << msg_ptstep << std::endl;
-    // ROS_INFO("Step: %d", msg_ptr->step);
-    // ROS_INFO("Width: %d", msg_ptr->width);
- 	// ROS_INFO("Height: %d", msg_ptr->height);
-    // count_++;
-    // // float bytesPerPixel = msg_ptr->step / msg_ptr->width;
-    // IplImage *tmp_image = cvCreateImage(cvSize(msg_ptr->width, msg_ptr->height), IPL_DEPTH_8U, 1);;
-    // ROS_INFO("step: %d", tmp_image->widthStep);
-    // ROS_INFO("size: %d", tmp_image->imageSize);
-    // tmp_image->widthStep = msg_ptr->width;
-    // cv::Mat cv_image;
-    // try
-    // {
-    //   tmp_image = bridge_.imgMsgToCv(msg_ptr,"mono8");
-    // }
-    // catch (sensor_msgs::CvBridgeException error)
-    // {
-    //   ROS_ERROR("error");
-    // }
-    // catch (cv::Exception& ex)
- 	// {
-	// 	ROS_ERROR("Error: %s", ex.err);
-	// 	return;
- 	//
-    //    }
-    count_++;
-    cv::Mat camera_image;
-    cv::Mat cv_image = cv::Mat(1024, 768, CV_8UC3);
+
+        cv::Mat image = cv::Mat(1024, 768, CV_8UC3);
     if (msg_ptr->encoding.find("bayer") != std::string::npos)
       {
         const std::string& raw_encoding = msg_ptr->encoding;
+        cv::Mat camera_image;
         int raw_type = CV_8UC1;
         if (raw_encoding == sensor_msgs::image_encodings::BGR8 || raw_encoding == sensor_msgs::image_encodings::RGB8)
           raw_type = CV_8UC3;
@@ -96,44 +73,60 @@ class CCDNode
         else
         {
           ROS_ERROR("[image_proc] Unsupported encoding '%s'", msg_ptr->encoding.c_str());
-          return;
         }
         cv::cvtColor(raw, camera_image, code);
 
         // cv::Mat tmp2;
         // cv::cvtColor(tmpImage, tmp2, CV_BGR2GRAY);
-        cv::resize(camera_image, cv_image, cv::Size(1024,768),0,0,cv::INTER_LINEAR);
+        cv::resize(camera_image, image, cv::Size(1024,768),0,0,cv::INTER_LINEAR);
       }
       else
       {
-        cv_image = bridge_.imgMsgToCv(msg_ptr, "bgr8");
+        image = bridge_.imgMsgToCv(msg_ptr, "bgr8");
       }
-      printf("\n\n");
-      ROS_INFO("Image received!");
+      return image;
+  }
 
-      // cv::Mat cv_image = cv::Mat(tmpImage);
-    
-    //ccd.pts.clear();
-    //canvas = imread("../data/ball.png", 1);
+  void contourSift()
+{
+  int row;
+  IplImage sift_tpl = ccd.tpl;
+  IplImage sift_tpl_img = ccd.canvas;
+  IplImage *tpl_ptr = &sift_tpl;
+  IplImage *tpl_img_ptr = &sift_tpl_img;
+  // CvMat points_mat = sift_init(tpl_ptr, tpl_img_ptr, 30);
+  CvMat points_mat = sift_init(tpl_ptr, tpl_img_ptr, 30);
+  CvMat *points_mat_ptr = &points_mat;
+  double *ptr = points_mat_ptr->data.db;
+  int step = points_mat.step/sizeof(double);
+  for (row = 0; row < points_mat_ptr->rows; ++row)
+  {
+    pts_.push_back(cv::Point3d((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2], 1));
+    // cv::circle(my_ccd.canvas, cvPoint((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]), 2, CV_RGB(0,255,0), 2, 8, 0);
+  }
+  //clean..........
+}
+
+  void imageCallback(const sensor_msgs::ImageConstPtr& msg_ptr)
+  {
+    count_++;
+    cv::Mat cv_image = readImage(msg_ptr);
     cv_image.copyTo(ccd.canvas);
     cv_image.copyTo(ccd.image);
-    // Mat_<Vec3b>& img = (Mat_<Vec3b>&)ccd.image;
-    // std::cerr << "sample data: " << (int)img(356, 180)[0] << " " << (int)img(356, 180)[1] << " " << (int)img(356, 180)[2] << " "  << std::endl;
-
-
-    std::cerr << "I got a new image" << std::endl;
-
     if (count_ == 1)
     {
+
       ccd.tpl = cv::imread("data/book.png", 1);
-
-      ccd.init_pts(2);
-
+      contourSift();
+      
+      if((int)pts_.size() > ccd.degree())
+      {
+        for (int i = 0; i < ccd.degree(); ++i)
+          pts_.push_back(pts_[i]);
+      }
+      
+      ccd.pts = pts_;
       BSpline bs(ccd.degree(), ccd.resolution(), ccd.pts);    
-
-      // for (int i = 0; i < ccd.get_resolution(); ++i)
-      //   std::cerr << "pts bspline: " << bs[i].x << " " << bs[i].y << std::endl;
-        
       ccd.init_cov(bs, (int)ccd.degree());
     }      
     ccd.run_ccd();
