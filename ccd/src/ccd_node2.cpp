@@ -12,7 +12,7 @@
 #include "ccd/sift_init.h"
 #include <ccd/bspline.h>
 #include <ccd/ccd.h>
-
+#include <geometry_msgs/PolygonStamped.h>
 //class ImageConverter {
 void on_mouse(int event, int x, int y, int flags, void *param );
 class CCDNode
@@ -21,25 +21,31 @@ class CCDNode
   ros::NodeHandle n_;
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
+  ros::Subscriber polygon_sub_;
   sensor_msgs::CvBridge bridge_;
-  std::string image_topic_;
+  std::string image_topic_, polygon_points_topic_;
   std::vector<cv::Point3d> pts_;
   CCD ccd;
   int count_;
   int init_method_;
-  CCDNode(ros::NodeHandle &n) :
+  bool got_polygon_;
+  CCDNode(ros::NodeHandle &n, int init_method) :
   n_(n), it_(n_)
   {
     // n_.param("image_topic", image_topic_, std::string("/narrow_stereo/left/image_rect"));
     // n_.param("image_topic", image_topic_, std::string("/wide_stereo/left/image_rect_color"));
-    n_.param("image_topic", image_topic_, std::string("/prosilica/image_raw"));
-    n_.param("init_method", init_method_, 1);
+    n_.param("image_topic", image_topic_, std::string("/camera/rgb/image_color"));
+    n_.param("polygon_points_topic", polygon_points_topic_, std::string("/pointcloud_to_image_projector_opencv_node/polygon_points"));
+//    n_.param("init_method", init_method_, 1);
+    init_method_ = init_method;
     image_sub_ = it_.subscribe(image_topic_, 1, &CCDNode::imageCallback, this);
+    polygon_sub_ = n_.subscribe(polygon_points_topic_, 1, &CCDNode::polygonCallback, this);
     ROS_INFO("CCDNode Ready, listening on topic %s", image_topic_.c_str());
     ccd.read_params(std::string("ccd_params.xml"));
     ROS_INFO("HELLOOOOOO %d", init_method_);
     ccd.init_mat();
     count_ = 0;
+    got_polygon_ = false;
   }
 
   ~CCDNode(){}
@@ -121,37 +127,63 @@ class CCDNode
 
   void imageCallback(const sensor_msgs::ImageConstPtr& msg_ptr)
   {
-    count_++;
-    cv::Mat cv_image = readImage(msg_ptr);
-    std::cerr << "col: " <<cv_image.cols << "  rows:" <<  cv_image.rows<< std::endl;
-    cv_image.copyTo(ccd.canvas);
-    cv_image.copyTo(ccd.image);
-    if (count_ == 1)
-    {
-
-      ccd.tpl = cv::imread("data/book.png", 1);
-      contourSift();
-      // contourManually();
-      
-      if((int)pts_.size() > ccd.degree())
+      count_++;
+      cv::Mat cv_image = readImage(msg_ptr);
+      std::cerr << "col: " <<cv_image.cols << "  rows:" <<  cv_image.rows<< std::endl;
+      cv_image.copyTo(ccd.canvas);
+      cv_image.copyTo(ccd.image);
+      if (count_ == 1)
       {
-        for (int i = 0; i < ccd.degree(); ++i)
-          pts_.push_back(pts_[i]);
-      }
-      
-      ccd.pts = pts_;
-      BSpline bs(ccd.degree(), ccd.resolution(), ccd.pts);    
-      ccd.init_cov(bs, (int)ccd.degree());
-    }      
-    ccd.run_ccd();
-    // cv::imshow("Original", ccd.canvas);
-    // cv::waitKey(1);
-    std::stringstream name;
-    name << count_;
-    cv::imwrite(name.str() + ".png", ccd.canvas);
-    // sleep(1);
+        if (init_method_ == 0) //manually 
+          contourManually();
+        else if (init_method_ == 1) //initialized from SIFT
+        {
+          ccd.tpl = cv::imread("data/book.png", 1);
+          contourSift();
+        }
+        else if (init_method_ == 2) //initialized from projected Point Cloud
+        {
+          while (!got_polygon_)
+            sleep(1);
+        }
+        else
+        {
+          ROS_ERROR("Unknown parameter!");
+          return;
+        }
+        
+        if((int)pts_.size() > ccd.degree())
+        {
+          for (int i = 0; i < ccd.degree(); ++i)
+            pts_.push_back(pts_[i]);
+        }
+        
+        ccd.pts = pts_;
+        BSpline bs(ccd.degree(), ccd.resolution(), ccd.pts);    
+        ccd.init_cov(bs, (int)ccd.degree());
+      }      
+      ccd.run_ccd();
+      // cv::imshow("Original", ccd.canvas);
+      // cv::waitKey(1);
+      std::stringstream name;
+      name << count_;
+      cv::imwrite(name.str() + ".png", ccd.canvas);
   }
+      // sleep(1);
   //protected:
+
+  void polygonCallback(const geometry_msgs::PolygonStampedPtr& msg_ptr)
+    {
+      if (!got_polygon_)
+      {
+        for (uint i = 0; i < msg_ptr->polygon.points.size(); i++)
+        {
+          ROS_INFO("Polygon: %f, %f", msg_ptr->polygon.points[i].x, msg_ptr->polygon.points[i].y);
+          pts_.push_back(cv::Point3d(msg_ptr->polygon.points[i].x, msg_ptr->polygon.points[i].y, 1));
+        }
+        got_polygon_ = true;
+      }
+    }
 };
 
   void on_mouse(int event, int x, int y, int flags, void *param )
@@ -178,15 +210,15 @@ class CCDNode
 
 int main(int argc, char** argv)
 {
-  if(argc < 1)
+  if(argc != 3)
   {
     exit(-1);
-    std::cout << "usage: ros_to_openCv topic" << std::endl;
+    std::cout << "usage: ros_to_openCv topic init_method (0-manual, 1-SIFT, 2-PointCloud)" << std::endl;
   }
 
   ros::init(argc, argv, "ros_to_openCv");
   ros::NodeHandle n("~");
-  CCDNode ccd_node(n);
+  CCDNode ccd_node(n, atoi(argv[2]));
   //  ccd_node.canvas = imread(argv[1], 1);
   //  ccd_node.img = imread(argv[1], 1);
   ros::spin();
