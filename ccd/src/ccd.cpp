@@ -6,7 +6,7 @@
 #include "ccd/sift_init.h"
 #include "ccd/bspline.h"
 #include "ccd/ccd.h"
-    cv::Mat canvas_tmp;
+cv::Mat canvas_tmp;
 
 inline cv::Scalar random_color(CvRNG* rng)
 {
@@ -16,27 +16,27 @@ inline cv::Scalar random_color(CvRNG* rng)
 
 
 
-void on_mouse(int event, int x, int y, int flags, void *param )
-{
-  CCD *my_ccd = (CCD *)param;
-  cv::Mat image = my_ccd->canvas;
-  if( image.empty())
-    return ;
+// void on_mouse(int event, int x, int y, int flags, void *param )
+// {
+//   CCD *my_ccd = (CCD *)param;
+//   cv::Mat image = my_ccd->canvas;
+//   if( image.empty())
+//     return ;
 
-  //caution: check
-  // if( image1.at<double>() )
-  //   y = image1->height - y;
-  switch( event )
-  {
-    case CV_EVENT_LBUTTONDOWN:
-      break;
-    case CV_EVENT_LBUTTONUP:
-      cv::circle(image,cv::Point(x,y),1,cv::Scalar(0,0,255),1);
-      my_ccd->pts.push_back(cv::Point3d(x,y,1));
-      cv::imshow("CCD", image);
-      break;
-  }
-}
+//   //caution: check
+//   // if( image1.at<double>() )
+//   //   y = image1->height - y;
+//   switch( event )
+//   {
+//     case CV_EVENT_LBUTTONDOWN:
+//       break;
+//     case CV_EVENT_LBUTTONUP:
+//       cv::circle(image,cv::Point(x,y),1,cv::Scalar(0,0,255),1);
+//       my_ccd->pts.push_back(cv::Point3d(x,y,1));
+//       cv::imshow("CCD", image);
+//       break;
+//   }
+// }
 
 void CCD::read_params( const std::string& filename)
 {
@@ -605,15 +605,6 @@ void CCD::run_ccd()
     BSpline bs(params_.degree , params_.resolution, pts);
 
     image.copyTo(canvas_tmp);
-    
-    for (int i = 0; i < params_.resolution; ++i)
-    {
-      // std::cout << bs[i].x << " " << bs[i].y << " " <<bs[i].z << std::endl;
-      int j = (i+1)%params_.resolution;
-      cv::line(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 255, 0, 0 ),2,8,0);
-      // cv::circle(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y), 2 ,CV_RGB(255,0,0), 2); 
-      // cv::circle(canvas, cv::Point2d(bs[i].x, bs[i].y), 1 ,CV_RGB(0,255,0), 1); 
-    }
 
     // converge condition
     // tol = \int (r - r_f)*n
@@ -650,7 +641,7 @@ void CCD::run_ccd()
 
     std::stringstream name;
     name << iter;
-    cv::imwrite(name.str() + ".png", canvas_tmp);
+    // cv::imwrite(name.str() + ".png", canvas_tmp);
     canvas_tmp.release();
     // cv::imwrite(name.str() + ".png", canvas);
 
@@ -659,6 +650,15 @@ void CCD::run_ccd()
 
     if(iter >= 20)
     {
+      for (int i = 0; i < params_.resolution; ++i)
+      {
+        // std::cout << bs[i].x << " " << bs[i].y << " " <<bs[i].z << std::endl;
+        int j = (i+1)%params_.resolution;
+        cv::line(canvas, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 0, 0, 255 ),2,8,0);
+        // cv::line(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 255, 0, 0 ),2,8,0);
+        // cv::circle(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y), 2 ,CV_RGB(255,0,0), 2); 
+        // cv::circle(canvas, cv::Point2d(bs[i].x, bs[i].y), 1 ,CV_RGB(0,255,0), 1); 
+      }
       convergence = true;
       init_cov(bs, params_.degree);
     }
@@ -667,36 +667,36 @@ void CCD::run_ccd()
   }while(!convergence);
 }
 
-void CCD::contour_sift()
-{
-  int row;
-  IplImage sift_tpl = tpl;
-  IplImage sift_tpl_img = canvas;
-  IplImage *tpl_ptr = &sift_tpl;
-  IplImage *tpl_img_ptr = &sift_tpl_img;
-  // CvMat points_mat = sift_init(tpl_ptr, tpl_img_ptr, 30);
-  CvMat points_mat = sift_init(tpl_ptr, tpl_img_ptr, 30);
-  CvMat *points_mat_ptr = &points_mat;
-  double *ptr = points_mat_ptr->data.db;
-  int step = points_mat.step/sizeof(double);
-  for (row = 0; row < points_mat_ptr->rows; ++row)
-  {
-    pts.push_back(cv::Point3d((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2], 1));
-    // cv::circle(my_ccd.canvas, cvPoint((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]), 2, CV_RGB(0,255,0), 2, 8, 0);
-  }
-  //clean..........
-}
+// void CCD::contour_sift()
+// {
+//   int row;
+//   IplImage sift_tpl = tpl;
+//   IplImage sift_tpl_img = canvas;
+//   IplImage *tpl_ptr = &sift_tpl;
+//   IplImage *tpl_img_ptr = &sift_tpl_img;
+//   // CvMat points_mat = sift_init(tpl_ptr, tpl_img_ptr, 30);
+//   CvMat points_mat = sift_init(tpl_ptr, tpl_img_ptr, 30);
+//   CvMat *points_mat_ptr = &points_mat;
+//   double *ptr = points_mat_ptr->data.db;
+//   int step = points_mat.step/sizeof(double);
+//   for (row = 0; row < points_mat_ptr->rows; ++row)
+//   {
+//     pts.push_back(cv::Point3d((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2], 1));
+//     // cv::circle(my_ccd.canvas, cvPoint((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]), 2, CV_RGB(0,255,0), 2, 8, 0);
+//   }
+//   //clean..........
+// }
 
 
-void CCD::contour_manually()
-{
-  int key;
-  cv::namedWindow("CCD", 1);
-  cv::setMouseCallback( "CCD", on_mouse,  (void*)this);
-  cv::imshow("CCD", canvas);
-  while (1)
-  {
-    key = cv::waitKey(10);
-    if (key == 27) break;
-  }
-}
+// void CCD::contour_manually()
+// {
+//   int key;
+//   cv::namedWindow("CCD", 1);
+//   cv::setMouseCallback( "CCD", on_mouse,  (void*)this);
+//   cv::imshow("CCD", canvas);
+//   while (1)
+//   {
+//     key = cv::waitKey(10);
+//     if (key == 27) break;
+//   }
+// }

@@ -14,7 +14,7 @@
 #include <ccd/ccd.h>
 
 //class ImageConverter {
-
+void on_mouse(int event, int x, int y, int flags, void *param );
 class CCDNode
 {
  public:
@@ -48,69 +48,82 @@ class CCDNode
 
   cv::Mat readImage(const sensor_msgs::ImageConstPtr& msg_ptr)
   {
-
-        cv::Mat image = cv::Mat(1024, 768, CV_8UC3);
+    cv::Mat image;
     if (msg_ptr->encoding.find("bayer") != std::string::npos)
-      {
-        const std::string& raw_encoding = msg_ptr->encoding;
-        cv::Mat camera_image;
-        int raw_type = CV_8UC1;
-        if (raw_encoding == sensor_msgs::image_encodings::BGR8 || raw_encoding == sensor_msgs::image_encodings::RGB8)
-          raw_type = CV_8UC3;
-        const cv::Mat raw(msg_ptr->height, msg_ptr->width, raw_type,
-                          const_cast<uint8_t*>(&msg_ptr->data[0]), msg_ptr->step);
+    {
+      image = cv::Mat(1024, 768, CV_8UC3);
+      const std::string& raw_encoding = msg_ptr->encoding;
+      cv::Mat camera_image;
+      int raw_type = CV_8UC1;
+      if (raw_encoding == sensor_msgs::image_encodings::BGR8 || raw_encoding == sensor_msgs::image_encodings::RGB8)
+        raw_type = CV_8UC3;
+      const cv::Mat raw(msg_ptr->height, msg_ptr->width, raw_type,
+                        const_cast<uint8_t*>(&msg_ptr->data[0]), msg_ptr->step);
 
-        // Convert to color BGR
-        int code = 0;
-        if (msg_ptr->encoding == sensor_msgs::image_encodings::BAYER_RGGB8)
-          code = CV_BayerBG2BGR;
-        else if (msg_ptr->encoding == sensor_msgs::image_encodings::BAYER_BGGR8)
-          code = CV_BayerRG2BGR;
-        else if (msg_ptr->encoding == sensor_msgs::image_encodings::BAYER_GBRG8)
-          code = CV_BayerGR2BGR;
-        else if (msg_ptr->encoding == sensor_msgs::image_encodings::BAYER_GRBG8)
-          code = CV_BayerGB2BGR;
-        else
-        {
-          ROS_ERROR("[image_proc] Unsupported encoding '%s'", msg_ptr->encoding.c_str());
-        }
-        cv::cvtColor(raw, camera_image, code);
-
-        // cv::Mat tmp2;
-        // cv::cvtColor(tmpImage, tmp2, CV_BGR2GRAY);
-        cv::resize(camera_image, image, cv::Size(1024,768),0,0,cv::INTER_LINEAR);
-      }
+      // Convert to color BGR
+      int code = 0;
+      if (msg_ptr->encoding == sensor_msgs::image_encodings::BAYER_RGGB8)
+        code = CV_BayerBG2BGR;
+      else if (msg_ptr->encoding == sensor_msgs::image_encodings::BAYER_BGGR8)
+        code = CV_BayerRG2BGR;
+      else if (msg_ptr->encoding == sensor_msgs::image_encodings::BAYER_GBRG8)
+        code = CV_BayerGR2BGR;
+      else if (msg_ptr->encoding == sensor_msgs::image_encodings::BAYER_GRBG8)
+        code = CV_BayerGB2BGR;
       else
       {
-        image = bridge_.imgMsgToCv(msg_ptr, "bgr8");
+        ROS_ERROR("[image_proc] Unsupported encoding '%s'", msg_ptr->encoding.c_str());
       }
-      return image;
+      cv::cvtColor(raw, camera_image, code);
+
+      // cv::Mat tmp2;
+      // cv::cvtColor(tmpImage, tmp2, CV_BGR2GRAY);
+      cv::resize(camera_image, image, cv::Size(1024,768),0,0,cv::INTER_LINEAR);
+    }
+    else
+    {
+      image = bridge_.imgMsgToCv(msg_ptr, "bgr8");
+    }
+    return image;
   }
 
   void contourSift()
-{
-  int row;
-  IplImage sift_tpl = ccd.tpl;
-  IplImage sift_tpl_img = ccd.canvas;
-  IplImage *tpl_ptr = &sift_tpl;
-  IplImage *tpl_img_ptr = &sift_tpl_img;
-  // CvMat points_mat = sift_init(tpl_ptr, tpl_img_ptr, 30);
-  CvMat points_mat = sift_init(tpl_ptr, tpl_img_ptr, 30);
-  CvMat *points_mat_ptr = &points_mat;
-  double *ptr = points_mat_ptr->data.db;
-  int step = points_mat.step/sizeof(double);
-  for (row = 0; row < points_mat_ptr->rows; ++row)
   {
-    pts_.push_back(cv::Point3d((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2], 1));
-    // cv::circle(my_ccd.canvas, cvPoint((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]), 2, CV_RGB(0,255,0), 2, 8, 0);
+    int row;
+    IplImage sift_tpl = ccd.tpl;
+    IplImage sift_tpl_img = ccd.canvas;
+    IplImage *tpl_ptr = &sift_tpl;
+    IplImage *tpl_img_ptr = &sift_tpl_img;
+    // CvMat points_mat = sift_init(tpl_ptr, tpl_img_ptr, 30);
+    CvMat points_mat = sift_init(tpl_ptr, tpl_img_ptr, 30);
+    CvMat *points_mat_ptr = &points_mat;
+    double *ptr = points_mat_ptr->data.db;
+    int step = points_mat.step/sizeof(double);
+    for (row = 0; row < points_mat_ptr->rows; ++row)
+    {
+      pts_.push_back(cv::Point3d((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2], 1));
+    }
   }
-  //clean..........
-}
+
+  
+  void contourManually()
+  {
+    int key;
+    cv::namedWindow("CCD", 1);
+    cv::setMouseCallback( "CCD", on_mouse,  (void*)this);
+    cv::imshow("CCD", ccd.canvas);
+    while (1)
+    {
+      key = cv::waitKey(10);
+      if (key == 27) break;
+    }
+  }
 
   void imageCallback(const sensor_msgs::ImageConstPtr& msg_ptr)
   {
     count_++;
     cv::Mat cv_image = readImage(msg_ptr);
+    std::cerr << "col: " <<cv_image.cols << "  rows:" <<  cv_image.rows<< std::endl;
     cv_image.copyTo(ccd.canvas);
     cv_image.copyTo(ccd.image);
     if (count_ == 1)
@@ -118,6 +131,7 @@ class CCDNode
 
       ccd.tpl = cv::imread("data/book.png", 1);
       contourSift();
+      // contourManually();
       
       if((int)pts_.size() > ccd.degree())
       {
@@ -139,6 +153,28 @@ class CCDNode
   }
   //protected:
 };
+
+  void on_mouse(int event, int x, int y, int flags, void *param )
+  {
+    CCDNode *my_node = (CCDNode *)param;
+    cv::Mat image = my_node->ccd.canvas;
+    if( image.empty())
+      return ;
+
+    //caution: check
+    // if( image1.at<double>() )
+    //   y = image1->height - y;
+    switch( event )
+    {
+      case CV_EVENT_LBUTTONDOWN:
+        break;
+      case CV_EVENT_LBUTTONUP:
+        cv::circle(image,cv::Point(x,y),1,cv::Scalar(0,0,255),1);
+        my_node->pts_.push_back(cv::Point3d(x,y,1));
+        cv::imshow("CCD", image);
+        break;
+    }
+  }
 
 int main(int argc, char** argv)
 {

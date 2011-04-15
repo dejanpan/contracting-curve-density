@@ -76,8 +76,10 @@ public:
   ~CCD(){clear();}
 private:
   void clear();
-  void contour_sift();
-  void contour_manually();
+  /* 
+   * void contour_sift();
+   * void contour_manually();
+   */
   void local_statistics(BSpline &bs);
   void refine_parameters(BSpline &bs);
   /* void on_mouse( int event, int x, int y, int flags, void* param ); */
@@ -109,4 +111,4 @@ private:
  * }
  */
 
-void on_mouse(int event, int x, int y, int flags, void* param );
+/* void on_mouse(int event, int x, int y, int flags, void* param ); */
