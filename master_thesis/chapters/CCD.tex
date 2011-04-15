@@ -15,19 +15,19 @@ pre-processing of input data and model parametrization.
 \subsection{Pre-processing of input data}
 \label{sec:pid}
 
-Before we start to processing step, it is required to
-improve the quality of the images though the CCD
+Before we start the processing step, it is required to
+improve the quality of the images even though the CCD
 algorithm is proved robust for noise and clutter information in
-images. Sometimes pre-processing make a problem easier to solve
+images. Sometimes pre-processing helps solve a problem more easily
 because it greatly reduces the variability , and is helpful to extract
 features. Furthermore, pre-processing might be performed in order to
 speed up computation. In our implementation, the idea case is that
-input data is noiseless, shadowless and have sharp edges or boundaries
-between objects. There are a group of operations corresponding to this
+input data is noiseless, shadowless and has sharp edges or boundaries
+between objects. There is a group of operations corresponding to this
 aim.
 \begin{itemize}
 \item \textbf{Noise reduction}. Many linear and non-linear algorithms
-  can help to remove noises, such as mean filer, Gaussian blur,
+  can help to remove noises, such as mean filter, Gaussian blur,
   Bilinear interpolation and so on.
 \item \textbf{Contrast improvement}. Usually, we can use a window to
   adjust brightness and contrast by selecting a range of input values
@@ -53,7 +53,7 @@ contour as a continuous, differentiable and uniform quadratic or cubic
 B-Spline in $\mathbb{R}^2$, which is discussed in chapter 3. 
 Given a ROI (region of interest), the first step is generating
 sufficient control points $\mathbf{P} = {P_0, \ldots, P_{N_p-1}}$ to
-do justice to the complexity of the object shape (add a image here).
+do justice to the complexity of the object shape (add an image here).
 
 Now there are two major methods to generate control points:
 manual initialization and intelligent initialization. The former is
@@ -63,10 +63,10 @@ the cost of manual operation is large, or vision deviation due to
 similar brightness between object and background. Therefore, a few new
 intelligent initialization methods are proposed to extract the
 contour.
-In this paper, a initial contour estimation method is described and
+In this paper, an initial contour estimation method is described and
 implemented by employing the well-known SIFT algorithm (source) for
-keypoint detection and matching. Section \ref{sift_init} be discussed this in
-detail.
+keypoint detection and matching. In section \ref{sift_init} it will be discussed in
+more detail.
 
 \subsection{Model parametrization}
 \label{sec:mp}
@@ -101,17 +101,18 @@ curves in shape-space $\mathcal{S}$ is:
 \begin{figure}[htb]
   \centering
   \includegraphics[width=10cm]{images/prior.png}
-\caption[Sampling from curve families\cite{blake1998active}]{top
-  figure is the mean shape, left represents the euclidean similarities, right
-  sketch some samples in affine space. All these are governed by a
+\caption[Sampling from curve families\cite{blake1998active}]{The top
+  figure is the mean shape, the left one represents the euclidean
+  similarities, the right one
+  sketches some samples in affine space. All these are governed by a
   Gaussian distribution in shape-space with root-mean-square
   displacement of 0.3 length units}
 \label{fig:prior}
 \end{figure}
 
 As claimed in chapter 1, $\mathbf{\Sigma}_{\mathbf{\Phi}}$ is a $6 \times 6$ 
-covariance matrix, which measure the variability of
-how much two group of model parameters change together. The
+covariance matrix, which measures the variability of
+how much two groups of model parameters change together. The
 information matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}^-1$ can be
 written as 
 \begin{equation}
@@ -122,7 +123,7 @@ written as
 where $\rho_0^2$ denotes the mean-square displacement along the entire
 curve (AC). $\mathbf{A}$ is the shape-matrix, and $\mathcal{U}$ is
 metric matrix for curves. $N_{\mathbf{\Phi}}$ represents
-the number of model parameters, for our case, it is 6. Note $\rho_0^2$
+the number of model parameters, in our case, it is 6. Note $\rho_0^2$
 is a real value and can be computed easily as 
 \begin{equation}
   \label{eq:5.3}
@@ -147,12 +148,12 @@ expected to reduce the computational cost. Therefore, we first define
 the region which contains pixels in the vicinity of expected image
 curve. 
 Consider complexity and the expense of computing, it is practicable
-that choose those pixels actually required for interpolation along
+to choose those pixels actually required for interpolation along
 normals of the curve. This is proved useful and important for image
 perception and real-time tracking system. In the implementation of
 this thesis, processing is limited to a segment of each normal within
-a search region. A fixed distance $h$ along the normal segment are
-choose according hypothetical uncertainty of parametric curve. In the
+a search region. A fixed distance $h$ along the normal segment is
+chosen according hypothetical uncertainty of parametric curve. In the
 special case of the norm-squared prior in spline space, a reasonable
 search segment is 
 
@@ -161,22 +162,22 @@ search segment is
   h = \sqrt{2} \rho_0 = \sqrt{\mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}}\mathbf{A}^T\mathcal{U}\mathbf{A})}
 \end{equation}
 
-Usually, $h$ denotes the size of \textit{window} used for computing
+Usually, $h$ denotes the size of the \textit{window} is used for computing
 local statistics. In the begining of interative procedure, the value
-is relatively big and only describe the vicinity of the image curve
+is relatively big and describe only the vicinity of the image curve
 roughly due to the high uncertainty. The
 uncertainty is reduced after some iteration steps, as a result, the $h$ becomes smaller and
-smaller. After determining the length of search segment, 
+smaller. After determining the length of the search segment, 
 a set of points located on these segments can be collected and
 evaluated. Note the parametric model curve is not required to be
-closed, but whatever case it encloses a limited area. We only plan to
+closed, but whether closed or open it always encompasses a limited area. We only plan to
 analyze the pixels located in the vicinity of the contour. Therefore,
 we should pay attention to limit the search distance on the
 \textit{internal} side in order to avoid crossing the opposite
 boundary to sample pixels from the wrong area (ICVS06). In order to
 decrease the computational expenses, it is advisable to uniformly sample those
 pixels on both segments in the vicinity of the contour. In the other
-hand, we should avoid to only collect a small number of pixels, thus
+hand, we should avoid to only collect a small number of pixels, because
 it makes no sense from the perspective of statistics. Let's denote the
 sample distance using $\delta h$, then the an overall number of spaced
 sample points $L$ ($2L$ for both sides in all) can be given by 
@@ -185,9 +186,9 @@ sample points $L$ ($2L$ for both sides in all) can be given by
   L = \lfloor \frac{h}{\delta h} \rfloor
 \end{equation}
 
-As mentioned before, the goal of the algorithm is assignment each pixel
+As mentioned before, the goal of the algorithm is to assign each pixel
 ($\mathrm{v}_{k,l}, k \in [0,\ldots,N_{\mathrm{C}}-1], l \in [0,
-2L-1]$) to either side of the contour, which is determined by the
+2L-1]$) on either side of the contour, which is determined by the
 curve distribution. We first compute the probabilistic
 assignments $\mathbf{a}_{v}$ for each pixel $\mathrm{v}_{k,l}$
 \begin{equation}
@@ -198,7 +199,7 @@ where $a_{v,1}$ describes to which extent a pixel $v$ is expected to
 be influenced by side $1$ of the curve, and $a_{v,2}$ is equivalent
 for side 2 given by $a_{v,2} = 1- a_{v,1}$. For arbitrary curve
 $\mathbf{C}$, it is difficult to give a closed form of $a_v$. In the
-following, a efficient approximation of the assignment is derived.
+following, an efficient approximation of the assignment is derived.
 
 We use $d_{k,l}$ to denote the \textbf{signed} distance between pixel
 $\mathrm{v}_{k,l}$ and a given curve $\mathbf{C}$(a image). $d_{k,l}$
@@ -221,7 +222,7 @@ and covariance of the distribution. Covariance $sigma$ holds
   \cdot \mathbf{J}_k^T \cdot \vec{n_K}^T
 \end{equation}
 where $\mathbf{J}_k$ is the Jacobian of curve $\mathbf{C}$. $sigma$
-can be take as the uncertainty of the curve along the normal
+can be taken as the uncertainty of the curve along the normal
 introduced by the covariance $\mathbf{\Sigma}_{\mathbf{\Phi}}$.
 Therefore, the probability that a point lies on side 1 of the
 curve can be evaluated by
@@ -283,15 +284,15 @@ In the implementation of this thesis,
 $2 \cdot L \cdot N_C$ distance ($d_{k,l}$), fuzzy assignment
 ($a_{v,1}(d_{k,l}))$ and weight function ($\omega_1(d_{k,l})$,
 $\omega_1(d_{k,l})$) are evaluated offline and saved in a big
-array. Now we have restrict our analysis the region of interest in the
-limited area, then collect all statistic information required to learn
-local statistics. In the next part, we will evaluated the local
+array. Now we have to restrict our analysis region of interest in the
+limited area, then collect all statistical information required to learn
+local statistics. In the next part, we will evaluate the local
 statistics.
 
 \subsection{Learning local statistics}
 \label{sec:lls}
 
-For simplicity, in current implementation, we only consider raw RGB
+For simplicity, in the current implementation, we only consider raw RGB
 statistics. With the pixel coordinates, assignment and weight
 function, local mean vectors $\mathbf{m}_{v,s}$  and local covariance matrices
 $\mathbf{\Sigma}_{\mathbf{\Phi}}$ will be derived for each side $s \in
@@ -305,7 +306,7 @@ $M_{k,s}^0(d_{k,l,s})$, $\mathbf{M}_{k,s}^1(d_{k,l,s})$ and $\mathbf{M}_{k,s}^2(
   \mathbf{M}_{k,s}^{(2)}(d_{k,l,s}) &=& \sum_{l=0}^{2L-1} \omega_s(d_{k,l}) \mathrm{I}_{k,l}\mathrm{I}_{k,l}^T
 \end{eqnarray}
 
-Where $\mathbf{I}$ is just the pixel raw RGB value, its elements'
+Where $\mathbf{I}$ is just the pixel raw RGB pixels, its elements'
 value are between 0 and 255. Then local mean vectors $\mathbf{m}_{v,s}$  and local covariance matrices
 $\mathbf{\Sigma}_{\mathbf{\Phi}}$  are obtained by 
 \begin{eqnarray}
@@ -331,7 +332,7 @@ likelihood function   $p(\mathbf{I}_{k,l} | \mathbf{m}_{v,1}, \mathbf{m}_{v,2},
   the relation between image data $\mathrm{I_{k,l}}$ and the model
   parameter $\mathbf{\Phi}$. Here we model the pixel value
   $\hat{\mathbf{m}}_{k,l}$ and $\hat{mathbf{\Sigma}}_{k,l}$
-  for all pixels $\mathrm{v_{k,l}}$ in the vicinity of curve as the
+  for all pixels $\mathrm{v_{k,l}}$ in the vicinity of the curve as the
   linear combination of $\mathbf{m}_{v,1}$ and $\mathbf{m}_{v,2}$
 
   \begin{equation}
@@ -341,7 +342,7 @@ likelihood function   $p(\mathbf{I}_{k,l} | \mathbf{m}_{v,1}, \mathbf{m}_{v,2},
 
 If we define  $\hat{mathbf{\Sigma}}_{k,l}$ using the rule as
 $\hat{mathbf{m}}_{k,l}$ resulting in a function about $d_{k,l}$, the computational cost in the procedure of
-parameters refinement which is discussed in next section  will be dramatically high. Instead, we decide to
+parameters refinement which is discussed in the next section  will be dramatically high. Instead, we decide to
 model the covariance matrix $\hat{mathbf{\Sigma}}_{k,l}$ following the
 rule in (????????), but we do not consider it as the function about $d_{k,l}$
 \begin{equation}
@@ -360,7 +361,7 @@ However, we hope to the likelihood for all pixels in the vicinity of
 the curve. If we consider the coupling or other complex relation among
 different group of pixels, the problem will become dramatically
 complicated and the cost of computing will be very expensive. We can
-avoid these problem if we assume pixels are drawn independently from the same distribution
+avoid these problems if we assume pixels are drawn independently from the same distribution
 (this is not true), namely independent and identically distributed
 (i.i.d)(bishop). Thus we can model the likelihood function as
 \begin{equation}
@@ -376,7 +377,7 @@ in the vicinity $\mathcal{V}$ of the curve. Pixels outside
 $\mathcal{V}$ are not considered.
 
 We have derived the likelihood function of observed pixels. Together
-with the input data and prior knowledge, now we can go into parameters
+with the input data and prior knowledge, now we can go into the parameters
 refinement stage by applying Bayesian's theorem.
 
 \section{Refine parameters}
@@ -403,7 +404,7 @@ Firstly, the posterior distribution holds
       }\}
 \end{align}
 
-Let's using a function $\mathcal{Q}$ to denote the logarithm function
+Using a function $\mathcal{Q}$ to denote the logarithm function
 of right part in (5.21)
 \begin{align}
   \label{eq:5.22}
@@ -457,7 +458,7 @@ components of pixel $\mathrm{v}_{k,l}$ , and $d_{k,l}$ is given by
   \label{eq:5.27}
   d_{k,l} = (x_{k,l} - x_{k})n_{k}(x) +(y_{k,l} - y_{k}) n_{k}(y)
 \end{equation}
-with $n_{k}(x)$ and $n_{k}(y)$ are the components of normal vector of
+with $n_{k}(x)$ and $n_{k}(y)$ being the components of the normal vector of
 curve point $C_{k}$. Moreover, we have
 \begin{equation}
   \label{eq:5.28}
@@ -517,15 +518,15 @@ performed as
   c\mathbf{\Sigma}_{\mathbf{\Phi}} - (1-c)(\mathcal{H}_{\mathbf{\Phi}}
   \mathcal{Q})^{-1}
 \end{eqnarray}
-with $c = \frac{1}{4}$ in our implementation. Note the covariance
-matrix is updated as well by an exponential decay rule. Coefficient $c$ specifies the
+with $c = \frac{1}{4}$ in our implementation. Note that the covariance
+matrix is updated by an exponential decay rule as well. Coefficient $c$ specifies the
 maximum decrease of the covariance within one iteration step[Hanek's
 paper]. If $c$ is very large, due the slow reduction of covariance the
-convergence process will be very slow. On the other hand, if $c$ is
+convergence process will be very slow. On one hand if $c$ is
 very small, it might converge to a wrong solution.
 
 We can investigate the iteration process of  the CCD algorithm by
-comparing with the counterpart of k-means or EM algorithms, both of
+comparing it with the counterpart of k-means or EM algorithms, both of
 which also include two stages. First it is required to choose some
 inital values for the parameters governing the posterior
 distribution. Then in the E (expectation) step, minimizing some cost
@@ -540,8 +541,8 @@ until convergence.
 
 The two stages of the CCD algorithm are iterated until the convergence
 criterion is satisfied. After each iteration step, there are two
-model parameters vector $\mathbf{m}_{\mathbf{\Phi}}^{old}$ and
-$\mathbf{m}_{\mathbf{\Phi}}^{\mathrm{new}}$, which correspond two
+model parameters vectors $\mathbf{m}_{\mathbf{\Phi}}^{old}$ and
+$\mathbf{m}_{\mathbf{\Phi}}^{\mathrm{new}}$, which correspond to
 spline curves $\mathbf{C}^{\mathrm{old}}$ and
 $\mathbf{C}^{\mathrm{new}}$ respectively. Which kind of convergence
 criterion should we choose? Two options, one is using the norm of
@@ -563,10 +564,10 @@ between two points on $\mathbf{C}^{new}(u)$ and $\mathbf{C}^{old}(u)$ is given b
 Where the total displacement $C^{new}(u) - C^{old}(u)$
  at a point represents the sum of components along
 the curve tangent and normal respectively. The tangential component
-approximate the displacement along the curve
+approximates the displacement along the curve
 $\mathbf{C}^{old}$, which reflects the variation of parameterisation
 between curves . If the tangential component is eliminated, the normal
-component will represents purely the distance between curves. (AC) The
+component will represent purely the distance between curves. (AC) The
 use of normal displacement is a standard technique in Computer Vision
 and can be explained intuitively. 
 Traversing all points on curves, the curve-displacement holds
@@ -601,12 +602,12 @@ algorithm.
 A sequence of images for example, video data, consist of neighboring 2-D slices of a
 higher-dimensional volume. Usually tow neighboring frames have similar
 information and features and might only be distinguished by
-investigation in detail. Hence, a naive CCD tracking algorithm can be
+investigating in detail. Hence, a naive CCD tracking algorithm can be
  be obtained by applying the CCD algorithm to each frame
  independently, and the output of parameters obtained from  the
- previous frame can be used in the next frame of image. However, such
+ previous frame can be used in the next frame of the image. However, such
  a tracker would be of limited use because the expense of computation
- will be intolerable in a practical environment which require high
+ will be intolerable in a practical environment which requires high
  performance and efficiency. Furthermore, without exploiting
  statistical dependencies between successive images, the tracker can
  not work if a radical change or big perturbation happened while
@@ -618,7 +619,7 @@ investigation in detail. Hence, a naive CCD tracking algorithm can be
 \section{Summary of the CCD algorithm and its variant}
 \label{sec:sccd}
 In this section,  for sake of clarity, a sketch of the naive CCD
-tracker is below given. Note we only consider the manual
+tracker is given below. Note we only consider the manual
 implementation.  
 % \newcommand{\redvline}{\color{red} \vrule width 4pt}
 \begin{table}[htbp]

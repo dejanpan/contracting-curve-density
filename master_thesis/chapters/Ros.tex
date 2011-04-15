@@ -5,7 +5,7 @@ infrastructure used in this thesis. In \ref{sec:ros} we introduce the
 Robo Operation System. The PR2 robot will be presented in section
 \ref{sec:pr2}. This is followed by the introduction of OpenCV library.
 
-\section{The Robot Operation System (ROS)}
+\section{The Robot Operating System (ROS)}
 \label{sec:ros}
 % provides libraries and tools to help
 % software developers create robot applications. It provides hardware
@@ -13,9 +13,9 @@ Robo Operation System. The PR2 robot will be presented in section
 % package management, and more.
 ROS is an open-source, meta-operating framework for robot software
 development. Ros was originally developed in 2007 by Stanford Artificial Intelligence Laboratory in support of the Stanford AI Robot\cite{quigley2007stair}. Like an ordinary operating system, it consists of  robot
-hardware resouces management, low-level device control, implementation
+hardware resources management, low-level device control, implementation
 of commonly-used functionality, interprocesses comunication (IPC), and package
-management. Ros is based on a pere-to-peer network architecture where
+management. ROS is based on a pere-to-peer network architecture where
 processing takes palce in nodes that may receive, post and 
 multiplex sensor, control, state, planning, actuator and other
 messages. There are several different styles of communication
@@ -28,11 +28,10 @@ running code across multiple computers.
 ROS is composed of operation system wide library \textbf{ros} and
 \textbf{ros-pkg}. The former one is a fundamental library as described
 above and the later one is a suit of user contributed packages which
-are organized into sets called \textbf{stacks}. The stacks includes
+are organized into sets called \textbf{stacks}. The stacks include
 many application areas, such as  perception, object identification,
 segmentation and recognition, face recognition, motion tracking ,
-stereopsis Stereo vision, control, planning, grasping and so on. Ros
-hs been ported to many robots and boards.
+stereopsis Stereo vision, control, planning, grasping and so on. ROS has been ported to many robots and boards.
 
 The goal of ROS is "to support code reuse in robotics research and
 development"\cite{rosintroduction}.  it is designed to enable easily
@@ -40,10 +39,10 @@ share and collaborate among developers. Moreover, ROS has many
 features, such as compact framwork, language independence, easy
 testing and scalability.
 
-ROS currently run on on Unix-like operation systems towards which the libary is
+ROS currently run on on Unix-like operating systems towards which the libary is
 geared. Currenty Ubuntu Linux is greatly supported. Moreover, The core
-ROS system and its tools and libraries are regularly released as a ROS
-Distribution\cite{rosintroduction} under the terms of the BSD license.
+ROS system and its tools and libraries are regularly released as ROS
+Distributions\cite{rosintroduction} under the terms of the BSD license.
 
 \section{PR2}
 \label{sec:pr2}
@@ -71,8 +70,8 @@ open source BSD license. The library is cross-platform, which supports
 Windows, Linux and MacOX,  in the latest version 2.2, the Android
 system is supported.
 
-OpenCV is originally written by C but now full C++ and Python
-interfaces are provided. The library is wildly used in the filed of
+OpenCV is originally written in C but now full C++ and Python
+interfaces are provided. The library is widely used in the field of
 computer vision, such as Human-Computer Interaction (HCI); Object
 Identification, Segmentation and Recognition; Face Recognition;
 Gesture Recognition; Motion Tracking, Ego Motion, Motion
@@ -87,14 +86,14 @@ system).
   \label{fig:bsopencv}
 \end{figure}
 
-Currently, OpenCV consisted of following five main components\cite{bradski2008learning}.
+Currently, OpenCV consists of following five main components\cite{bradski2008learning}.
 \begin{itemize}
 \item \textbf{Cv}: image processing and vision algorithms
 \item \textbf{MLL}: machine learning library, including statistical classifiers and clustering tools
 \item \textbf{HighGUI}: Graphic user interface and Input/Output
   routines for image and video.
 \item \textbf{CvCore}: the basic data structures and content
-\item \textbf{CvAux}: containsdefunct areas (embedded HMM face
+\item \textbf{CvAux}: contains defunct areas (embedded HMM face
   recognition) and experimental algorithms (background/foreground
   segmentation).
 \end{itemize}

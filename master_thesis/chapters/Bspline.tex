@@ -1,6 +1,6 @@
 \chapter{Shape-space Models and B-Spline Curves}
 \label{chapter:bspline}
-In the CCD algorthms, A parametric curve model is resposible for
+In the CCD algorithms, a parametric curve model is responsible for
 restricting Region of Interest (ROI) and providing prior knowledge. 
 Throughout this thesis, visual curves are represented in terms of
 parametric spline curves which is widely applied in computer grapics.
@@ -12,7 +12,7 @@ curves are constructed from spline functions are discussed in the
 later section. This forms the basis for the CCD approach.
 \section{B-Spline Function}
 \label{sec:bsc}
-In the mathematical, every spline function of a given degree,
+In mathematics, every spline function of a given degree,
 smoothness, and domain partition, can be represented as a linear
 combination of B-splines of that same degree and smoothness, and over
 that same partition(wikipedia). In terms of this statement, we can
@@ -20,7 +20,7 @@ construct  a spline curve parametrized by spline functions that are
 expressed as linear combinations of B-splines. 
 
 Given a nondecreasing vector of real values $U = [u_0, \ldots,
-u_{m-1}]$ called knot vector, with $u_i$ is called the knot, a
+u_{m-1}]$ called knot vector, with $u_i$ called the knot, a
 B-spline of degree n is a parametric curve
 \begin{equation}
   \label{eq:4.1}
@@ -96,7 +96,7 @@ derivative of uniform quadratic and cubic B-Spline respectively.
 
 Because the knot-vector is equidistant, the blending function can
 easily be computed. In each segment, the blending function shares the
-same form as following
+same form, as following
 \begin{equation}
   \label{eq:4.3}
   \mathbf{b}_{i,2}(u) = \begin{cases} \frac{1}{2}u^2 \\ -u^2 + u + \frac{1}{2} \\ \frac{1}{2}(1-u)^2   \end{cases}
@@ -119,7 +119,7 @@ The matrix-form of uniform quadratic B-Spline is given by
 
 \subsection{Uniform cubic B-Spline}
 \label{sec:uqb}
-Uniform cubic B-Spline is most commonly used form of B-Spline, 
+Uniform cubic B-Spline is the most commonly used form of B-Spline, 
 The blending function is
 \begin{equation}
   \label{eq:4.6}
@@ -154,7 +154,7 @@ Its matrix-form is given by
 \label{sec:pbc}
 
 In a 2-D image, a curve is composed of many discrete points which are
-identified by its coordinates. For those points on a curve, their axis
+identified by their coordinates. For those points on a curve, their axis
 components $x$, $y$ are particular functions of knots value $u$, known
 as splines. Hence, we can define a B-spline curve as 
 \begin{equation}
@@ -182,7 +182,7 @@ norm for curves as
   \left| \left| \mathbf{C} \right|\right|^2  = \mathbf{C}^T\mathcal{U}\mathbf{C}
 \end{equation}
 
-where $\mathcal{U}$ represents the metric matrix for curves, it can be
+where $\mathcal{U}$ represents the metric matrix for curves, and can be
 defined as 
 \begin{equation}
   \label{eq:4.14}
@@ -214,7 +214,7 @@ cola bottle.
 \label{sec:ssm}
 
 The shape-space $\mathcal{S}$ is a linear parameterisation of the set of allowed
-deformations of a base curve(AC). From the perspective of mathematics, A shape-space
+deformations of a base curve(AC). From the perspective of mathematics, shape-space
 $\mathcal{S} = \mathcal{S}(\mathbf{A},\mathbf{P})$ is a linear mapping of a shape-space
 vector $\mathbf{\Phi} \in  \mathbb{R}^{N_{\mathbf{\Phi}}}$ to a spline vector $\mathbf{C} \in
 \mathbb{R}^{Np}$:
@@ -227,7 +227,7 @@ where $T$ is a $Np \times N_{\mathbf{\Phi}}$ shape-matrix. The
 constant  $P_0$ is a deformable template curve. (AC), Usually, the
 dimension $N_{\mathbf{\Phi}}$ of the shape-space vector is clearly
 smaller than the dimension of the spline-vector $Np$. This makes the
-problem simplicity and computationally cheaper.
+problem more simple and computationally cheaper.
 
 In this chapter, we consider a important shape space named planar
 affine. The planar affine has 6 degree of freedom: horizontal
@@ -242,9 +242,9 @@ to a template curve $\mathbf{C}$(AC).
 \end{equation}
 
 where $T = (T_1, T_2)^T$ represents the two-dimensional translation
-vector, and $M$ is $2 \times 2$ matrix to control the rotation and
+vector, and $M$ is a $2 \times 2$ matrix to control the rotation and
 scaling, so that $T$ and $M$ together can represent the 6 degree of
-freedom of planar Affine space. We can write shape-matrix $\mathbf{A}$
+freedom of planar Affine space. We can write the shape-matrix $\mathbf{A}$
 as 
 \begin{equation}
   \label{eq:4.18}
