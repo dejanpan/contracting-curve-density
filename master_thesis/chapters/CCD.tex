@@ -3,7 +3,7 @@
 In this chapter, we describe the underlying principles of the
 Contracting Curve Density (CCD) algorithm, which is shown to
 over-perform in many challenging problems in the field of computer
-vison and robotics(paper list). Generally, as mentioned in section 1.3.3,
+vison and robotics (\cite{panin2006fully},~\cite{hanek2004contracting},~\cite{hahn2007tracking}). Generally, as mentioned in Section~\ref{sec:sccd},
 the algorithm includes three steps: initialization, learning
 local statistics and model parameters refinement. We describe these
 steps in the following sections respectively. 
@@ -19,7 +19,7 @@ Before we start the processing step, it is required to
 improve the quality of the images even though the CCD
 algorithm is proved robust for noise and clutter information in
 images. Sometimes pre-processing helps solve a problem more easily
-because it greatly reduces the variability , and is helpful to extract
+because it greatly reduces the variability, and is helpful to extract
 features. Furthermore, pre-processing might be performed in order to
 speed up computation. In our implementation, the idea case is that
 input data is noiseless, shadowless and has sharp edges or boundaries
@@ -50,7 +50,7 @@ model parametrization.
 
 In our implementation, we model the
 contour as a continuous, differentiable and uniform quadratic or cubic
-B-Spline in $\mathbb{R}^2$, which is discussed in chapter 3. 
+B-Spline in $\mathbb{R}^2$, which is discussed in Chapter~\ref{chapter:bspline}. 
 Given a ROI (region of interest), the first step is generating
 sufficient control points $\mathbf{P} = {P_0, \ldots, P_{N_p-1}}$ to
 do justice to the complexity of the object shape (add an image here).
@@ -64,8 +64,8 @@ similar brightness between object and background. Therefore, a few new
 intelligent initialization methods are proposed to extract the
 contour.
 In this paper, an initial contour estimation method is described and
-implemented by employing the well-known SIFT algorithm (source) for
-keypoint detection and matching. In section \ref{sift_init} it will be discussed in
+implemented by employing the well-known SIFT algorithm~\cite{lowe2004distinctive} for
+keypoint detection and matching. In Section~\ref{sift_init} it will be discussed in
 more detail.
 
 \subsection{Model parametrization}
@@ -101,12 +101,12 @@ curves in shape-space $\mathcal{S}$ is:
 \begin{figure}[htb]
   \centering
   \includegraphics[width=10cm]{images/prior.png}
-\caption[Sampling from curve families\cite{blake1998active}]{The top
+\caption[Sampling from curve families~\cite{blake1998active}]{The top
   figure is the mean shape, the left one represents the euclidean
   similarities, the right one
   sketches some samples in affine space. All these are governed by a
   Gaussian distribution in shape-space with root-mean-square
-  displacement of 0.3 length units}
+  displacement of 0.3 length units.}
 \label{fig:prior}
 \end{figure}
 
@@ -250,7 +250,7 @@ defined as
 
 
 where $\gamma_1$ holds $0.5$ (disjoint weight assignment) and $\gamma_2$
-holds $4$ for the truncated Gaussian \cite{hanek2004contracting}. 
+holds $4$ for the truncated Gaussian~\cite{hanek2004contracting}. 
 
 \begin{figure} 
   \begin{minipage}[t]{0.45\linewidth} 
@@ -263,7 +263,7 @@ holds $4$ for the truncated Gaussian \cite{hanek2004contracting}.
   \end{minipage} 
 \caption{the weight functions of the two sides of the contour, a) the
   weight function along the positive direction (outside) in the normal of the
-  contour. b) the weight function along the negative direction (inside) }
+  contour. b) the weight function along the negative direction (inside). }
 \label{fig:weight}
 \end{figure}
 
@@ -278,7 +278,7 @@ which yields
 
 with the two additional constants $\gamma_3 = 6$ (linear dependence
 between $\sigma$ and $\hat{\sigma}$) and $\sigma_4 = 4$ (minimum
-weighting window width) introduced in (ICVS06). 
+weighting window width) introduced in~\cite{panin2006efficient}. 
 
 In the implementation of this thesis,
 $2 \cdot L \cdot N_C$ distance ($d_{k,l}$), fuzzy assignment
@@ -343,8 +343,8 @@ likelihood function   $p(\mathbf{I}_{k,l} | \mathbf{m}_{v,1}, \mathbf{m}_{v,2},
 If we define  $\hat{mathbf{\Sigma}}_{k,l}$ using the rule as
 $\hat{mathbf{m}}_{k,l}$ resulting in a function about $d_{k,l}$, the computational cost in the procedure of
 parameters refinement which is discussed in the next section  will be dramatically high. Instead, we decide to
-model the covariance matrix $\hat{mathbf{\Sigma}}_{k,l}$ following the
-rule in (????????), but we do not consider it as the function about $d_{k,l}$
+model the covariance matrix $\hat{\mathbf{\Sigma}}_{k,l}$ following the
+rule in~\cite{hanek2004fitting}, but we do not consider it as the function about $d_{k,l}$
 \begin{equation}
   \label{eq:5.18}
   \hat{\mathbf{\mathbf{\Sigma}}}_{k,l} = a_{v,1}(d_{k,l})\mathbf{\Sigma}_{v,1} + a_{v,2}(d_{k,l})\mathbf{\Sigma}_{v,2}
@@ -363,7 +363,7 @@ different group of pixels, the problem will become dramatically
 complicated and the cost of computing will be very expensive. We can
 avoid these problems if we assume pixels are drawn independently from the same distribution
 (this is not true), namely independent and identically distributed
-(i.i.d)(bishop). Thus we can model the likelihood function as
+(i.i.d)~\cite{bishop2006pattern}. Thus we can model the likelihood function as
 \begin{equation}
   \label{eq:5.20}
   p(\mathbf{I}_{\mathcal{V}} |
@@ -520,8 +520,7 @@ performed as
 \end{eqnarray}
 with $c = \frac{1}{4}$ in our implementation. Note that the covariance
 matrix is updated by an exponential decay rule as well. Coefficient $c$ specifies the
-maximum decrease of the covariance within one iteration step[Hanek's
-paper]. If $c$ is very large, due the slow reduction of covariance the
+maximum decrease of the covariance within one iteration step~\cite{hanek2004contracting}. If $c$ is very large, due the slow reduction of covariance the
 convergence process will be very slow. On one hand if $c$ is
 very small, it might converge to a wrong solution.
 
@@ -613,7 +612,7 @@ investigating in detail. Hence, a naive CCD tracking algorithm can be
  not work if a radical change or big perturbation happened while
  switching into a new frame. A real-time CCD tracker exploiting the
  coherence of curve motion and the temporal coherence of pixel values
- is proposed in (Hanek's thesis). 
+ is proposed in~\cite{hanek2004fitting}. 
 
 
 \section{Summary of the CCD algorithm and its variant}

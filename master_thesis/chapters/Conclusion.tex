@@ -12,15 +12,15 @@
 In this work, we have investigated the Contracting Curve Density (CCD)
 algorithm and its application on personal robotics. Starting from
 parametric model curve, we have analyzed the core of the algorithm and
-proposed some improvement and optimization on it. Then we apply the
+proposed some improvements and optimizations on it. Then we applied the
 algorithm on some challenging computer vision problems, such as curve
-fitting, object segmentation and tracking, 3-D pose estimation.  We
-delivered some experiments on PR2 and show satisfactory results. 
+fitting, object segmentation and tracking, 3-D pose estimation. We
+delivered some experiments on the PR2 robot which are showing satisfactory results. 
 
-The CCD algorithm is a iterative procedure to refine an
+The CCD algorithm is an iterative procedure to refine an
 a prior distribution of the model parameters to a Gaussian
 approximation of the posterior distribution. It aims to extract the
-contour of a object based a prior model. A MAP estimate need to be
+contour of an object based a prior model. A MAP estimate need to be
 evaluated by applying an effective local optimization method in order to get
 the mean of model parameters and covariance matrices which govern the
 posterior distribution and determine the shape of model. Likelihood is 
@@ -28,29 +28,28 @@ obtained from local statistics of the vicinity of the expected
 curve. The local statistics provides locally adapted criteria for
 adjacent image regions seperated by a contour. This criteria is stable
 and effective than those relying on homogeneous image regions or
-specific edge properties. The local statistics is outstanding
+specific edge properties. The local statistics are very
 important for the CCD algorithm, in this thesis we design a new weight
 function as criteria for separating adjacent image regions. 
  In order to improve the performance and
-reduce computing cost, a blurred curve model
-\cite{hanek2004contracting} is applied as an efficient means for
+reduce computing cost, a blurred curve model~\cite{hanek2004contracting} is applied as an efficient means for
 iteratively optimization. In the iteration process, after the
 algorithm starts to converge, the area of
-convergence becomes smaller and smaller, this has two great
+convergence becomes smaller and smaller. This has two great
 advantages, one is that the pixels used to learn the local statistic
-are scaled, thus computing cost is decreased; Another one is that it
-leads a high level sub-pixel accuracy. The rate of decreasing of the
+are scaled, thus computing cost is decreased. Another one is that it
+leads a high level sub-pixel accuracy. The decreasing rate of the
 convergence area is significant, if too fast, the algorithm will stop
-converge, on the other hand, if too slow, it is difficult to achieve
-notably performance improvement. We investigate the relation between
-the rate and the convergence speed in this thesis.
-Beside, some features and improvement are integrated in to the
+converging, on the other hand, if too slow, it is difficult to achieve
+notably performance improvement. In this thesis we have investigated the relation between
+the rate and the convergence speed.
+Beside, some features and improvements are integrated in to the
 developed system.
 \begin{itemize}
-\item model the parametric curve is implemented using the quadratic or
+\item Modeling the parametric curve is implemented using the quadratic or
 cubic B-spline curve  to avoid the Runge phenomenon without increasing
 the degree.
-\item support both planar affine and non-planar affine
+\item Supports both planar affine and non-planar affine
   shape-space. This leads that the system is viewpoint invariant.
 \item Full automatic initialization of contour is developed to avoid
   intervention from human.
@@ -58,15 +57,15 @@ the degree.
 \end{itemize}
 
 Due to the robustness, stability and high performance, one main
-application of the CCD algorithm is on the development of real-time
+application of the CCD algorithm is the development of real-time
 object tracking system. The CCD tracker is presented and developed in
-this thesis, and simulation and experimental of results have been presented, through a
+this thesis, and simulation with experimental results have been presented, through a
 stand-alone implementation running both on
 standard hardware and PR2.
 
 We demonstrate the experimental results and compare it with other
-segmentation or tracking algorithm from some aspects such as
-robustness, performance and accuracy. quantitative and qualitative
+segmentation or tracking algorithm regarding some aspects such as
+robustness, performance and accuracy. Also qualitative
 results are presented in this thesis.
 
 The experimental analysis shows that the CCD approach is capable of
@@ -79,53 +78,56 @@ tracking.
 \section{Feature work}
 \label{sec:feature}
 
-Thougth the CCD algorithm is powerful local curve fitting algorithm,
+Though the CCD algorithm is a powerful local curve-fitting algorithm,
 like other computer vision algorithms, it is not a general solution to
 the image segmentation and curve fitting problem. There are following
-limitations or shortcomings.
+limitations or shortcomings:
 \begin{itemize}
-\item Current implementation strongly depends on values of pixels in
-  images, it is a algorithm relying on RGB statistics. Therefore, it
+\item The current implementation strongly depends on values of pixels in
+  images. It is also an algorithm relying on RGB statistics. Therefore, it
   does not work well for gray-scale images.
-\item In many cases, automation global initialization of contours does
-  not work, manual intervention has to be executed in the beginning or
+\item In many cases, if the automated global initialization of contours does
+  not work, then manual intervention has to be executed at the beginning or
   in case of tracking loss.
-\item For a object like a ring, there are two extremely similar
-  contours which are very close. The separating criteria, local
-  statistics, sometimes is not capable of distinguish two contours.
+\item For an object like e.g. a ring, there are two extremely similar
+  contours which are very close. The separating criteria, i.e. local
+  statistics, is sometimes not capable of distinguishing two contours.
 \item In the process of optimization, the algorithm might converge to
-  local minimum which leads to a failure. For an instance, sometimes the
-  contour of the shadow is similar to the object being studied, the
-  CCD algorithm could not obtain perfect result in this case.
+  local minimum which could lead to a failure. For instance, the
+  contour of the shadow is sometimes similar to the object being
+  studied. That is why the CCD algorithm could not obtain perfect results in this case.
 \end{itemize}
 
-We can improve the CCD algorithm from many aspects in order to make it
+We could improve the CCD algorithm in order to make it
 more stable for the application of personal robotics.
 \begin{itemize}
-\item Besides the RGB statistics, statistics base on the feature
-  descriptors, color values in other color space could be used as
+\item Besides the RGB statistics, statistics based on the feature
+  descriptors and color values in other color space could be used as
   local feature. This will make the algorithm adaptable.
-\item Current 6-DOF and 8-DOF shape-space could not cope with all
+\item The current 6-DOF and 8-DOF shape-space could not cope with all
   cases. When perspective effects are strong, approximation error
-may be appreciable. Therefore, some more complex model representations
+may be appreciated. Therefore, some more complex model representations
 should be designed.
-\item In order to avoid the local minimum, some advanced optimization
-  methods should be investigated.
-\item In the CCD algorithm, we do not take account of
-  the coupling of different group of pixels on perpendiculars. We also
+\item In order to avoid the local minima, some advanced optimization
+  methods should be investigated and implemented.
+\item In the CCD algorithm, we do not take into account
+  the coupling of different pixels groups on perpendiculars. We also
   do not consider the statistical dependencies between successive
-  images in the CCD tracker. Despite that fact that it is more
+  images in the CCD tracker. Despite that it is more
   complicated when considering these factors, a performance and
   stability enhancement could be achieved.
 \end{itemize}
 
 Moreover, Some possible applications of the CCD approach could be
-investigated.
+investigated:
 \begin{itemize}
 \item The CCD algorithm could be integrated into a more complex
   tracking framework by combining it with some other efficient
-  algorithms to implement complex applications.
-\item Take into account the advantages of the CCD algorithm,
-  robustness, stability and accuracy, it is usable for object
+  algorithms and to be implemented in complex applications.
+\item Taking into account the advantages of the CCD algorithm,
+  robustness, stability and accuracy, it can be used for object
   localization and recognition.
+\item Now the OpenCV library has provided support on the platform of
+  Android~\cite{android}. Therefore, the optimized CCD code could be ported to
+  Android system and used in mobile applications.
 \end{itemize}

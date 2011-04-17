@@ -15,7 +15,7 @@ later section. This forms the basis for the CCD approach.
 In mathematics, every spline function of a given degree,
 smoothness, and domain partition, can be represented as a linear
 combination of B-splines of that same degree and smoothness, and over
-that same partition(wikipedia). In terms of this statement, we can
+that same partition~\cite{press2007numerical}. In terms of this statement, we can
 construct  a spline curve parametrized by spline functions that are
 expressed as linear combinations of B-splines. 
 
@@ -77,13 +77,13 @@ vector of basis function
 \end{equation}
 
 A example of B-spline curve for different basic functions is depicted
-in \ref{fig:bspline}. The B-spline is said to be uniform when the knots are equidistant,
+in Section~\ref{fig:bspline}. The B-spline is said to be uniform when the knots are equidistant,
 otherwise non-uniform. In this thesis, for simplicity, we only
 consider the uniform case.
 \begin{figure}[htb]
   \centering
   \includegraphics[width=10cm]{images/bspline.png}
-  \caption[B-spline curves for different degrees\cite{contourpanin2011}]{: red, green and black
+  \caption[B-spline curves for different degrees~\cite{contourpanin2011}]{Red, green and black
     curves respectively represent the one for degree 1,2 and 3.}
 \label{fig:bspline}
 \end{figure}
@@ -115,12 +115,12 @@ The matrix-form of uniform quadratic B-Spline is given by
 1 & -2 & 1 \\
 -2 &  2 & 0 \\
 1 &  1 & 0 \end{bmatrix}
-\end{equation}
+\end{equation}.
 
 \subsection{Uniform cubic B-Spline}
 \label{sec:uqb}
 Uniform cubic B-Spline is the most commonly used form of B-Spline, 
-The blending function is
+the blending function is
 \begin{equation}
   \label{eq:4.6}
   \mathbf{b}_{i,3}(u) = \begin{cases} \frac{1}{6}(-u^3+3u^2-3u+1) \\
@@ -148,7 +148,7 @@ Its matrix-form is given by
 -3 &  0 &  3 & 0 \\
  1 &  4 &  1 & 0 \end{bmatrix}
 \begin{bmatrix} \mathbf{p}_{i-1} \\ \mathbf{p}_{i} \\ \mathbf{p}_{i+1} \\ \mathbf{p}_{i+2} \end{bmatrix}
-\end{equation}
+\end{equation}.
 
 \section{Parametric B-spline curve}
 \label{sec:pbc}
@@ -169,7 +169,7 @@ curve $\mathbf{C}(u)$
 \mathbf{B}(u)^T & 0 \\
 0 &\mathbf{B}(u)^T
   \end{pmatrix}
-\end{equation}
+\end{equation}.
 
 \subsection{Norm for B-spline curves}
 \label{sec:nbc}
@@ -199,13 +199,13 @@ function
   \mathcal{B}   = \frac{1}{L} \int_0^L \mathbf{B}(u)\mathbf{B}(u)^T \mathrm{d}u
 \end{equation}
 
-In \ref{fig:bsplinenormal}, we use B-spline to sketch the contour of a
+In~\ref{fig:bsplinenormal}, we use B-spline to sketch the contour of a
 cola bottle.
 \begin{figure}[htb]
   \centering
   \includegraphics[width=10cm]{images/bsplinenormal.png}
   \caption{The contour of a bottle is sketched using a B-spline
-    curve, the blue points are pixels on the perpendicular of the contour}
+    curve, the blue points are pixels on the perpendicular of the contour.}
 \label{fig:bspline}
 \end{figure}
 
