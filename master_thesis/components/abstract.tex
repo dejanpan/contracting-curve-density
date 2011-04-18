@@ -27,10 +27,13 @@ We developed an application based on the OpenCV library, which
 is a cross-platform computer vision library. Based on the
 design conception of the CCD algortihm, some
 additional features are integrated into the developed program in order to
-achieve stability and robustness. First, the quadratic (degree-2) or
+achieve stability and robustness. Firstly, we use the logistic sigmoid
+function instead of Gaussian error function, thus completely convert a
+curve-fitting problem to a Gaussian logistic regression problem in the
+field of pattern recognition. Secondly, the quadratic (degree-2) or
 cubic (degree-3) B-spline curve is used to model the parametric curve
 to avoid the Runge phenomenon without increasing the degree of the
-B-spline. Secondly, the system supports both planar affine (6-DOF) and
+B-spline. Thirdly, the system supports both planar affine (6-DOF) and
 non-planar affine (8-DOF) shape-space. The extended affine space can avoid
 curve mismatching caused by minor viewpoint changes. Moreover, in
 order to avoid manual intervention from the user, the developed system

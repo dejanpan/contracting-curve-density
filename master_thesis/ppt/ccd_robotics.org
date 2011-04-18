@@ -1,0 +1,11 @@
+#+LaTeX_CLASS: beamer
+#+TITLE: Implementation of Contracting Curve Density Algorithm for Applications in Personal Robotics
+#+OPTIONS: toc:2
+#+AUTHOR: Shulei Zhu
+#+LaTeX_CLASS_OPTIONS: [english,10pt,presentation]
+#+BEAMER_FRAME_LEVEL: 2
+#+BEAMER_HEADER_EXTRA: \usetheme{dimilar}\usecolortheme{rose}
+#+COLUMNS: %35ITEM %10BEAMER_env(Env) %10BEAMER_envargs(Args) %4BEAMER_col(Col) %8BEAMER_extra(Ex)
+
+* Overview
+** The Contracting Curve Density (CCD) Algorithm

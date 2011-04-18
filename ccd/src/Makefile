@@ -24,6 +24,10 @@ ros_to_openCv:ros_to_openCv.cpp
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $< $(LDFLAGS)
 snake:snake.cpp
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $< $(LDFLAGS)
+em:em.cpp
+	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $< $(LDFLAGS)
+kmeans:kmeans.cpp
+	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $< $(LDFLAGS)
 test:test.cpp $(OBJECTS) sift_init.o
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $@.cpp sift_init.o $(OBJECTS) $(LDFLAGS)
 ccd_tracker:ccd_tracker.cpp $(OBJECTS) sift_init.o

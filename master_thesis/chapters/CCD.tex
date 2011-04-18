@@ -60,7 +60,9 @@ do justice to the complexity of the object shape
   \centering
   \includegraphics[width=\linewidth]{images/curves.png}
 \caption[The parametric of some tropical fruits]{The blue curves are
-  the parametric contours of some tropical fruits[http://visual.merriam-webster.com/images/food-kitchen/food/fruits/tropical-fruits\_4.jpg]}
+  the parametric contours of some tropical fruits [\\
+  http://visual.merriam-webster.com/images/food-kitchen/food/fruits/tropical-fruits\_4.jpg
+  ]}
 \label{fig:prior}
 \end{figure}
 
@@ -100,7 +102,7 @@ possible curves (\ref{fig:prior}). The Gaussian probability density for these po
 curves in shape-space $\mathcal{S}$ is:
 
 \begin{equation}
-  \label{eq:5.1}
+  \label{eq:prior}
    p(\mathbf{\Phi}) \propto
 \mathrm{exp} \left\{ -\frac{1}{2} (\mathbf{\Phi} -
   \mathbf{\Sigma}_{\mathbf{\Phi}})^T \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} (\mathbf{\Phi} -
@@ -122,10 +124,10 @@ curves in shape-space $\mathcal{S}$ is:
 As claimed in chapter 1, $\mathbf{\Sigma}_{\mathbf{\Phi}}$ is a $6 \times 6$ 
 covariance matrix, which measures the variability of
 how much two groups of model parameters change together. The
-information matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}^-1$ can be
+information matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}^{-1}$ can be
 written as 
 \begin{equation}
-  \label{eq:5.2}
+  \label{eq:infomatrix}
   \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} = \frac{N_{\mathbf{\Phi}}}{\rho_0^2} \mathbf{A}^T\mathcal{U}\mathbf{A}
 \end{equation}
 
@@ -135,7 +137,7 @@ metric matrix for curves. $N_{\mathbf{\Phi}}$ represents
 the number of model parameters, in our case, it is 6. Note $\rho_0^2$
 is a real value and can be computed easily as 
 \begin{equation}
-  \label{eq:5.3}
+  \label{eq:trace}
   \rho_0^2 = \mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}})
 \end{equation}
 where $\mathrm{tr}(\cdot)$ denotes the trace of a matrix.
@@ -167,7 +169,7 @@ special case of the norm-squared prior in spline space, a reasonable
 search segment is 
 
 \begin{equation}
-  \label{eq:5.4}
+  \label{eq:radius}
   h = \sqrt{2} \rho_0 = \sqrt{\mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}}\mathbf{A}^T\mathcal{U}\mathbf{A})}
 \end{equation}
 
@@ -191,7 +193,7 @@ it makes no sense from the perspective of statistics. Let's denote the
 sample distance using $\delta h$, then the an overall number of spaced
 sample points $L$ ($2L$ for both sides in all) can be given by 
 \begin{equation}
-  \label{eq:5.5}
+  \label{eq:sample}
   L = \lfloor \frac{h}{\delta h} \rfloor
 \end{equation}
 
@@ -201,7 +203,7 @@ As mentioned before, the goal of the algorithm is to assign each pixel
 curve distribution. We first compute the probabilistic
 assignments $\mathbf{a}_{v}$ for each pixel $\mathrm{v}_{k,l}$
 \begin{equation}
-  \label{eq:5.6}
+  \label{eq:pa}
   \mathbf{a}_v  = (a_{v,1}, a_{v,2})^T
 \end{equation}
 where $a_{v,1}$ describes to which extent a pixel $v$ is expected to
@@ -214,8 +216,8 @@ We use $d_{k,l}$ to denote the \textbf{signed} distance between pixel
 $\mathrm{v}_{k,l}$ and a given curve $\mathbf{C}$(a image). $d_{k,l}$
 can be approximated by
 \begin{equation}
-  \label{eq:5.7}
-  d_{k,l} = \vec{n_k} \cdot ( \mathbf{v}_{k,l} - C_k)
+  \label{eq:dis}
+  d_{k,l} = \vec{n}_k \cdot ( \mathbf{v}_{k,l} - C_k)
 \end{equation}
 
 where $\mathbf{v}_{k,l} = {x_{k,l} \choose y_{k,l}}$ is the axis components of pixel
@@ -226,33 +228,79 @@ displacement $d_{k,l}$ is also a Gaussian distribution, $p(d_{k,l}) \sim
 \mathcal{N}(d_{k,l}|m_d, \sigma)$, where $m_d$ and $\sigma$ are mean
 and covariance of the distribution. Covariance $sigma$ holds
 \begin{equation}
-  \label{eq:5.8}
-  \sigma = \vec{n_k} \cdot \mathbf{J}_k \cdot \mathbf{\Sigma}_{\Phi}
-  \cdot \mathbf{J}_k^T \cdot \vec{n_K}^T
+  \label{eq:cov}
+  \sigma = \vec{n}_k \cdot \mathbf{J}_k \cdot \mathbf{\Sigma}_{\Phi}
+  \cdot \mathbf{J}_k^T \cdot \vec{n}_k^T
 \end{equation}
-where $\mathbf{J}_k$ is the Jacobian of curve $\mathbf{C}$. $sigma$
+where $\mathbf{J}_k$ is the Jacobian of curve $\mathbf{C}$. $\sigma$
 can be taken as the uncertainty of the curve along the normal
 introduced by the covariance $\mathbf{\Sigma}_{\mathbf{\Phi}}$.
-Therefore, the probability that a point lies on side 1 of the
-curve can be evaluated by
+
+In order to calculate the the probability that a point lies on side 1 of the curve
+, two functions are heuristically considered. The first is known as
+the \textit{logistic sigmoid} function, and given by
+
 \begin{equation}
-  \label{eq:5.9}
+  \label{eq:logistic}
+  a_{v,1} = \frac{1}{1+\mathrm{exp}(\frac{d_{k,l}}{\sqrt{2}\sigma}))}
+\end{equation}
+The term 'sigmoid' means
+S-shaped~\cite{bishop2006pattern}. In~\cite{hanek2004contracting}, 
+the probability is defined by
+\begin{equation}
+  \label{eq:erf}
   a_{v,1} = \frac{1}{2}erf(\frac{d_{k,l}}{\sqrt{2}\sigma} + 1)
 \end{equation}
-Where $erf(\cdot)$ is the error function of a distribution. This
-approximation process is called \textbf{fuzzy} (or \textbf{smooth})
-assignment. The accuracy of this assignment will increase as the
-uncertainty of curve governed by covariance
-$\mathbf{\Sigma}_{\mathrm{\Phi}}$ decreases.
+which has used the error function of a Gaussian distribution. Both
+two functions in eq.\ref{eg:erf} and eq.\ref{eq:logistic} are
+S-shaped~\ref{fig:s-shaped}.
 
-With this assignment and following the suggested rule in (hanek's
-paper), we now start to assign two suitable weighting functions
+\begin{figure} 
+  \begin{minipage}[t]{0.5\linewidth} 
+    \centering 
+        \subfloat[logistic sigmoid function]{\includegraphics[width=8.0cm]{images/logistic.png}}
+  \end{minipage}% 
+  \begin{minipage}[t]{0.5\linewidth} 
+    \centering 
+    \subfloat[error function]{\includegraphics[width=8.0cm]{images/erf.png}}
+  \end{minipage} 
+\caption[Logistic sigmoid function and error function]{Both functions
+  are S-shaped}
+\label{fig:s-shaped}
+\end{figure}
+
+In the implementation of this thesis, we use the logistic sigmoid
+function because it can be perfectly interpreted from the perspective
+of possibility. Consider the side $s \in \{0,1\}$, the posterior
+distribution for side $s = 1$ can be written as
+\begin{eqnarray}
+  \label{eq:pdfs}
+  p(s=1|I) &=& \frac{p(I|s=1)p(s=1)}{p(I|s=1)p(s=1)
+    + p(I|s=2)p(s=2)}\\
+&=&  \frac{1}{1+exp(-\mathcal{S})}
+\end{eqnarray}
+where I is pixels' value, and $\mathcal{S}$ is defined as
+\begin{equation}
+  \label{eq:ratio}
+  \mathcal{S} = \frac{p(I|s=1)p(s=1)}{p(I|s=2)p(s=2)}
+\end{equation}
+The logistic sigmoid plays an important role in many classification
+algorithms. It satisfies the symmetry property, and its inverse 
+is known as \textit{logit} function, which represents the log of the
+ratio of probabilities $ln [p(s=1|I)/p(s=2|I)]$ for the two classes,
+also known as the log odds~\ref{bishop2006pattern}.
+
+Generally, we can call this approximation process as \textit{fuzzy} (or \textit{smooth})
+assignment. The accuracy of this assignment will increase as the
+uncertainty of curve governed by covariance $\mathbf{\Sigma}_{\mathrm{\Phi}}$ decreases.
+
+With this assignment and following the suggested rule in~\cite{hanek2004contracting}, we now start to assign two suitable weighting functions
 $\omega_1$, $\omega_2$ to the pixels $\mathrm{v}_{k,l}$ along the
 normal for the two sides of the curve. the weighting functions are
 defined as
 
 \begin{equation}
-  \label{eq:5.10}
+  \label{eq:weight}
   \omega_{1/2}(d_{k,l}) = C\left(\frac{a_{1/2}(d_{k,l}) -
     \gamma_1}{1-\gamma_2}\right)^4 \left[e^{-d_{k,l}/(2\hat{\sigma}^2)} - e^{-\gamma_2}\right]^+
 \end{equation}
@@ -280,7 +328,7 @@ In addition, the standard
 deviation is chosen in order to cover the specified distance $h$,
 which yields 
 \begin{equation}
-  \label{eq:5.11}
+  \label{eq:deviation}
   \hat{\sigma} = \max \left[\frac{h}{\sqrt(2\gamma_2)}, \gamma_4
   \right], \sigma  = \frac{1}{\gamma_3} \hat{\sigma}
 \end{equation}
@@ -309,7 +357,7 @@ $\mathbf{\Sigma}_{\mathbf{\Phi}}$ will be derived for each side $s \in
 We first calculate the zero, first and second order weighted moments
 $M_{k,s}^0(d_{k,l,s})$, $\mathbf{M}_{k,s}^1(d_{k,l,s})$ and $\mathbf{M}_{k,s}^2(d_{k,l,s})$
 \begin{eqnarray}
-  \label{eq:5.13}
+  \label{eq:localm}
   M_{k,s}^{(0)}(d_{k,l,s}) &=& \sum_{l=0}^{2L-1} \omega_s(d_{k,l})\\
   \mathbf{M}_{k,s}^{(1)}(d_{k,l,s}) &=& \sum_{l=0}^{2L-1} \omega_s(d_{k,l}) \mathrm{I}_{k,l}\\
   \mathbf{M}_{k,s}^{(2)}(d_{k,l,s}) &=& \sum_{l=0}^{2L-1} \omega_s(d_{k,l}) \mathrm{I}_{k,l}\mathrm{I}_{k,l}^T
@@ -319,12 +367,12 @@ Where $\mathbf{I}$ is just the pixel raw RGB pixels, its elements'
 value are between 0 and 255. Then local mean vectors $\mathbf{m}_{v,s}$  and local covariance matrices
 $\mathbf{\Sigma}_{\mathbf{\Phi}}$  are obtained by 
 \begin{eqnarray}
-  \label{eq:5.14}
+  \label{eq:localcov}
   \mathbf{m}_{k,s} &=& \frac{\mathbf{M}^{(1)}_{k,s}}{M^{(0)}_{k,s}}\\
   \mathbf{\Sigma}_{k,s} &=& \frac{\mathbf{M}^{(2)}_{k,s}}{M^{(0)}_{k,s}}
   - \mathbf{m}_{k,s}\mathbf{m}_{k,s}^T  + \kappa \mathbf{I}
 \end{eqnarray}
-In function (????) $\kappa I$  means an identity matrix scaled by
+In function () $\kappa I$  means an identity matrix scaled by
 $\kappa$ in order to avoid numerical singularity because later it is
 required to calculate the inverse matrix of
 $\mathbf{\Sigma}_{k,s}$. In our experiments, we choose $\kappa$ to be
@@ -345,7 +393,7 @@ likelihood function   $p(\mathbf{I}_{k,l} | \mathbf{m}_{v,1}, \mathbf{m}_{v,2},
   linear combination of $\mathbf{m}_{v,1}$ and $\mathbf{m}_{v,2}$
 
   \begin{equation}
-    \label{eq:5.17}
+    \label{eq:meankl}
     \hat{\mathbf{m}}_{k,l} = a_{v,1}(d_{k,l})\mathbf{m}_{v,1} + a_{v,2}(d_{k,l})\mathbf{m}_{v,2}
   \end{equation}
 
@@ -355,14 +403,14 @@ parameters refinement which is discussed in the next section  will be dramatical
 model the covariance matrix $\hat{\mathbf{\Sigma}}_{k,l}$ following the
 rule in~\cite{hanek2004fitting}, but we do not consider it as the function about $d_{k,l}$
 \begin{equation}
-  \label{eq:5.18}
+  \label{eq:sigmakl}
   \hat{\mathbf{\mathbf{\Sigma}}}_{k,l} = a_{v,1}(d_{k,l})\mathbf{\Sigma}_{v,1} + a_{v,2}(d_{k,l})\mathbf{\Sigma}_{v,2}
 \end{equation}
 
 Now for each observed pixel $\mathbf{I}_{k,l}$, the likelihood
 function is given by
 \begin{equation}
-  \label{eq:5.19}
+  \label{eq:likelihood}
 p(\mathbf{I}_{k,l} | \mathbf{m}_{v,1}, \mathbf{m}_{v,2},
   \mathbf{\Sigma}_{v,1}, \mathbf{\Sigma}_{v,1}) = p(\mathbf{I}_{k,l} | \hat{\mathbf{\mathbf{m}}}_{k,l},\hat{\mathbf{\mathbf{\Sigma}}}_{k,l}) 
 \end{equation}
@@ -374,7 +422,7 @@ avoid these problems if we assume pixels are drawn independently from the same d
 (this is not true), namely independent and identically distributed
 (i.i.d)~\cite{bishop2006pattern}. Thus we can model the likelihood function as
 \begin{equation}
-  \label{eq:5.20}
+  \label{eq:liklihoodall}
   p(\mathbf{I}_{\mathcal{V}} |
   \hat{\mathbf{\mathbf{m}}}_{\mathcal{V}},\hat{\mathbf{\mathbf{\Sigma}}}_{\mathcal{V}})
   = \prod_l \prod_k p(\mathbf{I}_{k,l} | \hat{\mathbf{\mathbf{m}}}_{k,l},\hat{\mathbf{\mathbf{\Sigma}}}_{k,l}) 
@@ -392,11 +440,12 @@ refinement stage by applying Bayesian's theorem.
 \section{Refine parameters}
 \label{sec:ref}
 
-With the likelihood function in (5.20) and prior distribution in
-(5.1), we can estimate the $\hat{\Phi}$ using MAP which is based the
+With the likelihood function in eq.\ref{eq:liklihoodall} and prior distribution in
+eq.\ref{eq:prior}, we can estimate the $\hat{\Phi}$ using MAP which is based the
 Bayesian treatment.
 Firstly, the posterior distribution holds
 \begin{align}
+\label{eq:costf}
     p(\mathbf{\Phi}|\mathbf{\mathbf{I}}_{\mathcal{V}}) 
     \propto &
     p(\mathbf{\mathbf{I}_{\mathcal{V}}}
@@ -416,7 +465,7 @@ Firstly, the posterior distribution holds
 Using a function $\mathcal{Q}$ to denote the logarithm function
 of right part in (5.21)
 \begin{align}
-  \label{eq:5.22}
+  \label{eq:costd}
   \mathcal{Q} = & -2 \ln \left\{  p(\mathbf{\mathbf{I}_{\mathcal{V}}}
     |\hat{\mathbf{\mathbf{m}}}_{\mathcal{V}}(\mathrm{\Phi}),\hat{\mathbf{\mathbf{\Sigma}}}_{\mathcal{V}}(\mathrm{\Phi}))p(\mathbf{\Phi}
     | \mathbf{m}_{\mathbf{\Phi}},
@@ -432,7 +481,7 @@ We interpret the estimate $\hat{\mathbf{\Phi}}$ of the model
 parameters $\mathbf{\Phi}$ as  the mean $\mathbf{m}_{\mathbf{\Phi}}$ of a Gaussian
 approximation of the posterior distribution, and $\hat{\mathbf{\Phi}}$ can be evaluated as 
 \begin{equation}
-  \label{eq:5.23}
+  \label{eq:maxcost}
   \hat{\mathbf{\Phi}} = \mathbf{m}_{\mathbf{\Phi}}\underset{\mathbf{\Phi}}{\arg\max} \ \mathcal{Q}
 \end{equation}
 
@@ -442,21 +491,21 @@ the Hessian matrix can be adopted, first the partial derivatives of
 $\mathcal{Q}$ is computed as 
 
 \begin{equation}
-\label{eq:5.24}
+\label{eq:partcost}
 \nabla_{\mathbf{\Phi}}\{{\mathcal{Q}(\mathbf{\Phi})}\} =  2\{{\mathbf{\Sigma}_{\mathbf{\Phi}}}^{-1}\}^{T}{\mathbf{\Phi}} - \sum_{k = 0}^{N_{c}-1} \sum_{l=0}^{2L-1}
 \left\{\mathcal{J}_{a_{v,1}}^T\hat{\mathbf{\Sigma}}_{k,l}^{-1}\left[I_{k,l}-\hat{\mathbf{m}}_{k,l}(a_{v,1})\right]\right\}
 \end{equation}
 
 with 
 \begin{equation}
-  \label{eq:5.25}
+  \label{eq:jocob}
   \mathcal{J}_{a_{v,1}} = \left( \mathbf{m}_{k,1} -\mathbf{m}_{k,2} \right)(\nabla_{\phi} a_{v,1}(d_{k,l}))^T
 \end{equation}
 
 because $d_{k,l}$ is a function with respect to $\mathbf{\Phi}$, there
 $a_{v,1}(d_{k,l})$ holds
 \begin{equation}
-  \label{eq:5.26}
+  \label{eq:nablaa}
 \nabla_{\mathbf{\Phi}} a_{v,1}(d_{k,l}) = \frac{\partial a_{v,1}(d_{k,l})}{\partial d_{k,l}}
 \left( \frac{\partial d_{k,l}}{\partial x_{k,l}}\mathbf{J}_{\mathbf{\Phi}}(\mathrm{v}_{k,l}(x)) + \frac{\partial d_{k,l}}{\partial y_{k,l}}\mathbf{J}_{\mathbf{\Phi}}(\mathrm{v}_{k,l}(y))
  \right)  
@@ -464,13 +513,13 @@ $a_{v,1}(d_{k,l})$ holds
 Where $\mathrm{v}_{k,l}(x)$ and $\mathrm{v}_{k,l}(y)$ are the axis
 components of pixel $\mathrm{v}_{k,l}$ , and $d_{k,l}$ is given by
 \begin{equation}
-  \label{eq:5.27}
+  \label{eq:diskl}
   d_{k,l} = (x_{k,l} - x_{k})n_{k}(x) +(y_{k,l} - y_{k}) n_{k}(y)
 \end{equation}
 with $n_{k}(x)$ and $n_{k}(y)$ being the components of the normal vector of
 curve point $C_{k}$. Moreover, we have
 \begin{equation}
-  \label{eq:5.28}
+  \label{eq:nabladkl}
   \nabla_{\mathbf{\Phi}} a_{v,1}(d_{k,l}) = \frac{1}{\sqrt{2\pi}\sigma} \mathrm{exp}\left\{ -\frac{d_{k,l}^2}{2\sigma^2} \right\}
 \left( n_k(x)\mathbf{J}_{\mathbf{\Phi}}(\mathrm{v}_{k,l}(x)) + n_k(y)\mathbf{J}_{\mathbf{\Phi}}(\mathrm{v}_{k,l}(y))
  \right) 
@@ -479,7 +528,7 @@ In terms of the properties of  B-spline curve  and planar affine
 model-space. The pixel coordinate of $\mathrm{v}_{kl}$ can be written
 as
 \begin{eqnarray}
-  \label{eq:5.29}
+  \label{eq:vkl}
 \mathrm{v}_{k,l}(x) &= & \mathbf{U}_k^{T}\mathbf{A}_x \mathbf{\Phi} + \mathbf{U}_k P_0(y) + \Delta_h n_k(x) \\
           &=&\Phi_0\sum_{i}^nU_{k,i} +
           (1+\Phi_2)\sum_{i}^nU_{k,i}*x_{k,i} + \Phi_{5}\sum_{i}^n
@@ -495,7 +544,7 @@ Now we can compute $\mathbf{J}_{\mathbf{\Phi}}$ by the following
 formula
 
 \begin{equation}
-  \label{eq:5.30}
+  \label{eq:bigj}
 \mathbf{J}_{\mathbf{\Phi}}(\mathrm{v}_{k,l}) =
 \left[ {\begin{array}{cccccc}
 \frac{\partial \mathrm{v}_{k,l}(x)}{\partial \Phi_0}& \frac{\partial \mathrm{v}_{k,l}(x)}{\partial \Phi_1}& \frac{\partial \mathrm{v}_{k,l}(x)}{\partial \Phi_2}& \frac{\partial \mathrm{v}_{k,l}(x)}{\partial \Phi_3}&\frac{\partial \mathrm{v}_{k,l}(x)}{\partial \Phi_4} &\frac{\partial \mathrm{v}_{k,l}(x)}{\partial \Phi_5}  \\
@@ -507,7 +556,7 @@ Afterwords, the Gauss-Newton approximation to the Hessian
 matrix is given by
 
 \begin{equation}
-  \label{eq:5.31}
+  \label{eq:hessian}
   \mathcal{H}_{\mathbf{\Phi}} \mathcal{Q}  =
   \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} + \sum_{k = 0}^{N_{c}-1}
   \sum_{l=0}^{2L-1} \left\{\mathcal{J}_{a_{v,1}}^T\hat{\mathbf{\Sigma}}_{k,l}^{-1}\mathcal{J}_{a_{v,1}}\right\}
@@ -520,6 +569,7 @@ derivatives, and the Newton optimization step can finally be
 performed as
 
 \begin{eqnarray}
+\label{eq:newton}
   \mathbf{m}_{\mathbf{\Phi}}^{new} & = &
   \mathbf{m}_{\mathbf{\Phi}} - (\mathcal{H}_{\mathbf{\Phi}}
   \mathcal{Q})^{-1} \nabla_{\mathbf{\Phi}} \mathcal{Q} \nonumber \\
@@ -564,7 +614,7 @@ computation of the normal curve-displacement measure $D(\mathbf{C}^{new},
 local, rather than global minimization. The normal curve-displacement
 between two points on $\mathbf{C}^{new}(u)$ and $\mathbf{C}^{old}(u)$ is given by 
 \begin{equation}
-  \label{eq:5.32}
+  \label{eq:normald}
   D(u) \approx
   [C^{new}(u) - C^{old}(u)] \cdot \mathbf{n}(u)
 \end{equation}
@@ -580,7 +630,7 @@ use of normal displacement is a standard technique in Computer Vision
 and can be explained intuitively. 
 Traversing all points on curves, the curve-displacement holds
 \begin{equation}
-  \label{eq:5.33}
+  \label{eq:bigD}
   D(\mathbf{C}^{new}, \mathbf{C}^{old})  = \sum_{i=0}^{N_{C}-1} [C_{i}^{new} - C_{i}^{old})] \cdot \mathbf{n}_{i}
 \end{equation}
 In the implementation of this thesis, we use the $\mathbf{C}^{new},

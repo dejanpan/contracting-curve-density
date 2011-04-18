@@ -30,3 +30,8 @@ p(\mathbf{\Phi}|\mathbf{\mathcal{L}}) \propto p(\mathbf{\mathcal{L}} |\mathbf{\P
 \end{displaymath}
 
 
+
+\begin{equation}
+  \label{eq:logistic}
+  a_{v,1} = \frac{1}{1+\mathrm{exp}(\frac{d_{k,l}}{\sqrt{2}\sigma}))
+\end{equation}
