@@ -52,11 +52,20 @@ In our implementation, we model the
 contour as a continuous, differentiable and uniform quadratic or cubic
 B-Spline in $\mathbb{R}^2$, which is discussed in Chapter~\ref{chapter:bspline}. 
 Given a ROI (region of interest), the first step is generating
-sufficient control points $\mathbf{P} = {P_0, \ldots, P_{N_p-1}}$ to
-do justice to the complexity of the object shape (add an image here).
+sufficient control points $\mathbf{P} = \{P_0, \ldots, P_{N_p-1}\}$ to
+do justice to the complexity of the object shape
+(Figure~\ref{fig:curves}).
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\linewidth]{images/curves.png}
+\caption[The parametric of some tropical fruits]{The blue curves are
+  the parametric contours of some tropical fruits[http://visual.merriam-webster.com/images/food-kitchen/food/fruits/tropical-fruits\_4.jpg]}
+\label{fig:prior}
+\end{figure}
 
 Now there are two major methods to generate control points:
-manual initialization and intelligent initialization. The former is
+manual initialization and automated initialization. The former is
 given as a simple form by hand. It is easy to use and
 control. However, there are some problems and limitations in case that
 the cost of manual operation is large, or vision deviation due to

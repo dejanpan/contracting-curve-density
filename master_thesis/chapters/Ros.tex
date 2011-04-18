@@ -1,8 +1,8 @@
 \chapter{Software and Hardware Infrastructure}
 \label{chapter:SHI}
 In this chapter, we will introduce the software and hardware
-infrastructure used in this thesis. In~\ref{sec:ros} we introduce the
-Robo Operation System. The PR2 robot will be presented in section
+infrastructure used in this thesis. In Section~\ref{sec:ros} we introduce the
+Robo Operation System. The PR2 robot will be presented in Section
 ~\ref{sec:pr2}. This is followed by the introduction of OpenCV library.
 
 \section{The Robot Operating System (ROS)}
@@ -53,10 +53,18 @@ measurement unit. The "texture projector" on PR2 can project a pattern
 on the environment to create 3D information captured by the
 cameras. PR2 is equiped with 16 CPU cores with 48 Gigabytes of
 RAM. Its battery system consists of 16 laptop batteries. PR2 is
-controled with ROS system as described  in~\ref{sec:ros} which
+controled with ROS system as described in Section~\ref{sec:ros} which
 consistes of a series of libraries for perception, navigation and
 manipulation.
-The experiments of this thesis are partly delivered in PR2 system.
+The experiments of this thesis are partly delivered in PR2 system (Figure~\ref{fig:pr2}).
+
+\begin{figure}[htbp]
+  \centering
+\includegraphics[width=\linewidth]{images/pr2.png}
+  \caption[A PR2 robot]{The PR2 robot locate in Cognition for
+    Technical Systems (CoTeSys) Lab in Technische Universit\"at M\"unchen.}
+  \label{fig:pr2}
+\end{figure}
 
 \section{OpenCV Library}
 \label{sec:opencv}
