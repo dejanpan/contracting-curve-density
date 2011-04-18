@@ -153,6 +153,8 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
 
 
 	xformed = cvCreateImage( cvGetSize( img2 ), IPL_DEPTH_8U, 3 );
+    printf("image2 size %d %d \n", img2->width, img2->height);
+    printf("stacked size %d %d \n", stacked->width, stacked->height);
 	cvWarpPerspective( img1, xformed, H, 
                        CV_INTER_LINEAR + CV_WARP_FILL_OUTLIERS,
                        cvScalarAll( 0 ) );

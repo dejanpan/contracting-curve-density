@@ -603,8 +603,14 @@ void CCD::run_ccd()
 
     // create a new B-spline curve
     BSpline bs(params_.degree , params_.resolution, pts);
-
     image.copyTo(canvas_tmp);
+
+    for (int i = 0; i < params_.resolution; ++i)
+    {
+        int j = (i+1)%params_.resolution;
+        cv::line(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 255, 0, 0 ),2,8,0);
+        cv::line(canvas, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 255, 0, 0 ),2,8,0);
+    }
 
     // converge condition
     // tol = \int (r - r_f)*n
@@ -641,21 +647,20 @@ void CCD::run_ccd()
 
     std::stringstream name;
     name << iter;
-    // cv::imwrite(name.str() + ".png", canvas_tmp);
+    cv::imwrite(name.str() + ".png", canvas_tmp);
     canvas_tmp.release();
     // cv::imwrite(name.str() + ".png", canvas);
 
-    // cv::imshow("CCD", canvas);    
-    // cv::waitKey(200);
+    cv::imshow("CCD", canvas);    
+    cv::waitKey(200);
 
-    if(iter >= 20)
+    if(iter >= 100)
     {
       for (int i = 0; i < params_.resolution; ++i)
       {
         // std::cout << bs[i].x << " " << bs[i].y << " " <<bs[i].z << std::endl;
         int j = (i+1)%params_.resolution;
-        cv::line(canvas, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 0, 0, 255 ),2,8,0);
-        // cv::line(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 255, 0, 0 ),2,8,0);
+        cv::line(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 255, 0, 0 ),2,8,0);
         // cv::circle(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y), 2 ,CV_RGB(255,0,0), 2); 
         // cv::circle(canvas, cv::Point2d(bs[i].x, bs[i].y), 1 ,CV_RGB(0,255,0), 1); 
       }

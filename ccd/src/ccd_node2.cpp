@@ -35,6 +35,7 @@ class CCDNode
     // n_.param("image_topic", image_topic_, std::string("/narrow_stereo/left/image_rect"));
     // n_.param("image_topic", image_topic_, std::string("/wide_stereo/left/image_rect_color"));
     n_.param("image_topic", image_topic_, std::string("/camera/rgb/image_color"));
+//    n_.param("image_topic", image_topic_, std::string("/prosilica/image_raw"));
     n_.param("polygon_points_topic", polygon_points_topic_, std::string("/pointcloud_to_image_projector_opencv_node/polygon_points"));
 //    n_.param("init_method", init_method_, 1);
     init_method_ = init_method;
@@ -169,11 +170,11 @@ class CCDNode
         ccd.init_cov(bs, (int)ccd.degree());
       }      
       ccd.run_ccd();
-      // cv::imshow("Original", ccd.canvas);
-      // cv::waitKey(1);
-      std::stringstream name;
-      name << count_;
-      cv::imwrite(name.str() + ".png", ccd.canvas);
+       cv::imshow("CCD", ccd.canvas);
+       cv::waitKey(300);
+//      std::stringstream name;
+ //     name << count_;
+ //     cv::imwrite(name.str() + ".png", ccd.canvas);
   }
       // sleep(1);
   //protected:
