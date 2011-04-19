@@ -1,60 +1,67 @@
 \chapter{Introduction}
 \label{chapter:Introduction}
 In the field of computer vison and pattern recognition, determining a
-model from a finite set of samples or a complex image without prior
+model from a finite set of samples or a complex image without a prior
 knowledge is an ill-posed problem. Due to the the ill-posedness, in
-the sense that a unique model may not exist, models specifying a priori
+the sense that a unique model may not exist, models specifying a prior
 knowledge plays an very important role in solving many important
 computer vision problems, such as object tracking, shape recognition,
-pose estimation segmentation, edge detection, stereo matching and 3-D
+pose estimation, segmentation, edge detection, stereo matching and 3-D
 reconstruction.
 
 Some parametric curve models, also known as deformable models,
-deformable templates, snakes, or active contours, have been delevoped
+deformable templates, snakes, or active contours, have been developed
 to guide the image interpretation process towards particularly
-likely interpretations~\cite{hanek2004fitting}. These parametric curve models, namely
-prior knowledge have two outstanding influences in the
+likely interpretations~\cite{hanek2004fitting}. These parametric curve
+models have had two outstanding influences on the
 development of related algorithms. The first is the Snakes which
 represent a fundamentally new framework for delineating an object
-outline in an image. This framework attempts to minimize energy
-associated to the current contour as a sum of an internal and external
+outline in an image. This algorithm attempts to minimize energy
+associated to the current contour as a sum of an internal and an external
 energy~\cite{kass1988snakes}. The goal of snakes is to balance the prior
 knowledge with evidence from an image. The second outstanding
 influence is in the field of pattern recognition and machine learning,
 where statistical distributions plays a key role.  There treatment
-of prior knowledge about shape is put into a probabilistic
+of a prior knowledge about shape is put into a probabilistic
 context. Any shape is regarded as the result of applying some
 distortion to an ideal prototype shape, and an appropriate
 distribution governs the nature and extent of that distortion.
 For both kinds of methods, the common aim is to strengthen the visual
 interpretation of the shape via the establishing influence of prior
-expectations of the shapes that are likely to be seen~\cite{blake1998active}. This
-thesis dwells upon the Contracting Curve Density (CCD) algorithm whose
-basic step is solving a curve-fitting problem in a probabilistic
-context.
+expectations of the shapes that are likely to be
+seen~\cite{blake1998active}. This thesis dwells upon the Contracting
+Curve Density (CCD) algorithm whose basic step is solving a
+curve-fitting problem in a probabilistic context.
 
 
-\section{The CCD algorithm and curve-fitting problem}
+\section{The CCD Algorithm and Curve-fitting Problem}
 \label{sec:ccdcfp}
 The curve-fitting is a process that makes
 a practical deformable template (model) attached to the feature in a
 image. In essence it involves using algorithms to find the parameter
 values for a given parametric curve model. Lots of important and
 challenging computer vision tasks can be formulated as variants of the
-curve-fitting problem. The nature of a curve-fitting problem is taken into account from the
-outset, usually it is quite unnecessary to examine an entire
-image. Hence, there is no need to organise or group features in the
+curve-fitting problem. 
+
+Suppose we have an observed object in an
+image. Boundaries of the object can be completely or partially defined
+by an either open or closed curve obtained by human intervention or
+some object recognition techniques, such as SIFT features or reconstruction. The goal of
+curve-fitting problem is to accurately identify \textit{decision boundaries} (2-Dimensional) or
+\textit{decision surfaces} (3-Dimensional)~\cite{bishop2006pattern} by
+distorting the curve. Since the approximate boundaries of the observed
+object have been been given by the prior curve, there is no need to organise or group features in the
 image, and the analysis can be restricted to a relatively narrow
-ROI (region of interest), so it is usually expected to be computationally
-cheaper.
+ROI (region of interest), as a result, performance of such algorithms
+is boosted up. The CCD algorithm discussed in this thesis is a
+powerful one based on curve-fitting.
 
 The CCD algorithm can be described as follows. Given one or multiple images as input
 data and a parametric curve model with a prior distribution of model
 parameters, through curve-fitting process we estimate the model
 parameters which determine the approximation of the posterior
-distribution in order to make the curve models best matching image data.
-~\ref{fig:fitting} depicts a curve-fitting problem and the
-corresponding solution is obtained by the
+distribution in order to make the curve models best matching the image data.
+Fig.~\ref{fig:fitting} depicts a curve-fitting problem and the corresponding solution is obtained by the
 CCD algorithm.
 \begin{figure}[htb]
   \centering
@@ -62,9 +69,9 @@ CCD algorithm.
   \caption[The description of curve-fitting problem]{a) an input
     image is given but not showing the pre-processing step. b) A series of
     parametric curve model contours which can be used to evaluate the
-    prior distribution. These contours are only a few possibility
+    prior distribution. These contours represent only a few possible
     shapes for the ball. c) The curve-fitting problem aims to estimate the model
-    parameters determining the posterior distribution. During the
+    parameters by determining the posterior distribution. During the
     fitting process, the uncertainty of contours of the ball is widely
     reduced.}
   \label{fig:fitting}
@@ -72,74 +79,105 @@ CCD algorithm.
 
 
 
-\section{Motivation of the CCD Approach}
+\section{Motivation For the CCD Algorithm}
 \label{sec:mccd}
 The curve-fitting problem and its variants have a wide range of
 applications in the field of robotics, medical processing, user
 interface, surveillance and biometrics~\cite{hanek2004fitting}. In order to be
-widely applicable to practical computer vision problems, the following
-requirements, such as robustness,
-accuracy, efficiency, any-time property and versatility, should be
+widely applicable to practical personal robotics problems (such as
+perception of mobile manipulation), robustness,
+accuracy, efficiency and versatility, should be
 considered when a novel approach is designed and implemented.
 However, in the computer vision community, solving object segmentation and the
 related object contour tracking problems are always challenging,
 especially in natural and unconstrained scenes. Due to clutter,
-shading, texture, and highlights it is very difficulty to segment
+shading, texture, and highlights it is very difficult to segment
 an object from an inhomogeneous background. Furthermore, some physical
 conditions, such as the illumination or surface properties, will
 influence the efficiency and stability of related approaches. It is
-necessary and important to develop a method which determines adequate segmentation
-in advance or a single criterion that is applicable
-for all parts of objects boundaries.
+necessary and significant to develop a method which determines adequate segmentation
+in advance or a single criterion that is applicable for all parts of objects boundaries.
 
-Among the currently available methodologies, the CCD algorithm is an
-interesting one. It is developed and presented as a state-of-the-art
+Among the currently available methodologies, the CCD algorithm is
+thought as the one that solves above problems best due to a high level
+of robustness and sub-pixel accuracy even in the presence of severe
+texture, shading, clutter, partial occlusion, and strong changes of
+illumination.
+
+ accuracy and versatility. It is developed and presented as a state-of-the-art
 improvement over other advanced techniques such as the condensation
-algorithm~\cite{panin2006fully}. In the CCD approach, the curve-fitting problem is
-put in the context of probabilistic framework and converted to a
-regression one in the field of pattern recognition. It is especially
+algorithm~\cite{isard1998icondensation}. In the CCD approach, the curve-fitting problem is
+put in the context of probabilistic framework and thus analogous to
+the regression problem in the field of pattern recognition, which is especially
 helpful to touch the nature of curve-fitting problem. By introducing
 local image statistics, the algorithm can cope with highly
 inhomogeneous image regions and provide therefore locally adapted
 criteria for separating the adjacent image regions. The use of blurred
 curve models as efficient means for iteratively optimizing the
 posterior density over possible model parameters. These blurred curve
-models enables the algorithm to trade-off two conflicting objectives,
+models enable the algorithm to trade-off two conflicting objectives,
 namely heaving a large area of convergence and achieving high
-accuracy. The CCD algorithm achieves a high level of robustness and subpixel
-accuracy even in the presence of severe texture, shading, clutter,
-partial occlusion, and strong changes of illumination.
+accuracy~\cite{hanek2004fitting}. 
 
-The robustness, runtime and accuracy of the CCD algorithm enable it 
+The robustness, high performance and accuracy of the CCD algorithm enable it 
 to be used on personal robot  because many applications in the field
 of personal robotics are time-constrained. The object's contour
-obtained by the CCD algorithm can be used to locate the object and
+obtained by the CCD algorithm can be used to locate the object and 
 establish a set of safe grasps on it~\cite{hanek2000vision}.
 
-
-
-
-\section{The Contracting Curve Density (CCD) Approach}
+\section{The Contracting Curve Density (CCD) Algorithm}
 \label{sec:sketch}
 
-\subsection{Overview}
+\subsection{An Alternative View of the CCD Algorithm}
 \label{sec:overview}
 
 In the field of pattern recognition, the key concept is that of
 uncertainty. In image data, the uncertainty arises both
 through noise from measurements, as well as through the nature of
-the objects. Probability theory provides a consistent framework for the
-quantification and manipulation of uncertainty.  In this section, we
-view curve-fitting problem from a probabilistic perspective and turn
-us towards to Bayesian treatment.
+the objects (e.g. cardiac motion and deformation). Probability theory
+provides a consistent framework for the quantification and
+manipulation of uncertainty.  In this section, we view curve-fitting
+problem from a probabilistic perspective and turn us towards to
+Bayesian logistic regression problem.
+
+In the CCD algorithm, we aim to find the contour of observed object
+and thus segment it from the background. Therefore, a hypothesis
+contour divides the image into two part (Fig.\ref{fig:divide}), inside
+and outside. For probabilistic model, we can represent this using
+binary representation (e.g. $\{0, 1\}$). Our goal is to accurately
+assign a class label to each pixels in the image ( For the CCD
+algorithm, we only need assign those pixels in the vicinity of the
+contour), thus the curve-fitting problem becomes a classification
+one. A powerful approach to solve this problem involves modeling a
+conditional probability distribution in an inference stage, and then
+subsequently uses this distribution to make optimal decisions. In
+order to derive the conditional probability, prior distribution and
+likelihood function should be given.
+
+\begin{figure}[htbp]
+  \centering
+    \begin{minipage}[t]{0.5\linewidth} 
+    \centering 
+        \subfloat[]{\includegraphics[width=8.0cm]{images/divide1.png}}
+  \end{minipage}% 
+  \begin{minipage}[t]{0.5\linewidth} 
+    \centering 
+    \subfloat[]{\includegraphics[width=8.0cm]{images/divide2.png}}
+  \end{minipage} 
+  \caption[A contour divide an image into two parts]{a) The red
+    contour successfully segment the box from the background. b) The
+    blue one is outside, the golden one is inside.}
+  \label{fig:divide}
+\end{figure}
 
 
 We assume that a parametric curve model is governed by a prior distribution
-over the model parameters $\Phi$ (usually a $D$-dimensional
-vector). There exists a range of probability distributions which can
-be used to model the distribution of shapes. In this thesis, for
-simplicity, let us consider the Gaussian distribution, which is commonly
-used in computer vison because of its several outstanding features.
+over the model parameters (usually a multi-dimensional vector). There
+exists a range of probability distributions which can be used to model
+the distribution of shapes. In this thesis, for simplicity, let us
+consider the Gaussian distribution, which is commonly used in computer
+vison because of its several outstanding features. 
+
 
 % \begin{equation}
 %   \label{eq:1.1}
@@ -156,25 +194,34 @@ used in computer vison because of its several outstanding features.
 % the covariance, and $|\mathbf{\Sigma}_{\mathbf{\Phi}}|$ denotes the
 % determinant of $\mathbf{\Sigma}_{\mathbf{\Phi}}$
 
-Defining the prior distribution is only a step of the problem. Prior knowledge
-defines the possibility of a shape in an image, if we want to know what
-shape is presented in a given image, we must find the posterior
-distribution. According to the Bayesian theorem, posterior distribution
+%  Prior knowledge
+% defines the possibility of a shape in an image, if we want to know what
+% shape is presented in a given image, we must find the posterior
+% distribution. 
+Defining the prior distribution is only a step of the problem.
+According to the Bayesian theorem, posterior distribution
 is proportional to the product of prior distribution and the likelihood
 function. Hence, the next step is to define the likelihood function.
 
-In the implementation of the CCD algorithm, it is suggested to use local image pixels $\mathcal{L}$ as the training data to
-determine the likelihood function. If the data is assumed to be drawn
- independently from the distribution, then the likelihood function is
-given by the accumulation of all the components.
+In the implementation of the CCD algorithm, it is suggested to use
+local image pixels $\mathcal{L}$ as the training data to determine the
+likelihood function. If the data is assumed to be drawn  independently
+from the distribution, then the likelihood function is given by the accumulation of all the components.
 By pixel value we denote the vector containing the local single-or multichannel
 image data associated to a pixel. In our experiments, we directly use the sensed RGB
 values as pixel values. However, other types of local features computed in a pre-processing
 step may also be used, e.g. texture descriptors or color values in
 other color spaces.
 
+Because the likelihood function obtained from the local statistics has
+not a closed-form solution. Moreover, the prior distribution is just
+an approximate to the true distribution. Therefore, Maximization
+likelihood method does not work here, We have to use an alternative
+approach known as iterative reweighted least squares (IRLS) to find the solution. 
+
+ According to the Bayesian treatment for regression, 
 With the prior distribution and posterior distribution, we can now
-apply the Bayesian treatment to the curve-fitting problem.
+apply the Bayesian theorem to the curve-fitting problem.
 We determine $\hat{\mathbf{\Phi}}$ by finding the most probable
 value of $\mathbf{\Phi}$ given by the data, in other words by maximizing
 the posterior distribution. This technique is called maximum
@@ -197,7 +244,7 @@ govern the posterior distribution. With the resulting parameters we
 can predict what shape is actually likely to be present in a particular image.
 
 
-\subsection{Possible problems}
+\subsection{Possible Problems}
 \label{sec:prob}
 In order to implement the MAP estimation above, we have to address
 three questions.
@@ -236,6 +283,9 @@ the problem, it is necessary to make some assumptions about the image
 data. We will describe such assumptions in more detail. For the last
 question, different optimization methods used for curve-fitting will
 be discussed in this thesis.
+
+However, the original implementation in~\cite{hanek2004contracting}
+probit function as 
 
 \subsection{Sketch of the CCD algorithm}
 \label{sec:sccd}

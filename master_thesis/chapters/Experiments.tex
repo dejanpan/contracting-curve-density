@@ -33,7 +33,7 @@ is the partitioning of its domain into homogeneous regions
 $\Omega_1,\ldots, \Omega_n \subset \Omega$. In a complex environment,
 due to texture, shading, poor contrast and clutter, segmentation is
 always a challenging problem in the field of computer
-vision(Figure~\ref{fig:flower_m}).
+vision(Fig.~\ref{fig:flower_m}).
 
 \begin{figure}[htbp]
   \begin{minipage}[t]{0.5\linewidth} 
@@ -65,7 +65,7 @@ converting a pure segmentation problem to a problem in pattern
 recognition, a large amount of techniques in the field of pattern
 recognition are introduced to solve segmentation problems, which are
 proved to be effective and helpful. Compared with other segmentation
-methods Figure~\ref{fig:seg_compaison}, such as intensive-based method,  cluster method, region-based
+methods Fig.~\ref{fig:seg_compaison}, such as intensive-based method,  cluster method, region-based
 method and compression-based methods, the CCD algorithm has following
 advantages:
 \begin{figure}[htbp] 
@@ -166,10 +166,10 @@ from the observed object.
 }
 \end{figure}
 
-In Figure~\ref{fig:sab}, we intentionally set a hypothesis which is far away
+In Fig.~\ref{fig:sab}, we intentionally set a hypothesis which is far away
 from the ball, but after about 15 iteration, we successfully fit the
 contour the edge of the ball. For the sake of a ground truth we need
-investigate the pixels used in the iterations. The Figure~\ref{fig:pon} shows
+investigate the pixels used in the iterations. The Fig.~\ref{fig:pon} shows
 that only a small number of pixels is taken into account after the
 contour starts to converge. However, these pixels contain the
 necessary information for refining the fitting. Because the pixels used
@@ -214,7 +214,7 @@ suffice for non-planar surfaces. Imagine such a scenario, we generate the  plana
 space contour of a non-planar cube in the fist view. In the
 subsequent view the outline of the cube does not lie in the old
 space. Due the parallax effect the a mismatch in the fitted contour
-will be detected. This can be evidenced in the fitting experiment (Figure~\ref{fig:box_mismatch}).
+will be detected. This can be evidenced in the fitting experiment (Fig.~\ref{fig:box_mismatch}).
 \begin{figure}[htbp]
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
@@ -273,7 +273,7 @@ the following interpretation
 \end{equation}
 
 The expanded space now encompasses the outlines of all views of the three-dimensional
-outline, evidenced by Figure~\ref{fig:box_match}. At last, we do
+outline, evidenced by Fig.~\ref{fig:box_match}. At last, we do
 another experiments for a object with an irregular shape~\ref{fig:container}. This
 demonstrates that the CCD works well for 3-D non-planar object.
 
@@ -305,7 +305,7 @@ In this thesis, local statistical information is collected in terms of
 pixel intensity in the vicinity of a contour, this leads to a poor
 result for transparent objects. In this experiment, the
 target is a cola bottle whose upper part is nearly transparent and the
-lower part is opaque. The result in Figure~\ref{fig:cola} shows that the CCD algorithm
+lower part is opaque. The result in Fig.~\ref{fig:cola} shows that the CCD algorithm
 can segment the lower part but can not completely encompass the contour in the
 upper part. However, because the model only have 6 (or 8
 for 3-dimensional object) degree of freedom, the convergence of other
@@ -342,7 +342,7 @@ in the right. The transparency leads to the difficulties. }
 \subsection{Fitting a rigid wire frame}
 \label{sec:fdo}
 In the following, we fit a rigid wire frame model to the image
-depicted in Figure~\ref{fig:wireframe}.  The degrees of freedom
+depicted in Fig.~\ref{fig:wireframe}.  The degrees of freedom
 are the 8 pose parameters. This experiment demonstrates that the CCD
 algorithm is not only able to exploit object contours, but it can also
 use internal model edges separating multiple, possibly dependent,
@@ -458,8 +458,8 @@ correspondences and then minimizing corresponding norm.
 After obtaining the homography between the template image and the
 image being studied, the contour of object can be easily projected
 into the target image to obtain the estimate of the contour
-position. This is illustrated in Figure~\ref{fig:sift} on page
-\pageref{fig:sift} and Figure~\ref{fig:sift_result} on page
+position. This is illustrated in Fig.~\ref{fig:sift} on page
+\pageref{fig:sift} and Fig.~\ref{fig:sift_result} on page
 \pageref{fig:sift_result}. Note that because SIFT is only invariant for
 minor changes in view points, the method does not always work for
 non-planar object which has different viewpoint from the one in the
@@ -486,8 +486,7 @@ template image.
   \centering
 \includegraphics[width=\linewidth]{images/sift_result.png}
 \caption[The contour obtained using the CCD algorithm converges to the
-edge of the book]{After 8 iterations, the contour obtained in Figure
-  ~\ref{fig:sift} converges to the edge of the book. However, in our
+edge of the book]{After 8 iterations, the contour obtained in Fig.~\ref{fig:sift} converges to the edge of the book. However, in our
   implementation, the SIFT algorithm can only cope with 2-Dimensional
   local features, but actually the book on the desk is a non-planar
   object. Therefore, the result is not as good as expected.}
@@ -496,8 +495,7 @@ edge of the book]{After 8 iterations, the contour obtained in Figure
 
 The model hypothesis is obtained by applying the CCD algorithm to a
 frame of a video sequence. In the following experiments, we can test
-our naive CCD tracker on PR2, the result is demonstrated in Figure
-~\ref{fig:siftracker} 
+our naive CCD tracker on PR2, the result is demonstrated in Fig.~\ref{fig:siftracker} 
 
 \begin{figure}[htbp]
   \begin{minipage}[t]{0.5\linewidth} 
@@ -554,13 +552,13 @@ rendering.
 \end{figure}
 
 Point clouds can be rendered and inspected in software like MeshLab
-and rivtz (Figure~\ref{fig:pointcloud}). In addition, they are usually converted to polygon or
+and rivtz (Fig.~\ref{fig:pointcloud}). In addition, they are usually converted to polygon or
 triangle mesh models, NURBS surface models, or CAD models through a
 process commonly referred to as surface reconstruction.
 
 In this experiments, we plan to convert a point cloud of a object to a
 polygon, then use this polygon as the initial contour of observed
-object. In the point cloud in Figure~\ref{fig:pointcloud}, edges of
+object. In the point cloud in Fig.~\ref{fig:pointcloud}, edges of
 the observed object are not smoothed. By applying the CCD algorithm,
 we can accurately obtain the contour of a observed object. In
 comparison with the initialization from SIFT features, because the
