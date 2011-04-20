@@ -14,6 +14,17 @@ inline cv::Scalar random_color(CvRNG* rng)
   return CV_RGB(color&255, (color>>8)&255, (color>>16)&255);
 }
 
+inline double logistic(double x)
+{
+  return 1.0/(1.0+exp(-x));
+}
+
+inline double probit(double x)
+{
+  return 0.5*(1+1/sqrt(2)*erf(x));
+}
+
+
 
 
 // void on_mouse(int event, int x, int y, int flags, void *param )
@@ -250,7 +261,8 @@ void CCD::local_statistics(BSpline &bs)
       vic_ptr[10*k + 3] = tmp_dis1.y;
 
       // fuzzy assignment a(d_{k,l}) = 1/2*(erf(d_{kl})/\sqrt(2)*sigma) + 1/2
-      vic_ptr[10*k + 4] = 0.5*(erf((tmp_dis1.x)/(sqrt(2)*sigma)) + 1);
+      // vic_ptr[10*k + 4] = 0.5*(erf((tmp_dis1.x)/(sqrt(2)*sigma)) + 1);
+      vic_ptr[10*k + 4] = logistic(tmp_dis1.x/(sqrt(2)*sigma));
 
       // wp1 = (a_{d,l} - gamm_1) /(1-gamma_1)
       double wp1 = (vic_ptr[10*k + 4] - params_.gamma_1)/(1-params_.gamma_1);
@@ -310,7 +322,8 @@ void CCD::local_statistics(BSpline &bs)
       vic_ptr[10*negative_normal + 1] = tmp2.x;
       vic_ptr[10*negative_normal + 2] = tmp_dis2.x;
       vic_ptr[10*negative_normal + 3] = tmp_dis2.y;
-      vic_ptr[10*negative_normal + 4] = 0.5*(erf(tmp_dis2.x/(cvSqrt(2)*sigma)) + 1);
+      // vic_ptr[10*negative_normal + 4] = 0.5*(erf(tmp_dis2.x/(cvSqrt(2)*sigma)) + 1);
+      vic_ptr[10*negative_normal + 4] = logistic(tmp_dis2.x/(sqrt(2)*sigma));
       // vic_ptr[10*negative_normal + 4] = 0.5;
       wp1 = (vic_ptr[10*negative_normal + 4] - 0.25);
       vic_ptr[10*negative_normal + 5] = -64*wp1*wp1*wp1*wp1 + 0.25;
@@ -608,8 +621,8 @@ void CCD::run_ccd()
     for (int i = 0; i < params_.resolution; ++i)
     {
         int j = (i+1)%params_.resolution;
-        cv::line(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 255, 0, 0 ),2,8,0);
-        cv::line(canvas, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 255, 0, 0 ),2,8,0);
+        cv::line(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 0, 0, 255 ),2,8,0);
+        cv::line(canvas, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 0, 0, 255 ),2,8,0);
     }
 
     // converge condition
