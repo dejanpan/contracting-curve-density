@@ -214,96 +214,160 @@ step may also be used, e.g. texture descriptors or color values in
 other color spaces.
 
 Because the likelihood function obtained from the local statistics has
-not a closed-form solution. Moreover, the prior distribution is just
+not a closed-form solution. In addition, the prior distribution is just
 an approximate to the true distribution. Therefore, Maximization
 likelihood method does not work here, We have to use an alternative
-approach known as iterative reweighted least squares (IRLS) to find the solution. 
+approach known as iterative reweighted least squares (IRLS) to find
+the solution. Here the IRLS process is called Maximum a Posterior, or
+simply MAP.
 
- According to the Bayesian treatment for regression, 
-With the prior distribution and posterior distribution, we can now
-apply the Bayesian theorem to the curve-fitting problem.
-We determine $\hat{\mathbf{\Phi}}$ by finding the most probable
-value of $\mathbf{\Phi}$ given by the data, in other words by maximizing
-the posterior distribution. This technique is called maximum
-posterior, or simply MAP.
+In the CCD algorithm, because we just need a parameter vector determining
+the shape of specified contour, we do not plan to calculate the
+predictive distribution. Therefore, the MAP solution mentioned above
+is our objective.
 
-There are several methods to estimate the MAP~\cite{map}:
-\begin{itemize}
-\item In some special cases, posterior distribution can be given in
-  closed form analytically. This requires conjugate priors.
-\item Numerical optimization such as the conjugate gradient method or
-  Newton's method.
-\item Modification of an expectation-maximization (EM) algorithm,
-  which does not require to derive the posterior density.
-\item Monte Carlo method using simulated annealing.
-\end{itemize}
+However, take account into the fact that exact inference for the
+regression is always intractable, we could encounter some issues before
+implementing the algorithm. In the next section, we will discuss these
+problems.
 
-In this thesis, we adopt the second method to obtain the MAP estimate.
-Usually, the results are some parameters (e.g. mean and covariance) to
-govern the posterior distribution. With the resulting parameters we
-can predict what shape is actually likely to be present in a particular image.
+% According to the Bayesian treatment for regression, 
+% With the prior distribution and posterior distribution, we can now
+% apply the Bayesian theorem to the curve-fitting problem.
+% We determine $\hat{\mathbf{\Phi}}$ by finding the most probable
+% value of $\mathbf{\Phi}$ given by the data, in other words by maximizing
+% the posterior distribution. This technique is called maximum
+% posterior, or simply MAP.
 
+% There are several methods to estimate the MAP~\cite{map}:
+% \begin{itemize}
+% \item In some special cases, posterior distribution can be given in
+%   closed form analytically. This requires conjugate priors.
+% \item Numerical optimization such as the conjugate gradient method or
+%   Newton's method.
+% \item Modification of an expectation-maximization (EM) algorithm,
+%   which does not require to derive the posterior density.
+% \item Monte Carlo method using simulated annealing.
+% \end{itemize}
 
-\subsection{Possible Problems}
+% In this thesis, we adopt the second method to obtain the MAP estimate.
+% Usually, the results are some parameters (e.g. mean and covariance) to
+% govern the posterior distribution. With the resulting parameters we
+% can predict what shape is actually likely to be present in a particular image.
+
+\subsection{Improvements Based on the Original CCD Algorithm}
 \label{sec:prob}
-In order to implement the MAP estimation above, we have to address
-three questions.
+Some key issues have been explained in the origin
+implementation~\cite{hanek2004contracting}.
+After evaluating the CCD algorithm, some new questions are posed.
 
 \begin{itemize}
-\item How to create a parametric curve model as prior knowledge , and
-  at the same time determine the distribution? There are a variety of
-  active shape models available, such as principally snakes,
+\item How to create a parametric curve model as prior knowledge and
+  make it well approximate the distribution of contour shapes? 
+There are a variety of active shape models available, such as principally snakes,
   deformable templates and dynamic contours. For curve-fitting
   problem, deformable template is a good choice to match the image
-  data. Then we have to choose a suitable number of parameters to control
-  the strength of prior assumptions. If there are too many parameters
-  in the model, it is easy to control the contour accurately at the
-  expense of complexity and computational cost. Balance among these
-  aspects are non-trivial.
+  data. Model parameters control the complexity of parametric curve,
+  as well degrees of freedom. There is a trade-off between the degree
+  of contour and complexity, with very flexible models having high
+  computational cost and design barrier, and relatively rigid models
+  having low accuracy and high misclassification rate. 
 
-\item How can the local statistics in the image be evaluated? First, it
-  is necessary to establish the relation between the model parameters
-  $\mathbf{\Phi}$ and the image data $\mathcal{L}$. This is especially
-challenging in the presence of clutter and strong texture if we
-consider the factors, such as  illumination, surface properties,
-characteristics of the camera and shadow. 
+\item Moreover, one
+  main limitation of the CCD algorithm is manual initialization. How can
+  we avoid too much manual intervention?
 
-\item How can the fit be optimized efficiently? Generally MAP and some
-  other nonlinear optimization algorithms may find multiple local
-  maxima and are not guaranteed to find the largest out of these maxima.
+\item How can the local statistics in the image be efficiently
+  evaluated? First, it is necessary to establish the relation between the model parameters
+  and the image data. This is especially challenging in the presence
+  of clutter and strong texture if we consider the factors, such as
+  illumination, surface properties, characteristics of the camera and
+  shadow. 
+
+\item How can the fit be optimized efficiently? Many
+  nonlinear optimization algorithms used to estimate MAP may find
+  multiple local maxima and  are not guaranteed to find the largest
+  out of these maxima.
 \end{itemize}
 
+Based on these questions, we improve the CCD algorithm from the
+following aspects:
+\begin{itemize}
+\item We will use parametric B-Spline curve as
+parametric model curve. It is proved that this type of curve model is
+flexible enough and can well represent the contour of the
+object. Both 6-dimensional and 8-dimensional model parameters vector
+are provided in our implementation. The parametric model with 8
+degrees of freedom can efficiently fit objects in non-planar affine
+space. Parametric B-Spline curve will be described in
+Chapter~\ref{chapter:bspline}.
+\item In order to avoid human intervention, we add a feature to 
+  initialize a contour from Scale-invariant feature transform (SIFT)
+  features or a point cloud polygon.
+\item The local statistics is the main feature of the CCD
+  algorithms. The blurred curve models can considerably decrease the
+  computational cost. However, excessive sparse samples may ignore some
+  features in the vicinity of the curve. Hence, before we blur the
+  model, we compute the circumference of a contour thus reasonably
+  sample pixels from the vicinity of the curve.
+\item Experiments show that the probit regression function used
+  in~\cite{hanek2004contracting} is sensitive to outliers. In this
+  thesis, we make it support both probit and logistic regression
+  function.
+\item We have used some new optimization methods instead of the
+  newton method, such as least squares support vector machine.
+\end{itemize}
 
-For the first question, we will use parametric B-Spline curve as
-our prior knowledge. It is proved that this kind of curve model is
-flexible enough and can well represent the contour of the object. The
-parametric B-Spline curve will be described in Chapter~\ref{chapter:bspline}.
-The second question is especially challenging. In order to simplify
-the problem, it is necessary to make some assumptions about the image
-data. We will describe such assumptions in more detail. For the last
-question, different optimization methods used for curve-fitting will
-be discussed in this thesis.
+% The second question is especially challenging. In order to simplify
+% the problem, it is necessary to make some assumptions about the image
+% data. We will describe such assumptions in more detail. For the last
+% question, different optimization methods used for curve-fitting will
+% be discussed in this thesis.
 
-However, the original implementation in~\cite{hanek2004contracting}
-probit function as 
+Moreover, in order to deploy the CCD algorithm in personal robotics,
+we have to scale the algorithm and implement it using OpenCV library.
+The algorithm will be released under the open source BSD license. Some
+related information can be found on\\
+http://www.ros.org/wiki/contracking\_curve\_density\_algorithm
 
 \subsection{Sketch of the CCD algorithm}
 \label{sec:sccd}
 
 In this section, the basic steps of the CCD algorithm will be
-sketched. Given an input image as training data, we first choose an initial
+sketched. 
+\begin{enumerate}
+\item \textbf{Initialization}: Given an input image as training data, we first choose an initial
 contour for an object or feature which will be fitted or tracked, and
-some initial values for the means, covariances. Then we alternate
-between the following two updates that we shall call the learning
-local statistics step and the refining parameters step, for reasons
-that will become apparent shortly.
-In the step of learning local statistics, for each pixel $\nu$ in the
+some initial values for the means, covariances. For most practical
+application, pre-processing stage is necessary to make the problem
+easier to solve. 
+\item \textbf{Local statistics}: In the step of learning local
+  statistics, for each pixel in the
 vicinity of the expected curve, two sets of local statistics
 are computed, one set for each side of the curve. The local statistics are obtained from
-pixels that are close to $nu$ pixel and most likely lie on the corresponding side of the curve,
-according to the current estimate of the model parameters. The resulting local statistics
+pixels that are close to the pixel on the contour and most likely lie
+on the corresponding side of the curve, according to the current
+estimate of the model parameters. The resulting local statistics
 represent an expectation of "what the two sides of the curve look
-like"~\cite{hanek2004contracting}.
+like"~\cite{hanek2004contracting}, which is known as likelihood.
+\item \textbf{Refining parameters}: The conditional distribution, namely
+  the product of prior distribution and  the likelihood, is evaluated
+  as the cost function. Then MAP estimate is executed to optimize the
+  parameters, as a result, MAP value of model parameters vector and
+  covariance will be given in this step.
+\item \textbf{Checking Convergence}: Check for convergence of either
+  the parameters or log cost function. If the convergence criterion is
+  not satisfied return to step 2.
+\end{enumerate}
+Fig.\ref{fig:flowchart} gives the flow chart of the CCD algorithm.
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=10cm]{images/flowchart.png}
+  \caption[The flow chart of
+  the CCD algorithm ]{The flow chart of the CCD algorithm}
+  \label{fig:flowchart}
+\end{figure}
+
 
 % The CCD algorithm has some interesting similarities to the Expectation-Maximization
 % (EM) algorithm (Dempster et al., 1977), which is often used for clustering-based image
@@ -319,8 +383,7 @@ like"~\cite{hanek2004contracting}.
 \label{sec:overview}
 The remainder of the work at hand is organized as
 follows. Chapter~\ref{chapter:related} describes the related work on
-an active contour,
-curve-fitting, image segmentation, object tracking and optimization methods will be
+active contour, model-based image segmentation and tracking, optimization methods will be
 introduced. In Chapter~\ref{chapter:SHI}, we give a brief introduction of software
 and hardware infrastructure used in the implementation of the CCD
 approach. We will concern the OpenCV library, ROS and PR2. Details on shape-space models and parametric
