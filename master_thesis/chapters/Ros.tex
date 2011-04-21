@@ -1,8 +1,8 @@
 \chapter{Software and Hardware Infrastructure}
 \label{chapter:SHI}
-In this chapter, we will introduce the software and hardware
+In this chapter, we will describe the software and hardware
 infrastructure used in this thesis. In Section~\ref{sec:ros} we introduce the
-Robo Operation System. The PR2 robot will be presented in Section
+Robot Operating System. The PR2 robot will be presented in Section
 ~\ref{sec:pr2}. This is followed by the introduction of OpenCV library.
 
 \section{The Robot Operating System (ROS)}
@@ -14,8 +14,8 @@ Robo Operation System. The PR2 robot will be presented in Section
 ROS is an open-source, meta-operating framework for robot software
 development. Ros was originally developed in 2007 by Stanford Artificial Intelligence Laboratory in support of the Stanford AI Robot~\cite{quigley2007stair}. Like an ordinary operating system, it consists of  robot
 hardware resources management, low-level device control, implementation
-of commonly-used functionality, interprocesses comunication (IPC), and package
-management. ROS is based on a pere-to-peer network architecture where
+of commonly-used functionality, inter-processes communication (IPC), and package
+management. ROS is based on a peer-to-peer network architecture where
 processing takes place in nodes that may receive, post and 
 multiplex sensor, control, state, planning, actuator and other
 messages. There are several different styles of communication, including synchronous RPC-style communication over services, asynchronous
@@ -24,10 +24,10 @@ Server.
 Moreover, ROS provides tools and libraries for obtaining, building, writing, and
 running code across multiple computers.
 
-ROS is composed of operation system wide library \textbf{ros} and
-\textbf{ros-pkg}. The former one is a fundamental library as described
-above and the later one is a suit of user contributed packages which
-are organized into sets called \textbf{stacks}. The stacks include
+ROS is composed of operating system wide library \textit{ros} and
+\textit{ros-pkg}. The former one is a fundamental library as described
+above and the latter one is a suit of user contributed packages which
+are organized into sets called \textit{stacks}. The stacks include
 many application areas, such as  perception, object identification,
 segmentation and recognition, face recognition, motion tracking ,
 stereopsis stereo vision, control, planning, grasping and so on. ROS has been ported to many robots and boards.
@@ -38,29 +38,29 @@ share and collaborate among developers. Moreover, ROS has many
 features, such as compact framework, language independence, easy
 testing and scalability.
 
-ROS currently run on on Unix-like operating systems towards which the libary is
-geared. Currenty Ubuntu Linux is greatly supported. Moreover, The core
+ROS currently run on on Unix-like operating systems towards which the library is
+geared. Currently Ubuntu Linux is greatly supported. Moreover, The core
 ROS system and its tools and libraries are regularly released as ROS
 Distributions~\cite{rosintroduction} under the terms of the BSD license.
 
 \section{PR2}
 \label{sec:pr2}
-Personal Robot 2 (PR2) is a personal robitics research and development
+Personal Robot 2 (PR2) is a personal robotics research and development
 platform.  It is developed by Willow Garage.  PR2 has two 7-DOF arms and a mobile
 base, and its size  is similar to a human. Its sensors system consists of a 5
-megapixel camera, a tilting laser range finder, and an inertial
+mega-pixel camera, a tilting laser range finder, and an inertial
 measurement unit. The "texture projector" on PR2 can project a pattern
 on the environment to create 3D information captured by the
-cameras. PR2 is equiped with 16 CPU cores with 48 Gigabytes of
+cameras. PR2 is equipped with 16 CPU cores with 48 Gigabytes of
 RAM. Its battery system consists of 16 laptop batteries. PR2 is
-controled with ROS system as described in Section~\ref{sec:ros} which
-consistes of a series of libraries for perception, navigation and
+controlled with ROS system as described in Section~\ref{sec:ros} which
+consists of a series of libraries for perception, navigation and
 manipulation.
-The experiments of this thesis are partly delivered in PR2 system (Fig.~\ref{fig:pr2}).
+The experiments of this thesis are partly delivered on PR2 system (Fig.~\ref{fig:pr2}).
 
 \begin{figure}[htbp]
   \centering
-\includegraphics[width=\linewidth]{images/pr2.png}
+\includegraphics[width=\linewidth]{images/pr2.jpg}
   \caption[A PR2 robot]{The PR2 robot locate in Cognition for
     Technical Systems (CoTeSys) Lab in Technische Universit\"at M\"unchen.}
   \label{fig:pr2}
@@ -88,24 +88,22 @@ system).
 
 \begin{figure}[htbp]
   \centering
-\includegraphics[width=\linewidth]{images/bsopencv.png}
+\includegraphics[width=\linewidth]{images/bsopencv.jpg}
   \caption{The basic structure of OpenCV~\cite{bradski2008learning}}
   \label{fig:bsopencv}
 \end{figure}
 
 Currently, OpenCV consists of following five main components~\cite{bradski2008learning}.
 \begin{itemize}
-\item \textbf{Cv}: image processing and vision algorithms
-\item \textbf{MLL}: machine learning library, including statistical classifiers and clustering tools
+\item \textbf{Cv}: Image processing and vision algorithms
+\item \textbf{MLL}: Machine learning library, including statistical classifiers and clustering tools
 \item \textbf{HighGUI}: Graphic user interface and Input/Output
   routines for image and video.
-\item \textbf{CvCore}: the basic data structures and content
-\item \textbf{CvAux}: contains defunct areas (embedded HMM face
+\item \textbf{CvCore}: The basic data structures and content
+\item \textbf{CvAux}: Contains defunct areas (embedded HMM face
   recognition) and experimental algorithms (background/foreground
   segmentation).
 \end{itemize}
 
 The B-spline and CCD algorithm in this thesis is implemented using the
 OpenCV library.
-
-

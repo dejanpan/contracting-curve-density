@@ -2,32 +2,38 @@
 %%% mode: latex
 %%% TeX-master: "../main"
 %%% End: 
-\chapter{Related work}
+\chapter{Related Work}
 \label{chapter:related}
 
 As mentioned in the previous chapter, the
-CCD approach introduced in this chapter is a model-based computer
+CCD approach introduced in this thesis is a model-based computer
 vision algorithm. In the field of
 computer vision, the topics of model-based approach have been addressed in numerous research papers.
 In this chapter we review selected publications related to the topics
 covered in this thesis and try to reveal the evolution of algorithms. The
 articles have been carefully selected based on the following criteria:
 \begin{itemize}
-\item Articles on 2-Dimensional and 3-Dimensional deformable models,
-  such as snakes and gradient vector flow deformable models~\cite{xu2000gradient}.
+\item Articles on 2-D and 3-D deformable models,
+  such as Snakes and gradient vector flow deformable models.
 \item Articles on applying statistical knowledge to the models
 \end{itemize}
-There are possible overlaps in the two categories. We will discuss the
-advantages and limitations of these methods related to the work we aim
-to solve. In section~\ref{2d3ddm} we will discuss the related work
+Currently, the second category becomes very popular. The CCD algorithm proposed in
+~\cite{hanek2004contracting} is insprired those methods for solving
+supervised learning problems (e.g. regression, classification) in
+the context of probability.
+
+In section~\ref{sec:2d3ddm} we will discuss the related work
 belonging to the first category. This is followed by the introduction
 of previous work on statistical models.
 % The topics of active contour, the Contracting
 % Curve Density approach and model tracking have been addressed in
 % numerous research papers.
 
-\section{2-Dimensional and 3-Dimensional deformable model}
+\section{2-D and 3-D Deformable Models}
 \label{sec:2d3ddm}
+
+\subsection{2-D \& 3-D Models}
+\label{sec:23m}
 Many traditional segmentation methods are effected by the assumption that the
 images studied in computer vision are usually self-contained, namely,
 the information needed for a successful segmentation can be extracted
@@ -35,26 +41,29 @@ from the images.
 
 In 1980s, a paradigm named \textit{Active Vison}~\cite{aloimonos1988active} escaped this bind and
 pushed the vision process in a more goal-directed fashion. After that, a
-notably successful departure, the \textit{Snake}, is proposed in a
-seminar work conducted by Kass~\cite{kass1988snakes}. The original paper~\cite{kass1988snakes}, spawned many variations
-and extensions including the use of Fourier parameterisation~\cite{scott1987alternative}, incorporation
-of a topologically adaptable model~\cite{mcinerney1995topologically} and
-its application~\cite{mcinemey1999topology}, incorporation of a discrete
-dynamic contour model~\cite{lobregt1995discrete}. A realization of snakes
-using B-splines was developed in~\cite{brigger2000b}. In two
-dimensions, The snake has a variation named active shape
+notably successful departure, the \textit{Snakes}, is proposed in a
+seminar work conducted by Kass~\cite{kass1988snakes}. The original paper, spawned many variations
+and extensions including the use of Fourier
+parameterisation~\cite{scott1987alternative}, and incorporation
+of a topologically adaptable models~\cite{mcinerney1995topologically},
+thereof application~\cite{mcinemey1999topology} and incorporation of a discrete
+dynamic contour model~\cite{lobregt1995discrete}. A realization of the
+Snakes using B-splines was developed in~\cite{brigger2000b}. In two
+dimensions, the Snakes have a variation named active shape
 model~\cite{cootes1995active}, which is a discrete version of this
 approach. Gradient Vector Flow~\cite{xu1998snakes}, or GVF, is an extension developed
-based on a new type of external field. Another paper written by the same
-authors~\cite{xu2000gradient} is concerned with the convergence properties of
-deformable models. In three dimensions, a good deal of research work has
-been conducted on matching three-dimensional models, both on rigid
-~\cite{harris1993tracking} and deformable~\cite{terzopoulos1991dynamic} shapes. 
-
-Besides the segmentation,
-dynamic models, such as snake and its variations, are greatly used in application of object
+based on a new type of external field. In~\cite{xu2000gradient}
+authors are concerned with the convergence properties of deformable
+models. In three dimensions, a good deal of research work has been
+conducted on matching three-dimensional models, both on rigid
+~\cite{harris1993tracking} and deformable~\cite{terzopoulos1991dynamic} shapes.
+\subsection{Appliocations}
+\label{sec:app}
+Model-based segmentation methods are widly used in the field of
+medical image processing. Besides the segmentation,
+dynamic models, such as the Snakes and its variations, are greatly used in application of object
 tracking. A real-time tracking system based on deformable models, such
-as snakes, is developed
+as the Snakes, is developed
 in~\cite{terzopoulos1992tracking}. It proved that the active shape and
 motion estimators are able to deal very effectively with the complex
 motions of nonrigid objects. Furthermore, the combination of active
@@ -72,48 +81,53 @@ and 1980s when a new interpretation of image was proposed in the
 statistical community.  Analyzing the model problems in probabilistic
 context has two great advantages. The first is that it approaches the
 nature of the problems, the ranges of shapes are defined by a
-probability, this provides another viewpoint for curve fitting problem
+probability, this provides another viewpoint for curve-fitting problem
 in the field of computer vision. Another advantage is that after we
-convert a problem in pattern recognition, there are abundant tools and
-skills to deal with such a problem. 
+convert a problem in pattern recognition, there are abundant tools to deal with such problems. 
 The CCD approach is a method developed in the probabilistic context. 
 
 In~\cite{kelemen1999three} and~\cite{kelemen1999elastic}, an elegant
 use of statistical models for the segmentation of medical images is
 designed.  The resulting segmentation system consists of building
 statistical models and automatic segmentation of new image data
-sets by restricting elastic deformation of models.  The work
+sets by restricting elastic deformation of models.  The works
 in~\cite{sclaroff2001deformable} and~\cite{liu1999deformable} also
 exploit the prior knowledge from the perspective of probability,
 furthermore, the statistical shape models enforce the prior
 probabilities on objects by designing a complicated energy function.  In this thesis, we assume that the shapes' priors have a Gaussian form in
 shape-space. In the case of a norm-squared density over  quadratic spline space,
-the prior is a Gaussian Markov Random Field (MRF)~\cite{blake1998active}, which is used widely  for modelling prior
-distributions for curves~\cite{storvik1994bayesian}.
+the prior is a Gaussian Markov Random Field
+(MRF)~\cite{blake1998active}, which is used widely  for modelling
+prior distributions for curves~\cite{storvik1994bayesian}.
 
-
-However, defining a prior distribution for shape is only part of the
-problem. Prior knowledge only controls the feature interpretation in an
-image. A successful segmentation or curve fitting requires
-obtaining the posterior distribution, which takes account of what
-shape is actually likely to be present in a particular image. Inspired
-by the iterative algorithm k-means~\cite{ding2004k} and
-Expectation-Maximization (EM)~\cite{dempster1977maximum} algorithm, especially the later one, a novel
-curve fitting method the CCD algorithm is proposed in
-~\cite{hanek2004contracting}. Bayesian treatment is used in this
-algorithm for incorporation of maximum a posteriori probability (MAP)
-~\cite{sorenson1980parameter} estimate instead of a complicated cost
-function. Unlike the EM algorithm, the CCD uses local statistics
-instead of global statistics. Moreover, blurred curve models is
-proposed as efficient means for iteratively optimizing. The algorithm
+Defining a prior distribution for shape is only part of the
+problem, prior knowledge only controls the feature interpretation in an
+image, also it just approximates the contour of an observed object. It
+is not difficult to determine the model parameters vector by maximum
+likelihood because there is usually no closed-solution. An indirect
+approach known as iterative reweighted least squares
+(IRLS)~\cite{bishop2006pattern} is used find the parameters of the model.
+the CCD  algorithm uses local statistics to evaluate a conditional distribution
+(Likelihood), then iterative maximum a posteriori probability (MAP)
+~\cite{sorenson1980parameter} estimate process is used to refine
+parameters instead of maximizing a complex cost function. 
+Moreover, a blurred curve model is proposed as a efficient mean for iteratively optimizing. The algorithm
 can be used in object localization and object tracking. As an example
 of applications of the CCD approach, an efficient, robust and fully
 automatic real-time system for 3D object pose tracking in
-image sequences is presented in~\cite{panin2006fully} and~\cite{panin2006efficient}. MultiOcular Contracting Curve Density
+image sequences is presented in~\cite{panin2006fully}
+and~\cite{panin2006efficient}. MultiOcular Contracting Curve Density
 algorithm (MOCCD)~\cite{hahn2007tracking} is an extension of the CCD
-approach. In the paper, it is integrated into the tracking system of the human body. 
+approach. In the paper, it is integrated into the tracking system of
+the human body. 
+% A successful segmentation or curve fitting requires to
+% construct the posterior distribution, which accounts for what
+% shape is actually likely to be present in a particular image. 
+ % Bayesian treatment is used for incorporation of 
+% Unlike the EM algorithm, the CCD uses local statistics
+% instead of global statistics.
 
-Both the snake and CCD can be used to build naive tracking
+Both the Snakes and CCD can be used to build naive tracking
 system. However, they are limited by the performance and stability
 problems. Several methods achieve a speed-up by propagating a Gaussian
 distribution of the model parameters over time, such as tracking based
@@ -126,16 +140,16 @@ pixels on some perpendiculars like the condensation algorithm, but
 focuses on the vicinity of the contour. This means the CCD tracker can
 save time and improve performance.
 
-In the CCD algorithm and its variations, the curve fitting probelm is
-often converted to an optimization one. The optimization step is
-outstanding important for the CCD approach. There are many methods to
+In the CCD algorithm and its variations, the curve fitting process is
+often addressed in an optimization stage. The optimization step is
+very important for the CCD approach. There are many methods to
 deal with optimization, which can be classified into two
 categories, one is that global optimization and another is the local
-optimization~\cite{hanek2004fitting}. The later one is used in the CCD
+optimization. The latter one is used in the CCD
 approach. First, a smoothed objective function is obtained by fitting
 the curve model to a large scale description. Then the window's size is
 gradually reduced. During the process, many types of  numerical
-optimization  methods such as  conjugate gradient method , Newton's
-method, Gaussian-Newton and Levenberg-Marquardt algorithm~\cite{contourpanin2011} can be used.
-
-
+optimization methods such as  conjugate gradient method , Newton's
+method, Gaussian-Newton and Levenberg-Marquardt
+algorithm~\cite{contourpanin2011}, least squares support vector
+machine (LS-SVM)~\cite{vapnik2000nature} can be used.

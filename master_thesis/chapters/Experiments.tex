@@ -38,11 +38,11 @@ vision(Fig.~\ref{fig:flower_m}).
 \begin{figure}[htbp]
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-        \subfloat[the origin image]{\includegraphics[width=2.5in]{images/segmentation/flowers.png}}
+        \subfloat[the origin image]{\includegraphics[width=2.5in]{images/segmentation/flowers.jpg}}
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[the ROI]{\includegraphics[width=2.5in]{images/segmentation/flowers_m.png}}
+    \subfloat[the ROI]{\includegraphics[width=2.5in]{images/segmentation/flowers_m.jpg}}
   \end{minipage}
 \caption[Segmentation a flower petal from a cluster of flowers]{The
   origin image is a little clutter, the border of the ROI in b) can
@@ -71,27 +71,27 @@ advantages:
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Sobel]{\includegraphics[width=2.5in]{images/flowers_sobel.png}}
+    \subfloat[Sobel]{\includegraphics[width=2.5in]{images/flowers_sobel.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Watershed algorithm]{\includegraphics[width=2.5in]{images/flowers_watershed.png}}
+    \subfloat[Watershed algorithm]{\includegraphics[width=2.5in]{images/flowers_watershed.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Graph cut]{\includegraphics[width=2.5in]{images/flowers_graph.png}}
+    \subfloat[Graph cut]{\includegraphics[width=2.5in]{images/flowers_graph.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Kmeans++]{\includegraphics[width=2.5in]{images/flowers_kmeans.png}}
+    \subfloat[Kmeans++]{\includegraphics[width=2.5in]{images/flowers_kmeans.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Expectation and Maximization]{\includegraphics[width=2.5in]{images/flowers_em.png}}
+    \subfloat[Expectation and Maximization]{\includegraphics[width=2.5in]{images/flowers_em.jpg}}
   \end{minipage}
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[CCD]{\includegraphics[width=2.5in]{images/flowers_ccd.png}}
+    \subfloat[CCD]{\includegraphics[width=2.5in]{images/flowers_ccd.jpg}}
   \end{minipage}% 
 \caption[Resulting images after applying some segmentation methods]{a)
   Edges are detected by a gradient-based algorithm~\cite{scharr2000optimal}. b) Watershed algorithm takes an image as a
@@ -141,19 +141,19 @@ from the observed object.
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-        \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/ball/0.png}}
+        \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/ball/0.jpg}}
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 3]{\includegraphics[width=2.5in]{images/ball/2.png}}
+    \subfloat[iteration 3]{\includegraphics[width=2.5in]{images/ball/2.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 7]{\includegraphics[width=2.5in]{images/ball/6.png}}
+    \subfloat[iteration 7]{\includegraphics[width=2.5in]{images/ball/6.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 16]{\includegraphics[width=2.5in]{images/ball/15.png}}
+    \subfloat[iteration 16]{\includegraphics[width=2.5in]{images/ball/15.jpg}}
   \end{minipage} 
 \caption[Segmentation of a ball]{There is a translation between the
   initial hypothesis and the contour of the observed object. However, It is
@@ -180,19 +180,19 @@ CCD algorithm can achieve high sub-pixel accuracy.
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/ball_normal/0.png}}
+    \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/ball_normal/0.jpg}}
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 3]{\includegraphics[width=2.5in]{images/ball_normal/1.png}}
+    \subfloat[iteration 3]{\includegraphics[width=2.5in]{images/ball_normal/1.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 5]{\includegraphics[width=2.5in]{images/ball_normal/3.png}}
+    \subfloat[iteration 5]{\includegraphics[width=2.5in]{images/ball_normal/3.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 6]{\includegraphics[width=2.5in]{images/ball_normal/4.png}}
+    \subfloat[iteration 6]{\includegraphics[width=2.5in]{images/ball_normal/4.jpg}}
   \end{minipage} 
 \caption[Pixels used in each iteration]{Generally, compared with other
   algorithm, the pixels used in the CCD algorithm are much less. In
@@ -218,11 +218,11 @@ will be detected. This can be evidenced in the fitting experiment (Fig.~\ref{fig
 \begin{figure}[htbp]
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[]{\includegraphics[width=2.5in]{images/box1.png}}
+    \subfloat[]{\includegraphics[width=2.5in]{images/box1.jpg}}
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[]{\includegraphics[width=2.5in]{images/box2_mismatch.png}}
+    \subfloat[]{\includegraphics[width=2.5in]{images/box2_mismatch.jpg}}
   \end{minipage} 
   \caption[Planar space can not encompass a general non-planar
   contour]{a) A planar affine space of contours has been fitted from
@@ -252,11 +252,11 @@ of shape matrix for 3-dimensional case can be given by
 \begin{figure}[htbp]
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[]{\includegraphics[width=2.5in]{images/box2_3d.png}}
+    \subfloat[]{\includegraphics[width=2.5in]{images/box2_3d.jpg}}
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[]{\includegraphics[width=2.5in]{images/box2_ok.png}}
+    \subfloat[]{\includegraphics[width=2.5in]{images/box2_ok.jpg}}
   \end{minipage} 
   \caption[Non-planar contour has been successfully fitted]{The
     contour of a cube which could not be encompassed in a planar
@@ -280,19 +280,19 @@ demonstrates that the CCD works well for 3-D non-planar object.
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/container/0.png}}
+    \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/container/0.jpg}}
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 2]{\includegraphics[width=2.5in]{images/container/1.png}}
+    \subfloat[iteration 2]{\includegraphics[width=2.5in]{images/container/1.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 4]{\includegraphics[width=2.5in]{images/container/2.png}}
+    \subfloat[iteration 4]{\includegraphics[width=2.5in]{images/container/2.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 7]{\includegraphics[width=2.5in]{images/container/5.png}}
+    \subfloat[iteration 7]{\includegraphics[width=2.5in]{images/container/5.jpg}}
   \end{minipage} 
 \caption[Three-dimensional affine shape-space for rigid object]{The
   non-planar polyhedron is encompassed by a 3D affine space}
@@ -316,19 +316,19 @@ detect that the convergence happens in the transparent part.
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/bottle/0.png}}
+    \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/bottle/0.jpg}}
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 2]{\includegraphics[width=2.5in]{images/bottle/1.png}}
+    \subfloat[iteration 2]{\includegraphics[width=2.5in]{images/bottle/1.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 3]{\includegraphics[width=2.5in]{images/bottle/2.png}}
+    \subfloat[iteration 3]{\includegraphics[width=2.5in]{images/bottle/2.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 21]{\includegraphics[width=2.5in]{images/bottle/20.png}}
+    \subfloat[iteration 21]{\includegraphics[width=2.5in]{images/bottle/20.jpg}}
   \end{minipage} 
 \caption[Segmentation of a transparent bottle]{in image (d), Due the shadow and poor
 contrast, the contour does not completely attach to the edge of the
@@ -352,24 +352,24 @@ the partial occlusion.
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering  
-    \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/book/0.png}}    
+    \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/book/0.jpg}}    
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 2]{\includegraphics[width=2.5in]{images/book/1.png}}
+    \subfloat[iteration 2]{\includegraphics[width=2.5in]{images/book/1.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 3]{\includegraphics[width=2.5in]{images/book/2.png}}
+    \subfloat[iteration 3]{\includegraphics[width=2.5in]{images/book/2.jpg}}
     \label{subfig:iteration 3}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 14]{\includegraphics[width=2.5in]{images/book/13.png}}
+    \subfloat[iteration 14]{\includegraphics[width=2.5in]{images/book/13.jpg}}
   \end{minipage}
   \begin{minipage}[t]{\linewidth} 
     \centering 
-    \subfloat[segmentation of edge-based algorithm]{\includegraphics[width=0.8\linewidth]{images/book/book_sobel.png}}
+    \subfloat[segmentation of edge-based algorithm]{\includegraphics[width=0.8\linewidth]{images/book/book_sobel.jpg}}
   \end{minipage} 
 \caption[Fitting a rigid wire frame in a inhomogeneous background]{The book
   is located in a partially occluded background. From (a)-(d), despite
@@ -467,7 +467,7 @@ template image.
 
 \begin{figure}[htbp]
   \centering
-\includegraphics[width=\linewidth]{images/sift.png}
+\includegraphics[width=\linewidth]{images/sift.jpg}
 \caption[Contour initialization using the SIFT algorithm]{The image in
   the upper-left corner is a template. It is projected into the bottom
   image. The green points in the template encompass the
@@ -484,7 +484,7 @@ template image.
 
 \begin{figure}[htbp]
   \centering
-\includegraphics[width=\linewidth]{images/sift_result.png}
+\includegraphics[width=\linewidth]{images/sift_result.jpg}
 \caption[The contour obtained using the CCD algorithm converges to the
 edge of the book]{After 8 iterations, the contour obtained in Fig.~\ref{fig:sift} converges to the edge of the book. However, in our
   implementation, the SIFT algorithm can only cope with 2-Dimensional
@@ -500,28 +500,28 @@ our naive CCD tracker on PR2, the result is demonstrated in Fig.~\ref{fig:siftra
 \begin{figure}[htbp]
   \begin{minipage}[t]{0.5\linewidth} 
     \centering  
-    \subfloat[Sampled frame 1]{\includegraphics[width=2.5in]{images/sift/1.png}}    
+    \subfloat[Sampled frame 1]{\includegraphics[width=2.5in]{images/sift/1.jpg}}    
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Sampled frame 2]{\includegraphics[width=2.5in]{images/sift/10.png}}
+    \subfloat[Sampled frame 2]{\includegraphics[width=2.5in]{images/sift/10.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Sampled frame 3]{\includegraphics[width=2.5in]{images/sift/30.png}}
+    \subfloat[Sampled frame 3]{\includegraphics[width=2.5in]{images/sift/30.jpg}}
     \label{subfig:iteration 3}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Sampled frame 4]{\includegraphics[width=2.5in]{images/sift/45.png}}
+    \subfloat[Sampled frame 4]{\includegraphics[width=2.5in]{images/sift/45.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Sampled frame 5]{\includegraphics[width=2.5in]{images/sift/63.png}}
+    \subfloat[Sampled frame 5]{\includegraphics[width=2.5in]{images/sift/63.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Sampled frame 6]{\includegraphics[width=2.5in]{images/sift/80.png}}
+    \subfloat[Sampled frame 6]{\includegraphics[width=2.5in]{images/sift/80.jpg}}
   \end{minipage} 
   \caption[The tracking result based on SIFT contour initialization]{The
     CCD tracker successfully tracks the motion of a book. However, in
@@ -545,7 +545,7 @@ for manufactured parts, a multitude of visualization, animation and
 rendering.
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=\linewidth]{images/pr2b.png}
+  \includegraphics[width=\linewidth]{images/pr2b.jpg}
   \caption[Point cloud of a book rendered in rivz]{A point cloud is
     generated by the scanner in PR2.}
   \label{fig:pointcloud}
