@@ -48,11 +48,11 @@ int main( int argc, char** argv )
 
   CvEM em_model;
   CvEMParams params;
-  CvMat *pointMat = cvCreateMat( sampleCount, 3, CV_32FC1 );
+  CvMat *samples = cvCreateMat( sampleCount, 3, CV_32FC1 );
 
-  int step = pointMat->step/sizeof(CV_32F);
+  int step = samples->step/sizeof(CV_32F);
 
-  float *ptr = pointMat->data.fl;
+  float *ptr = samples->data.fl;
   for (int i = 0; i < sampleCount; ++i)
   {
     (ptr+i*step)[0] = points.ptr<double>(i)[0];
@@ -61,13 +61,55 @@ int main( int argc, char** argv )
   }
 
   CvMat labelsMat = labelsKmeans;
-  CvMat *samples = pointMat;
   CvMat *labels = &labelsMat;
 
+  CvMat **initCovs = (CvMat**)cvAlloc( clusterCount * sizeof(*initCovs));
+  // for (int i = 0; i < clusterCount; ++i)
+  // {
+  //   cvCalcCovarMatrix( vec, cluster_size, initCovs[i], &avg, CV_COVAR_NORMAL | CV_COVAR_SCALE )
+  // }
+
+  CvMat *initMeans = cvCreateMat(clusterCount,3, CV_64FC1);
+  cvZero(initMeans);
+  double *mptr = initMeans->data.db;
+  int dstep = initMeans->step/sizeof(CV_64F);
+
+  std::vector<int> clusterPoints(clusterCount,0);
+  for (int i = 0 ; i < sampleCount; ++i)
+  {
+    clusterPoints[labelsKmeans.at<int>(i)] += 1;
+    (mptr+labelsKmeans.at<int>(i)*dstep)[0] += (ptr+i*step)[0];
+    (mptr+labelsKmeans.at<int>(i)*dstep)[1] += (ptr+i*step)[1];
+    (mptr+labelsKmeans.at<int>(i)*dstep)[2] += (ptr+i*step)[2];
+  }
+  for (int i = 0; i < clusterCount; ++i)
+  {
+    (mptr+i*dstep)[0] /= clusterPoints[i];
+    (mptr+i*dstep)[1] /= clusterPoints[i];
+    (mptr+i*dstep)[2] /= clusterPoints[i];
+  }
+
+
+  CvMat *initWeights = cvCreateMat(1, clusterCount, CV_64FC1);
+  mptr = initWeights->data.db;
+  for (int i = 0; i < clusterCount; ++i)
+  {
+    (mptr+i*dstep)[0] = clusterPoints[i]/sampleCount;
+  }
+
+  CvMat *initProbs = cvCreateMat(sampleCount, clusterCount, CV_64FC1);
+  cvZero(initProbs);
+  mptr = initProbs->data.db;
+  
+  for (int i = 0; i < sampleCount; ++i)
+  {
+    (mptr + i*dstep)[labelsKmeans.at<int>(i)] = 1;
+  }
+
   params.covs      = NULL;
-  params.means     = NULL;
-  params.weights   = NULL;
-  params.probs     = NULL;
+  params.means     = initMeans;
+  params.weights   = initWeights;
+  params.probs     = initProbs;
   params.nclusters = clusterCount;
   params.cov_mat_type       = CvEM::COV_MAT_SPHERICAL;
   params.start_step         = CvEM::START_AUTO_STEP;
@@ -97,14 +139,14 @@ int main( int argc, char** argv )
 
   for (int i = 0 ; i < image.rows; ++i)
   {
-  for (int j = 0; j < image.cols; ++j)
-  {
-  int imgRow = i*image.cols+j;
-  imgS(i,j)[0] = colorTab[labelsKmeans.at<int>(imgRow)][0];
-  imgS(i,j)[1] = colorTab[labelsKmeans.at<int>(imgRow)][1];
-  imgS(i,j)[2] = colorTab[labelsKmeans.at<int>(imgRow)][2];
-}
-}  
+    for (int j = 0; j < image.cols; ++j)
+    {
+      int imgRow = i*image.cols+j;
+      imgS(i,j)[0] = colorTab[labelsKmeans.at<int>(imgRow)][0];
+      imgS(i,j)[1] = colorTab[labelsKmeans.at<int>(imgRow)][1];
+      imgS(i,j)[2] = colorTab[labelsKmeans.at<int>(imgRow)][2];
+    }
+  }  
   imshow("clusters", imageShow);
   imwrite("flowers_kmeans.png", imageShow);
   waitKey(0);

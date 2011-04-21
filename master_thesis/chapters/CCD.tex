@@ -54,11 +54,11 @@ B-Spline in $\mathbb{R}^2$, which is discussed in Chapter~\ref{chapter:bspline}.
 Given a ROI (region of interest), the first step is generating
 sufficient control points $\mathbf{P} = \{P_0, \ldots, P_{N_p-1}\}$ to
 do justice to the complexity of the object shape
-(Figure~\ref{fig:curves}).
+(Fig.~\ref{fig:curves}).
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=\linewidth]{images/curves.png}
+  \includegraphics[width=\linewidth]{images/curves.jpg}
 \caption[The parametric of some tropical fruits]{The blue curves are
   the parametric contours of some tropical fruits [\\
   http://visual.merriam-webster.com/images/food-kitchen/food/fruits/tropical-fruits\_4.jpg
@@ -98,7 +98,7 @@ vector with 6 real elements $\mathbf{\Phi}$, namely model
 parameters. From the perspective of probability, the hypothetical
 curve gives a uncertainty, the solution of the curving problem is
 therefore no longer just a single curve, but a whole family of
-possible curves (\ref{fig:prior}). The Gaussian probability density for these possible
+possible curves (Fig.~\ref{fig:prior}). The Gaussian probability density for these possible
 curves in shape-space $\mathcal{S}$ is:
 
 \begin{equation}
@@ -111,7 +111,7 @@ curves in shape-space $\mathcal{S}$ is:
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=10cm]{images/prior.png}
+  \includegraphics[width=10cm]{images/prior.jpg}
 \caption[Sampling from curve families~\cite{blake1998active}]{The top
   figure is the mean shape, the left one represents the euclidean
   similarities, the right one
@@ -253,16 +253,16 @@ the probability is defined by
 \end{equation}
 which has used the error function of a Gaussian distribution. Both
 two functions in eq.\ref{eg:erf} and eq.\ref{eq:logistic} are
-S-shaped~\ref{fig:s-shaped}.
+S-shaped Fig.~\ref{fig:s-shaped}.
 
 \begin{figure} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-        \subfloat[logistic sigmoid function]{\includegraphics[width=8.0cm]{images/logistic.png}}
+        \subfloat[logistic sigmoid function]{\includegraphics[width=8.0cm]{images/logistic.jpg}}
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[error function]{\includegraphics[width=8.0cm]{images/erf.png}}
+    \subfloat[error function]{\includegraphics[width=8.0cm]{images/erf.jpg}}
   \end{minipage} 
 \caption[Logistic sigmoid function and error function]{Both functions
   are S-shaped}
@@ -312,11 +312,11 @@ holds $4$ for the truncated Gaussian~\cite{hanek2004contracting}.
 \begin{figure} 
   \begin{minipage}[t]{0.45\linewidth} 
     \centering 
-        \subfloat[]{\includegraphics[width=2.0in]{images/weight1.png}}
+        \subfloat[]{\includegraphics[width=2.0in]{images/weight1.jpg}}
   \end{minipage}% 
   \begin{minipage}[t]{0.45\linewidth} 
     \centering 
-    \subfloat[]{\includegraphics[width=2.0in]{images/weight2.png}}
+    \subfloat[]{\includegraphics[width=2.0in]{images/weight2.jpg}}
   \end{minipage} 
 \caption{the weight functions of the two sides of the contour, a) the
   weight function along the positive direction (outside) in the normal of the

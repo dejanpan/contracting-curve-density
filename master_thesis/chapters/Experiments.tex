@@ -33,16 +33,16 @@ is the partitioning of its domain into homogeneous regions
 $\Omega_1,\ldots, \Omega_n \subset \Omega$. In a complex environment,
 due to texture, shading, poor contrast and clutter, segmentation is
 always a challenging problem in the field of computer
-vision(Figure~\ref{fig:flower_m}).
+vision(Fig.~\ref{fig:flower_m}).
 
 \begin{figure}[htbp]
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-        \subfloat[the origin image]{\includegraphics[width=2.5in]{images/segmentation/flowers.png}}
+        \subfloat[the origin image]{\includegraphics[width=2.5in]{images/segmentation/flowers.jpg}}
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[the ROI]{\includegraphics[width=2.5in]{images/segmentation/flowers_m.png}}
+    \subfloat[the ROI]{\includegraphics[width=2.5in]{images/segmentation/flowers_m.jpg}}
   \end{minipage}
 \caption[Segmentation a flower petal from a cluster of flowers]{The
   origin image is a little clutter, the border of the ROI in b) can
@@ -65,33 +65,33 @@ converting a pure segmentation problem to a problem in pattern
 recognition, a large amount of techniques in the field of pattern
 recognition are introduced to solve segmentation problems, which are
 proved to be effective and helpful. Compared with other segmentation
-methods Figure~\ref{fig:seg_compaison}, such as intensive-based method,  cluster method, region-based
+methods Fig.~\ref{fig:seg_compaison}, such as intensive-based method,  cluster method, region-based
 method and compression-based methods, the CCD algorithm has following
 advantages:
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Sobel]{\includegraphics[width=2.5in]{images/flowers_sobel.png}}
+    \subfloat[Sobel]{\includegraphics[width=2.5in]{images/flowers_sobel.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Watershed algorithm]{\includegraphics[width=2.5in]{images/flowers_watershed.png}}
+    \subfloat[Watershed algorithm]{\includegraphics[width=2.5in]{images/flowers_watershed.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Graph cut]{\includegraphics[width=2.5in]{images/flowers_graph.png}}
+    \subfloat[Graph cut]{\includegraphics[width=2.5in]{images/flowers_graph.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Kmeans++]{\includegraphics[width=2.5in]{images/flowers_kmeans.png}}
+    \subfloat[Kmeans++]{\includegraphics[width=2.5in]{images/flowers_kmeans.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Expectation and Maximization]{\includegraphics[width=2.5in]{images/flowers_em.png}}
+    \subfloat[Expectation and Maximization]{\includegraphics[width=2.5in]{images/flowers_em.jpg}}
   \end{minipage}
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[CCD]{\includegraphics[width=2.5in]{images/flowers_ccd.png}}
+    \subfloat[CCD]{\includegraphics[width=2.5in]{images/flowers_ccd.jpg}}
   \end{minipage}% 
 \caption[Resulting images after applying some segmentation methods]{a)
   Edges are detected by a gradient-based algorithm~\cite{scharr2000optimal}. b) Watershed algorithm takes an image as a
@@ -141,19 +141,19 @@ from the observed object.
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-        \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/ball/0.png}}
+        \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/ball/0.jpg}}
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 3]{\includegraphics[width=2.5in]{images/ball/2.png}}
+    \subfloat[iteration 3]{\includegraphics[width=2.5in]{images/ball/2.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 7]{\includegraphics[width=2.5in]{images/ball/6.png}}
+    \subfloat[iteration 7]{\includegraphics[width=2.5in]{images/ball/6.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 16]{\includegraphics[width=2.5in]{images/ball/15.png}}
+    \subfloat[iteration 16]{\includegraphics[width=2.5in]{images/ball/15.jpg}}
   \end{minipage} 
 \caption[Segmentation of a ball]{There is a translation between the
   initial hypothesis and the contour of the observed object. However, It is
@@ -166,10 +166,10 @@ from the observed object.
 }
 \end{figure}
 
-In Figure~\ref{fig:sab}, we intentionally set a hypothesis which is far away
+In Fig.~\ref{fig:sab}, we intentionally set a hypothesis which is far away
 from the ball, but after about 15 iteration, we successfully fit the
 contour the edge of the ball. For the sake of a ground truth we need
-investigate the pixels used in the iterations. The Figure~\ref{fig:pon} shows
+investigate the pixels used in the iterations. The Fig.~\ref{fig:pon} shows
 that only a small number of pixels is taken into account after the
 contour starts to converge. However, these pixels contain the
 necessary information for refining the fitting. Because the pixels used
@@ -180,19 +180,19 @@ CCD algorithm can achieve high sub-pixel accuracy.
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/ball_normal/0.png}}
+    \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/ball_normal/0.jpg}}
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 3]{\includegraphics[width=2.5in]{images/ball_normal/1.png}}
+    \subfloat[iteration 3]{\includegraphics[width=2.5in]{images/ball_normal/1.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 5]{\includegraphics[width=2.5in]{images/ball_normal/3.png}}
+    \subfloat[iteration 5]{\includegraphics[width=2.5in]{images/ball_normal/3.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 6]{\includegraphics[width=2.5in]{images/ball_normal/4.png}}
+    \subfloat[iteration 6]{\includegraphics[width=2.5in]{images/ball_normal/4.jpg}}
   \end{minipage} 
 \caption[Pixels used in each iteration]{Generally, compared with other
   algorithm, the pixels used in the CCD algorithm are much less. In
@@ -214,15 +214,15 @@ suffice for non-planar surfaces. Imagine such a scenario, we generate the  plana
 space contour of a non-planar cube in the fist view. In the
 subsequent view the outline of the cube does not lie in the old
 space. Due the parallax effect the a mismatch in the fitted contour
-will be detected. This can be evidenced in the fitting experiment (Figure~\ref{fig:box_mismatch}).
+will be detected. This can be evidenced in the fitting experiment (Fig.~\ref{fig:box_mismatch}).
 \begin{figure}[htbp]
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[]{\includegraphics[width=2.5in]{images/box1.png}}
+    \subfloat[]{\includegraphics[width=2.5in]{images/box1.jpg}}
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[]{\includegraphics[width=2.5in]{images/box2_mismatch.png}}
+    \subfloat[]{\includegraphics[width=2.5in]{images/box2_mismatch.jpg}}
   \end{minipage} 
   \caption[Planar space can not encompass a general non-planar
   contour]{a) A planar affine space of contours has been fitted from
@@ -252,11 +252,11 @@ of shape matrix for 3-dimensional case can be given by
 \begin{figure}[htbp]
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[]{\includegraphics[width=2.5in]{images/box2_3d.png}}
+    \subfloat[]{\includegraphics[width=2.5in]{images/box2_3d.jpg}}
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[]{\includegraphics[width=2.5in]{images/box2_ok.png}}
+    \subfloat[]{\includegraphics[width=2.5in]{images/box2_ok.jpg}}
   \end{minipage} 
   \caption[Non-planar contour has been successfully fitted]{The
     contour of a cube which could not be encompassed in a planar
@@ -273,26 +273,26 @@ the following interpretation
 \end{equation}
 
 The expanded space now encompasses the outlines of all views of the three-dimensional
-outline, evidenced by Figure~\ref{fig:box_match}. At last, we do
+outline, evidenced by Fig.~\ref{fig:box_match}. At last, we do
 another experiments for a object with an irregular shape~\ref{fig:container}. This
 demonstrates that the CCD works well for 3-D non-planar object.
 
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/container/0.png}}
+    \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/container/0.jpg}}
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 2]{\includegraphics[width=2.5in]{images/container/1.png}}
+    \subfloat[iteration 2]{\includegraphics[width=2.5in]{images/container/1.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 4]{\includegraphics[width=2.5in]{images/container/2.png}}
+    \subfloat[iteration 4]{\includegraphics[width=2.5in]{images/container/2.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 7]{\includegraphics[width=2.5in]{images/container/5.png}}
+    \subfloat[iteration 7]{\includegraphics[width=2.5in]{images/container/5.jpg}}
   \end{minipage} 
 \caption[Three-dimensional affine shape-space for rigid object]{The
   non-planar polyhedron is encompassed by a 3D affine space}
@@ -305,7 +305,7 @@ In this thesis, local statistical information is collected in terms of
 pixel intensity in the vicinity of a contour, this leads to a poor
 result for transparent objects. In this experiment, the
 target is a cola bottle whose upper part is nearly transparent and the
-lower part is opaque. The result in Figure~\ref{fig:cola} shows that the CCD algorithm
+lower part is opaque. The result in Fig.~\ref{fig:cola} shows that the CCD algorithm
 can segment the lower part but can not completely encompass the contour in the
 upper part. However, because the model only have 6 (or 8
 for 3-dimensional object) degree of freedom, the convergence of other
@@ -316,19 +316,19 @@ detect that the convergence happens in the transparent part.
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/bottle/0.png}}
+    \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/bottle/0.jpg}}
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 2]{\includegraphics[width=2.5in]{images/bottle/1.png}}
+    \subfloat[iteration 2]{\includegraphics[width=2.5in]{images/bottle/1.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 3]{\includegraphics[width=2.5in]{images/bottle/2.png}}
+    \subfloat[iteration 3]{\includegraphics[width=2.5in]{images/bottle/2.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 21]{\includegraphics[width=2.5in]{images/bottle/20.png}}
+    \subfloat[iteration 21]{\includegraphics[width=2.5in]{images/bottle/20.jpg}}
   \end{minipage} 
 \caption[Segmentation of a transparent bottle]{in image (d), Due the shadow and poor
 contrast, the contour does not completely attach to the edge of the
@@ -342,7 +342,7 @@ in the right. The transparency leads to the difficulties. }
 \subsection{Fitting a rigid wire frame}
 \label{sec:fdo}
 In the following, we fit a rigid wire frame model to the image
-depicted in Figure~\ref{fig:wireframe}.  The degrees of freedom
+depicted in Fig.~\ref{fig:wireframe}.  The degrees of freedom
 are the 8 pose parameters. This experiment demonstrates that the CCD
 algorithm is not only able to exploit object contours, but it can also
 use internal model edges separating multiple, possibly dependent,
@@ -352,24 +352,24 @@ the partial occlusion.
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering  
-    \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/book/0.png}}    
+    \subfloat[iteration 1]{\includegraphics[width=2.5in]{images/book/0.jpg}}    
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 2]{\includegraphics[width=2.5in]{images/book/1.png}}
+    \subfloat[iteration 2]{\includegraphics[width=2.5in]{images/book/1.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 3]{\includegraphics[width=2.5in]{images/book/2.png}}
+    \subfloat[iteration 3]{\includegraphics[width=2.5in]{images/book/2.jpg}}
     \label{subfig:iteration 3}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[iteration 14]{\includegraphics[width=2.5in]{images/book/13.png}}
+    \subfloat[iteration 14]{\includegraphics[width=2.5in]{images/book/13.jpg}}
   \end{minipage}
   \begin{minipage}[t]{\linewidth} 
     \centering 
-    \subfloat[segmentation of edge-based algorithm]{\includegraphics[width=0.8\linewidth]{images/book/book_sobel.png}}
+    \subfloat[segmentation of edge-based algorithm]{\includegraphics[width=0.8\linewidth]{images/book/book_sobel.jpg}}
   \end{minipage} 
 \caption[Fitting a rigid wire frame in a inhomogeneous background]{The book
   is located in a partially occluded background. From (a)-(d), despite
@@ -458,8 +458,8 @@ correspondences and then minimizing corresponding norm.
 After obtaining the homography between the template image and the
 image being studied, the contour of object can be easily projected
 into the target image to obtain the estimate of the contour
-position. This is illustrated in Figure~\ref{fig:sift} on page
-\pageref{fig:sift} and Figure~\ref{fig:sift_result} on page
+position. This is illustrated in Fig.~\ref{fig:sift} on page
+\pageref{fig:sift} and Fig.~\ref{fig:sift_result} on page
 \pageref{fig:sift_result}. Note that because SIFT is only invariant for
 minor changes in view points, the method does not always work for
 non-planar object which has different viewpoint from the one in the
@@ -467,7 +467,7 @@ template image.
 
 \begin{figure}[htbp]
   \centering
-\includegraphics[width=\linewidth]{images/sift.png}
+\includegraphics[width=\linewidth]{images/sift.jpg}
 \caption[Contour initialization using the SIFT algorithm]{The image in
   the upper-left corner is a template. It is projected into the bottom
   image. The green points in the template encompass the
@@ -484,10 +484,9 @@ template image.
 
 \begin{figure}[htbp]
   \centering
-\includegraphics[width=\linewidth]{images/sift_result.png}
+\includegraphics[width=\linewidth]{images/sift_result.jpg}
 \caption[The contour obtained using the CCD algorithm converges to the
-edge of the book]{After 8 iterations, the contour obtained in Figure
-  ~\ref{fig:sift} converges to the edge of the book. However, in our
+edge of the book]{After 8 iterations, the contour obtained in Fig.~\ref{fig:sift} converges to the edge of the book. However, in our
   implementation, the SIFT algorithm can only cope with 2-Dimensional
   local features, but actually the book on the desk is a non-planar
   object. Therefore, the result is not as good as expected.}
@@ -496,34 +495,33 @@ edge of the book]{After 8 iterations, the contour obtained in Figure
 
 The model hypothesis is obtained by applying the CCD algorithm to a
 frame of a video sequence. In the following experiments, we can test
-our naive CCD tracker on PR2, the result is demonstrated in Figure
-~\ref{fig:siftracker} 
+our naive CCD tracker on PR2, the result is demonstrated in Fig.~\ref{fig:siftracker} 
 
 \begin{figure}[htbp]
   \begin{minipage}[t]{0.5\linewidth} 
     \centering  
-    \subfloat[Sampled frame 1]{\includegraphics[width=2.5in]{images/sift/1.png}}    
+    \subfloat[Sampled frame 1]{\includegraphics[width=2.5in]{images/sift/1.jpg}}    
   \end{minipage}% 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Sampled frame 2]{\includegraphics[width=2.5in]{images/sift/10.png}}
+    \subfloat[Sampled frame 2]{\includegraphics[width=2.5in]{images/sift/10.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Sampled frame 3]{\includegraphics[width=2.5in]{images/sift/30.png}}
+    \subfloat[Sampled frame 3]{\includegraphics[width=2.5in]{images/sift/30.jpg}}
     \label{subfig:iteration 3}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Sampled frame 4]{\includegraphics[width=2.5in]{images/sift/45.png}}
+    \subfloat[Sampled frame 4]{\includegraphics[width=2.5in]{images/sift/45.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Sampled frame 5]{\includegraphics[width=2.5in]{images/sift/63.png}}
+    \subfloat[Sampled frame 5]{\includegraphics[width=2.5in]{images/sift/63.jpg}}
   \end{minipage} 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[Sampled frame 6]{\includegraphics[width=2.5in]{images/sift/80.png}}
+    \subfloat[Sampled frame 6]{\includegraphics[width=2.5in]{images/sift/80.jpg}}
   \end{minipage} 
   \caption[The tracking result based on SIFT contour initialization]{The
     CCD tracker successfully tracks the motion of a book. However, in
@@ -547,20 +545,20 @@ for manufactured parts, a multitude of visualization, animation and
 rendering.
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=\linewidth]{images/pr2b.png}
+  \includegraphics[width=\linewidth]{images/pr2b.jpg}
   \caption[Point cloud of a book rendered in rivz]{A point cloud is
     generated by the scanner in PR2.}
   \label{fig:pointcloud}
 \end{figure}
 
 Point clouds can be rendered and inspected in software like MeshLab
-and rivtz (Figure~\ref{fig:pointcloud}). In addition, they are usually converted to polygon or
+and rivtz (Fig.~\ref{fig:pointcloud}). In addition, they are usually converted to polygon or
 triangle mesh models, NURBS surface models, or CAD models through a
 process commonly referred to as surface reconstruction.
 
 In this experiments, we plan to convert a point cloud of a object to a
 polygon, then use this polygon as the initial contour of observed
-object. In the point cloud in Figure~\ref{fig:pointcloud}, edges of
+object. In the point cloud in Fig.~\ref{fig:pointcloud}, edges of
 the observed object are not smoothed. By applying the CCD algorithm,
 we can accurately obtain the contour of a observed object. In
 comparison with the initialization from SIFT features, because the
