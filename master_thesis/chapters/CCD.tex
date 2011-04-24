@@ -23,22 +23,24 @@ because it greatly reduces the variability, and also improves the
 extraction of extract features. % Furthermore, pre-processing might be performed in order to
 % speed up computation. 
 In our case, the data had to be noiseless, shadowless and with sharp edges or boundaries
-between objects. There is a group of operations solving this bxection.
+between objects. There is a group of operations solving this objection.
 \begin{itemize}
 \item \textbf{Noise reduction}. Many linear and non-linear algorithms
   can help to remove noises, such as mean filter, Gaussian blur,
   Bi-linear interpolation.
-\item \textbf{Contrast improvement}. Also we can use a window to
+\item \textbf{Contrast improvement}. Also we can use a convolution kernel to
   adjust brightness and contrast by selecting a range of input values
   which are mapped to the full output range of intensities.
 \item \textbf{Sharpening and detail enhancement}. Scale space is one
   of methods to highlight and enhance fine details in a image.
 \end{itemize}
 
-OpenCV provides a series of implementation of these operations. Note
+OpenCV provides a series of implementation of these operations. In
+this thesis, we filter input images using the OpenCV built-in function
+\textit{GaussianBlur}. Note
 that for different input data, according to the object properties,
 illumination and other physical conditions, different operations
-will be taken. 
+were taken. 
 
 \section{Contour Initialization}
 \label{sec:mp}
@@ -52,32 +54,37 @@ contour as a continuous, differentiable and uniform quadratic or cubic
 B-Spline in $\mathbb{R}^2$, which was discussed in Chapter~\ref{chapter:bspline}. 
 Given a ROI (region of interest), the first step is to generate
 sufficient control points $\mathbf{P} = \{P_0, \ldots, P_{N_p-1}\}$ to
-account for the complexity of the object shape
-(Fig.~\ref{fig:prior}).
+account for the complexity of the object shape (Fig.~\ref{fig:prior}).
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=\linewidth]{images/curves.jpg}
-\caption[The parametric of listed tropical fruits]{The blue curves are
-  the parametric contours of some tropical fruits [\\
-  http://visual.merriam-webster.com/images/food-kitchen/food/fruits/tropical-fruits\_4.jpg
-  ]}
+  \includegraphics[width=\linewidth]{images/cont.jpg}
+\caption[The contour of a ball ]{The contour of a ball. The blue contour
+  divided the image into two parts: outside and inside. As depicted in
+  right-bottom image, pixels inside the contour are labeled "0",
+  and those outside the contour are labeled "1". For each point on the
+  contour (skyblue point), we sample some points (red points) along both positive
+  and negative direction.}
 \label{fig:prior}
 \end{figure}
 
-There are two ways to generate control points:
-manual initialization and automated initialization. The former is
-given as a simple form by hand. % It is easy to use and
+% Since the former is
+% given as a simple form by hand.
+% It is easy to use and
 % control. However, there are some problems and limitations in case that
 % the cost of manual operation is large, or vision deviation due to
 % similar brightness between object and background. Therefore,
-Sleace the former is rather tedious, two new
+There are two ways to generate control points:
+manual initialization and automated initialization. 
+Since the former is rather tedious, two new
 intelligent initialization methods are proposed to extract the
 contour.
 In this thesis, an initial contour estimation method is described and
 implemented by employing the well-known SIFT algorithm~\cite{lowe2004distinctive} for
 keypoint detection and matching. In Section~\ref{sec:sift_init} it will be discussed in
-more detail.
+more detail. In addition, we can convert the point cloud generated
+by scanners on PR2 into a polygon. With that polygon we can now model the contour
+of an observed object. This method will be described in Section~\ref{sec:tifpc}.
 
 \section{Model Parametrization}
 \label{sec:mp}
@@ -107,15 +114,15 @@ vector $\mathbf{\Phi}$ with 6 real elements, namely model
 parameters vector. From the perspective of probability, the hypothetical
 curve gives a uncertainty, the solution of the curving problem is
 therefore no longer just a single curve, but a whole family of
-possible curves (Fig.~\ref{fig:prior}). The Gaussian probability density for these possible
+possible curves (Fig.~\ref{fig:transform}). The Gaussian probability density for these possible
 curves in shape-space $\mathcal{S}$ is given as:
 
 \begin{equation}
   \label{eq:prior}
    p(\mathbf{\Phi}) \propto
 \mathrm{exp} \left\{ -\frac{1}{2} (\mathbf{\Phi} -
-  \mathbf{\Sigma}_{\mathbf{\Phi}})^T \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} (\mathbf{\Phi} -
-  \mathbf{\Sigma}_{\mathbf{\Phi}}) \right\}
+  \mathbf{m}_{\mathbf{\Phi}})^T \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} (\mathbf{\Phi} -
+  \mathbf{m}_{\mathbf{\Phi}}) \right\}
 \end{equation}
 
 \begin{figure}[htb]
@@ -127,11 +134,12 @@ curves in shape-space $\mathcal{S}$ is given as:
   sketches some samples in affine space. All these are governed by a
   Gaussian distribution in shape-space with root-mean-square
   displacement of 0.3 length units.}
-\label{fig:prior}
+\label{fig:transform}
 \end{figure}
 
-In two dimensions, $\mathbf{\Sigma}_{\mathbf{\Phi}}$ is a $6 \times 6$ 
-covariance matrix, which measures the variability of
+In two dimensions, the current mean model parameter
+$\mathbf{m}_{\mathbf{\Phi}}$ is vector with $6$ elements, and current
+covariance matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}$ is a $6 \times 6$ matrix, which measures the variability of
 how much two groups of model parameters change together. The
 information matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}^{-1}$ can be
 written as 
@@ -167,8 +175,8 @@ which is
 expected to reduce the computational cost. Hence, we first define
 the region which contains pixels in the vicinity of the expected image
 curve. Considering the complexity and the expense of computing, it is practicable
-to choose those pixels actually required for interpolation along
-normals of the curve. This is proved useful and important for image
+to choose those pixels that are actually required for interpolation along
+normals of the curve (Fig.~\ref{fig:prior}). This is proved useful and important for image
 perception and real-time tracking system. In the implementation of
 this thesis, the processing is limited to a segment of each normal within
 a search region. A fixed distance $h$ along the normal segment is
@@ -190,7 +198,8 @@ smaller. After determining the length of the search segment,
 a set of points located on these segments can be collected and
 evaluated. Note that the parametric model curve is not required to be
 closed, but it shall always encompass a limited area. We only plan to
-analyze the pixels located in the vicinity of the contour. Therefore,
+analyze the pixels located in the vicinity of the contour (red sample
+pixels in Fig.~\ref{fig:prior}). Therefore,
 we should pay attention to limit the search distance on the
 \textit{inner} side in order to avoid crossing the opposite
 boundary to sample pixels from the wrong area~\cite{panin2006fully}. In order to
@@ -198,12 +207,12 @@ decrease the computational expense, it is advisable to uniformly sample those
 pixels on both segments in the vicinity of the contour. On the other
 hand, we should avoid to collect too small number of pixels, because
 it is statistically invalid and can not
-capture all features near the contour. Let us denote the
-sample distance using $\delta h$, then the overall number of spaced
+capture all features (e.g. spinodals and corners) of the contour. Let us denote the
+sample distance using $\Delta h$, then the overall number of spaced
 sample points $L$ ($2L$ for both sides in all) can be given by:
 \begin{equation}
   \label{eq:sample}
-  L = \lfloor \frac{h}{\delta h} \rfloor
+  L = \lfloor \frac{h}{\Delta h} \rfloor
 \end{equation}
 
 Note that the goal of the algorithm is to assign each pixel
@@ -212,8 +221,7 @@ Note that the goal of the algorithm is to assign each pixel
 classification problem.
 Although each pixel should be assigned to one and only
 one class so that the target variable is discrete, we can model the
-posterior probabilities that lie in $(0,1)$, thus it is similar to a
-regression problem. To achieve this, we model the probabilistic
+posterior probabilities that lie in $(0,1)$ interval, which converts the classification into the regression problem. To achieve the latter, we model the probabilistic
 assignments $\mathbf{a}_{v}$ for each pixel $\mathrm{v}_{k,l}$ as following:
 \begin{equation}
   \label{eq:pa}
@@ -225,9 +233,10 @@ for side 2 given by $a_{v,2} = 1- a_{v,1}$. For arbitrary curve
 $\mathbf{C}$, it is difficult to give a closed form of $a_v$. In the
 following, an efficient approximation of the assignment is derived.
 
-We use the \textbf{signed} distance between pixel
-$\mathrm{v}_{k,l}$ and a given curve $\mathbf{C}$ (Fig.~\ref{fig:dis}). $d_{k,l}$
-can be approximated by
+We will first evaluate the \textbf{signed} distance $d_{k,l}$ between pixel
+$\mathrm{v}_{k,l}$ and a given curve $\mathbf{C}$
+(Fig.~\ref{fig:dis}), which
+can be approximated by:
 \begin{equation}
   \label{eq:dis}
   d_{k,l} = \mathbf{n}_k \cdot ( \mathbf{v}_{k,l} - C_k)
@@ -307,7 +316,7 @@ S-shaped (Fig.~\ref{fig:s-shaped}).
 In this thesis, we use both of them to implement the algorithm. They give
 similar results but have different behaviors. Logistic sigmoid function
 can be perfectly interpreted from the perspective of
-possibility. Consider the side $s \in \{0,1\}$, the posterior
+probability. Consider the side $s \in \{0,1\}$, the posterior
 distribution for side $s = 1$ can be written as
 \begin{eqnarray}
   \label{eq:pdfs}
@@ -384,9 +393,8 @@ between $\sigma$ and $\hat{\sigma}$) and $\gamma_4 = 4$ (minimum
 weighting window width) as discussed in~\cite{panin2006efficient}. 
 
 In the implementation of this thesis,
-all $2 \cdot L \cdot N_C$ distance ($d_{k,l}$), fuzzy assignment
-($a_{v,1}(d_{k,l}))$ and weight function ($\omega_1(d_{k,l})$,
-$\omega_1(d_{k,l})$) are evaluated offline and saved in an array. Now we have restricted our analysis region of interest in the
+there are $2 \cdot L \cdot N_C$ distances, fuzzy assignments
+and weight functions which leads to as many weight functions being evaluated offline and stored in an array. Now we have restricted our analysis region of interest in the
 limited area, and collected all statistical information required to learn
 local statistics. In the next part, we will evaluate the local
 statistics.
@@ -422,8 +430,9 @@ $\mathbf{\Sigma}_{\mathbf{\Phi}}$  are obtained by
 In Eq.~\ref{eq:localcov}, $\kappa I$  means an identity matrix scaled by
 $\kappa$ in order to avoid numerical singularity.Later it is namely
 required to calculate the inverse matrix of
-$\mathbf{\Sigma}_{k,s}$. In our experiments, we choose $\kappa$ to be $\kappa = 0.5$. It is shown that this is efficient to
-avoid numerical problems in the process of iteration.
+$\mathbf{\Sigma}_{k,s}$. In our experiments, we choose $\kappa$ to be
+$\kappa = 0.5$, which is efficient to avoid numerical problems in the
+process of iteration.
 
 With the local mean vectors $\mathbf{m}_{v,s}$  and the local covariance matrices
 $\mathbf{\Sigma}_{\mathbf{\Phi}}$, we can compute the
@@ -575,8 +584,8 @@ curve point $C_{k}$. Moreover, we have
 \left( n_k(x)\mathbf{J}_{\mathbf{\Phi}}(\mathrm{v}_{k,l}(x)) + n_k(y)\mathbf{J}_{\mathbf{\Phi}}(\mathrm{v}_{k,l}(y))
  \right) 
 \end{equation}
-In terms of the properties of  B-spline curve  and planar affine
-model-space. The pixel coordinate of $\mathrm{v}_{kl}$ can be written
+According to the properties of  B-spline curve  and planar affine
+model-space, the coordinate of pixel $\mathrm{v}_{kl}$ can be written
 as
 \begin{eqnarray}
   \label{eq:vkl}
@@ -714,10 +723,11 @@ information and features and might only be distinguished by
 investigating in detail. Hence, a naive CCD tracking algorithm can be
  be obtained by applying the CCD algorithm to each frame
  independently, and the output of parameters obtained from  the
- previous frame can be used in the next frame. However, such
- a tracker would be of limited use because the expense of computation
- will be intolerable in a practical environment which requires high
- performance and efficiency. Furthermore, without exploiting
+ previous frame can be used in the next frame. % However, such
+ % a tracker would be of limited use because the expense of computation
+ % will be intolerable in a practical environment which requires high
+ % performance and efficiency.
+ Furthermore, without exploiting
  statistical dependencies between successive images, the tracker can
  not work if a radical change or big perturbation happened while
  switching into a new frame. A real-time CCD tracker exploiting the
@@ -728,11 +738,34 @@ investigating in detail. Hence, a naive CCD tracking algorithm can be
 \section{Summary of the CCD algorithm and its variant}
 \label{sec:sccd}
 In this section,  for sake of clarity, a sketch of the naive CCD
-tracker is given below. Note that we only consider the manual
-implementation.  
+tracker is given. Because the core stage of the naive CCD tracker
+is using the CCD algorithm to fit the contour of an observed
+object, the algorithm sketched below includes the basic steps of the CCD
+algorithm.
+
+% \begin{algorithm}
+% \DontPrintSemicolon
+% \KwData{  \begin{enumerate}
+%   \item Sequence image data $\mathbf{I}(t)$, $t$ denotes the time-step
+%   \item A set of control points:  $\mathbf{P} = \{P_{0}, \ldots, P_{N_{cp}}\}$,
+% $N_{cp}$ is the number of control points.
+%   \end{enumerate}
+% }
+% \KwResult{
+% \begin{enumerate}
+%   \item Estimate model parameter vector $\mathbf{m}_{\mathbf{\Phi}}^{best}$ 
+%   \item Corresponding covariance matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}^{best}$
+%   \end{enumerate}
+% }
+% \Begin{
+% \caption{The naive Contracting Curve Density (CCD)
+%   tracker\label{alg:ccd}
+% }
+% \end{algorithm}
+
 % \newcommand{\redvline}{\color{red} \vrule width 4pt}
 \begin{table}[htbp]
-  \caption{Algorithm: the naive Contracting Curve Density (CCD) tracker}
+  \caption{Algorithm: The naive Contracting Curve Density (CCD) tracker}
   \label{summary of CCD}
   \centering
   \begin{tabular*}{0.9\textwidth}{!{\color{red} \vrule width 4pt}l}
