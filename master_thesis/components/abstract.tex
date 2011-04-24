@@ -16,49 +16,79 @@
 \end{center}
 \vspace{1cm}
 
-This master's thesis investigates an extended and optimized
-implementation of a state-of-the-art local curve fitting algorithm,
-the Contracting Curve Density (CCD).
-In particular, we investigate
-the application of the CCD algorithm and its variant the CCD tracker
-on personal robotics (e.g. PR2).
+% This master's thesis investigates an extended and optimized
+% implementation of a state-of-the-art local curve fitting algorithm,
+% the Contracting Curve Density (CCD).
+% In particular, we investigate
+% the application of the CCD algorithm and its variant the CCD tracker
+% on personal robotics (e.g. PR2).
 
-We developed an application based on the OpenCV library, which
-is a cross-platform computer vision library. Based on the
-design conception of the CCD algortihm, some
-additional features are integrated into the developed program in order to
-achieve stability and robustness. Firstly, we use the logistic sigmoid
-function instead of Gaussian error function, thus completely convert a
-curve-fitting problem to a Gaussian logistic regression problem in the
-field of pattern recognition. Secondly, the quadratic (degree-2) or
-cubic (degree-3) B-spline curve is used to model the parametric curve
+% We developed an application based on the OpenCV library, which
+% is a cross-platform computer vision library. Based on the
+% design conception of the CCD algortihm, some
+% additional features are integrated into the developed program in order to
+% achieve stability and robustness. Firstly, we use the logistic sigmoid
+% function instead of Gaussian error function, thus completely convert a
+% curve-fitting problem to a Gaussian logistic regression problem in the
+% field of pattern recognition. Secondly, the quadratic (degree-2) or
+% cubic (degree-3) B-spline curve is used to model the parametric curve
+% to avoid the Runge phenomenon without increasing the degree of the
+% B-spline. Thirdly, the system supports both planar affine (6-DOF) and
+% non-planar affine (8-DOF) shape-space. The extended affine space can avoid
+% curve mismatching caused by minor viewpoint changes. Moreover, in
+% order to avoid manual intervention from the user, the developed system
+% also supports robust global initialization modules based on both keypoint
+% feature matching and 3-Dimensional point cloud. At last, the CCD
+% algorithm solves the curve fitting problem by converting it to a
+% pattern recognition problem, and because maximum a posteriori probability
+% (MAP) estimate is an important but time-cost step. We proposed some
+% changes and optimization on it.
+
+% The developed system mainly consists of two functional parts, the CCD
+% algorithm to fit model curve in still images and the CCD tracker to
+% track model in sequential-frame video. We apply the CCD algorithm to
+% serval image segmentation and object tracking problems. Some experiments with RGB
+% images and videos are delivered on Personal Robot 2 (PR2), and the
+% performance is examined on two tasks listed above.  It is shown that
+% the CCD algorithm achieves robustness and subpixel accuracy even in the
+% presence of clutter, partial occlusion, and changes of
+% illumination. We present results for some curve-ftting problems, such
+% as image segmentation, 3-D pose estimation, object tracking based on
+% both manual intervention and automatical initialization.
+
+This thesis investigates an extended and optimized
+implementation of the state-of-the-art local curve fitting algorithm
+named Contracting Curve Density (CCD) algorithm, originally developed 
+by Hanek et al. In particular, we investigate its application  
+in the field of personal robotics for the tasks such as the segmentation
+of objects in clutter and the tracking of objects. 
+
+The CCD algorithm can be best described as follows. Given one or multiple images as input
+data and a parametric curve model with a priori distribution of model
+parameters, through curve-fitting process, we estimate the model
+parameters which determine the approximation of the posterior
+distribution in order to make the curve models best matching the image data.
+In order to improve the stability, accuracy and robustness over the original
+implementation we introduce the following improvements. Firstly, we use the logistic sigmoid
+function instead of a Gaussian error function which renders a
+curve-fitting problem as a Gaussian logistic regression problem known in the
+field of pattern recognition. Secondly, a quadratic or
+a cubic B-spline curve is used to model the parametric curve
 to avoid the Runge phenomenon without increasing the degree of the
 B-spline. Thirdly, the system supports both planar affine (6-DOF) and
-non-planar affine (8-DOF) shape-space. The extended affine space can avoid
-curve mismatching caused by minor viewpoint changes. Moreover, in
-order to avoid manual intervention from the user, the developed system
-also supports robust global initialization modules based on both keypoint
-feature matching and 3-Dimensional point cloud. At last, the CCD
-algorithm solves the curve fitting problem by converting it to a
-pattern recognition problem, and because maximum a posteriori probability
-(MAP) estimate is an important but time-cost step. We proposed some
-changes and optimization on it.
+three-dimensional affine (8-DOF) shape-space. The latter affine space can avoid
+curve mismatching caused by major viewpoint changes. Lastly, in
+order to avoid manual intervention by the user, the developed system
+also supports robust global initial curve initialization modules based on both keypoint
+feature matching and back-projections from the 3D point clouds. 
 
 The developed system mainly consists of two functional parts, the CCD
-algorithm to fit model curve in still images and the CCD tracker to
-track model in sequential-frame video. We apply the CCD algorithm to
-serval image segmentation and object tracking problems. Some experiments with RGB
-images and videos are delivered on Personal Robot 2 (PR2), and the
-performance is examined on two tasks listed above.  It is shown that
-the CCD algorithm achieves robustness and subpixel accuracy even in the
-presence of clutter, partial occlusion, and changes of
-illumination. We present results for some curve-ftting problems, such
-as image segmentation, 3-D pose estimation, object tracking based on
-both manual intervention and automatical initialization.
-
-
-
-
+algorithm to fit the model curve in still images and the CCD tracker to
+track the model in the videos. We demonstrate algorithm's working 
+in various scenes using handheld camera and the cameras from the 
+PR2 robot. Achieved results show that the CCD algorithm achieves 
+robustness and sub-pixel accuracy even in the presence of clutter, 
+partial occlusion, and changes of illumination. 
 
 
 
