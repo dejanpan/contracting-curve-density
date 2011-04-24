@@ -3,18 +3,18 @@
 
 So far we have discussed the CCD approach in detail. In this chapter,
 the experimental evaluation of the CCD algorithm and the naive CCD
-tracker will be presented. we apply the CCD approach to three
+tracker will be presented. We apply the CCD approach to three
 different kinds of model fitting and object tracking problems:
 
 \begin{enumerate}
-\item Contour convergence on still image
-\item Track initialization from sift features
-\item Track initialization from 3D point cloud
+\item Contour convergence on still image.
+\item Track initialization from sift features.
+\item Track initialization from 3D point cloud.
 \end{enumerate}
 
 Some experiments have been delivered on the PR2, then we analyze the performance
 of the approach in terms of robustness, accuracy and runtime. This is
-followed the comparison between the CCD approach and  other
+followed by the comparison between the CCD approach and  other
 model-based methods.
 
 
@@ -22,7 +22,7 @@ model-based methods.
 % algorithm. presents the evaluation of the naive CCD
 % tracker and 
 
-\section{Contour convergence on still image}
+\section{Contour Convergence On Still Image}
 \label{sec:ES}
 
 As mentioned in related work, the CCD algorithm is an effective
@@ -33,7 +33,7 @@ is the partitioning of its domain into homogeneous regions
 $\Omega_1,\ldots, \Omega_n \subset \Omega$. In a complex environment,
 due to texture, shading, poor contrast and clutter, segmentation is
 always a challenging problem in the field of computer
-vision(Fig.~\ref{fig:flower_m}).
+vision (Fig.~\ref{fig:flower_m}).
 
 \begin{figure}[htbp]
   \begin{minipage}[t]{0.5\linewidth} 
@@ -53,10 +53,10 @@ vision(Fig.~\ref{fig:flower_m}).
 
 There are many practical
 applications of image segmentation, such as medical imaging, object
-tracking, face recognition, fingerprint recognition, machine vison and
+tracking, face recognition, fingerprint recognition, machine vision and
 so on. In this thesis, we concern its application in object tracking.
-In many cases segmentation is the bottleneck when trying to tracking a
-object. Many segmentation methods are developed, however, there is not
+In many cases segmentation is the bottleneck when trying to track an
+object. Many segmentation methods have been developed, however, there is not
 general solution to the segmentation problem. In the real world,
 segmentation problems will often require much domain knowledge before
 a successful segmentation can be performed. The CCD algorithm is a
@@ -65,7 +65,7 @@ converting a pure segmentation problem to a problem in pattern
 recognition, a large amount of techniques in the field of pattern
 recognition are introduced to solve segmentation problems, which are
 proved to be effective and helpful. Compared with other segmentation
-methods Fig.~\ref{fig:seg_compaison}, such as intensive-based method,  cluster method, region-based
+methods (Fig.~\ref{fig:seg_comparison}), such as intensive-based method,  cluster method, region-based
 method and compression-based methods, the CCD algorithm has following
 advantages:
 \begin{figure}[htbp] 
@@ -107,9 +107,9 @@ advantages:
 \end{figure}
 
 \begin{itemize}
-\item restrict segmentation problem to a limited explicit region, it is helpful
+\item Restrict segmentation problem to a limited explicit region: it is helpful
   to decrease the computation cost.
-\item probabilistic representation of the variation of the registered
+\item Probabilistic representation of the variation of the registered
   samples could be easily given, thus statistical inference between
   the model and the image will be applied. All these are helpful to
   improve the segmentation results.
@@ -121,13 +121,13 @@ advantages:
 In the following, we apply the proposed CCD algorithm to 4 kind of
 objects:
 \begin{enumerate}
-\item Segmentation of a spherical object
-\item Segmentation of a 3-D object
-\item Segmentation of a transparent object
+\item Segmentation of a spherical object.
+\item Segmentation of a 3D object.
+\item Segmentation of a transparent object.
 \item Fitting a rigid wire frame.
 \end{enumerate}
 
-\subsection{Segmenation of a ball}
+\subsection{Segmentation of A Ball}
 \label{sec:sb}
 Like other contour-based method, we model a contour of the ball as the
 prior knowledge. Because the contour for a rigid spherical object is a
@@ -135,7 +135,7 @@ circle, besides manually initialization, we can use some built-in function in
 OpenCV library to generate the contour with given center and
 radius. According to the definition of prior distribution, it is required
 that the hypothesis is in the range of the variation of
-registered sample, namely, the initial contour can not be too far away
+registered samples, namely, the initial contour can not be too far away
 from the observed object.
 
 \begin{figure}[htbp] 
@@ -156,7 +156,7 @@ from the observed object.
     \subfloat[iteration 16]{\includegraphics[width=2.5in]{images/ball/15.jpg}}
   \end{minipage} 
 \caption[Segmentation of a ball]{There is a translation between the
-  initial hypothesis and the contour of the observed object. However, It is
+  initial hypothesis and the contour of the observed object. However, it is
   mandatory that the initial contour encompass at least part surface
   of the object being learning. In the beginning, the uncertainty of
   the contour is very large, so the contour is always changing in
@@ -168,9 +168,9 @@ from the observed object.
 
 In Fig.~\ref{fig:sab}, we intentionally set a hypothesis which is far away
 from the ball, but after about 15 iteration, we successfully fit the
-contour the edge of the ball. For the sake of a ground truth we need
-investigate the pixels used in the iterations. The Fig.~\ref{fig:pon} shows
-that only a small number of pixels is taken into account after the
+contour of the ball. For the sake of a ground truth we need
+to investigate the pixels used in the iterations. The Fig.~\ref{fig:pon} shows
+that only a small number of pixels are taken into account after the
 contour starts to converge. However, these pixels contain the
 necessary information for refining the fitting. Because the pixels used
 to compute become less and less, at last, it is supposed that
@@ -202,13 +202,13 @@ CCD algorithm can achieve high sub-pixel accuracy.
 \end{figure}
 
 
-\subsection{Segmentation of a 3-D obejct}
+\subsection{Segmentation of a 3D Object}
 \label{sec:s3o}
-In the experiments of segmentation of a spherical object, a planar
+In the experiments of segmenting a spherical object, a planar
 affine space of contour is generated. It works very well because the
 contour of the ball is always a circle, there is not parallax effect
 for such objects. In this case, a 6-dimension model parameters vector
-can cope with basic geometrical transformation of a object. However,
+can cope with basic geometrical transformation of an object. However,
 clearly a 6-dimension model parameters vector can not be expected to
 suffice for non-planar surfaces. Imagine such a scenario, we generate the  planar affine
 space contour of a non-planar cube in the fist view. In the
@@ -234,12 +234,12 @@ will be detected. This can be evidenced in the fitting experiment (Fig.~\ref{fig
 \end{figure}
 
 
-The new 3-dimensional affine shape-space with 8 degree of freedom,
+The new 3D affine shape-space with 8 degree of freedom,
 made up of the 6-parameter planar affine space and a two-parameter
 extension, is designed to cope with such problem. Two added components
 account for the depth variation that is not visible in the template
 view. If tacking the two new parameters to the shape matrix, the form
-of shape matrix for 3-dimensional case can be given by
+of shape matrix for 3D case can be given by
 \begin{equation}
   \label{eq:4.18}
   A =
@@ -264,7 +264,7 @@ of shape matrix for 3-dimensional case can be given by
 \label{fig:box_match}
 \end{figure}
 
-The three-dimensional affine shape-space model parameters have
+The 3D affine shape-space model parameters have
 the following interpretation
 
 \begin{equation}
@@ -272,10 +272,10 @@ the following interpretation
   \mathbf{\Phi} =  (T_1, T_2, M_{11} - 1, M_{22} - 1, M_{21}, M_{12}, \nu_1, \nu_2)
 \end{equation}
 
-The expanded space now encompasses the outlines of all views of the three-dimensional
-outline, evidenced by Fig.~\ref{fig:box_match}. At last, we do
-another experiments for a object with an irregular shape~\ref{fig:container}. This
-demonstrates that the CCD works well for 3-D non-planar object.
+The expanded space now encompasses the outlines of all views of the
+3D outline, evidenced by Fig.~\ref{fig:box_match}. At last, we do
+another experiments for an object with an irregular shape~\ref{fig:container}. This
+demonstrates that the CCD works well for 3D non-planar object.
 
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
@@ -294,12 +294,12 @@ demonstrates that the CCD works well for 3-D non-planar object.
     \centering 
     \subfloat[iteration 7]{\includegraphics[width=2.5in]{images/container/5.jpg}}
   \end{minipage} 
-\caption[Three-dimensional affine shape-space for rigid object]{The
-  non-planar polyhedron is encompassed by a 3D affine space}
+\caption[3D affine shape-space for rigid object]{The
+  non-planar polyhedron is encompassed by a 3D affine space.}
 \label{fig:container}
 \end{figure}
 
-\subsection{Segmentation of transparent objects}
+\subsection{Segmentation of a Transparent Object}
 \label{sec:sto}
 In this thesis, local statistical information is collected in terms of
 pixel intensity in the vicinity of a contour, this leads to a poor
@@ -308,7 +308,7 @@ target is a cola bottle whose upper part is nearly transparent and the
 lower part is opaque. The result in Fig.~\ref{fig:cola} shows that the CCD algorithm
 can segment the lower part but can not completely encompass the contour in the
 upper part. However, because the model only have 6 (or 8
-for 3-dimensional object) degree of freedom, the convergence of other
+for 3D object) degree of freedom, the convergence of other
 part will effect the fitting in the transparent part such that we can
 detect that the convergence happens in the transparent part.
 
@@ -330,7 +330,7 @@ detect that the convergence happens in the transparent part.
     \centering 
     \subfloat[iteration 21]{\includegraphics[width=2.5in]{images/bottle/20.jpg}}
   \end{minipage} 
-\caption[Segmentation of a transparent bottle]{in image (d), Due the shadow and poor
+\caption[Segmentation of a transparent bottle]{In image (d), due the shadow and poor
 contrast, the contour does not completely attach to the edge of the
 bottom. Moreover, in the transparent part of the bottle, the outline
 closely attaches to the edge in the left but stays away from the edge
@@ -339,7 +339,7 @@ in the right. The transparency leads to the difficulties. }
 \end{figure}
 
 
-\subsection{Fitting a rigid wire frame}
+\subsection{Fitting a Rigid Wire Frame}
 \label{sec:fdo}
 In the following, we fit a rigid wire frame model to the image
 depicted in Fig.~\ref{fig:wireframe}.  The degrees of freedom
@@ -380,7 +380,7 @@ edge-based algorithm yields some errors.}
 \end{figure}
 
 
-\section{Track initialization from SIFT features}
+\section{Track Initialization from SIFT Features}
 \label{sec:sift_init}
 Scale-invariant feature transform (or SIFT) is an algorithm to detect
 and describe local features in images.  It is widely used to solve
@@ -397,7 +397,7 @@ interest can be identified.
 \item \textbf{Orientation assignment}:  based on local image gradient
   directions each keypoint is assigned one or more orientations.
 \item \textbf{Keypoint descriptor}: measure the local image gradients
-  at the selected scale in the region around each keypoint
+  at the selected scale in the region around each keypoint.
 \end{enumerate}
 
 
@@ -405,12 +405,12 @@ The SIFT keypoints and features are local and based on the appearance
 of the object at particular interest points. The SIFT algorithm has following
 features and advantages:
 \begin{itemize}
-\item invariant to image scale and rotation, robust to changes in
-  illumination and minor changes in viewpoint
-\item highly distinctive, easy to extract,allow for correct object
+\item Invariant to image scale and rotation, robust to changes in
+  illumination and minor changes in viewpoint.
+\item Highly distinctive, easy to extract, allow for correct object
   identification and easy to match against a database of local
   features. 
-\item need few features (as few as 3) from an object to compute its location
+\item Need few features (as few as 3) from an object to compute its location
   and pose. Computation cost is moderate on modern computer hardware.
 \end{itemize}
 
@@ -426,7 +426,7 @@ steps are given below.
 
 In this thesis, we plan to use the SIFT algorithm to initialize the
 contour of an object. Assume we have marked the boundary points in the
-training images. In order project these boundary points to a image
+training images. In order project these boundary points to an image
 being studied, it is essential to estimate the homography between the
 images. The SIFT is helpful for realize this. However, SIFT matching
 in the step 2 above might leads to lots of "false" matches. In order
@@ -438,7 +438,7 @@ iterative process by randomly select enough matches to fit
 homography. It contains following stages~\cite{fischler1981random}.
 \begin{itemize}
 \item  Randomly select a sample of matched points and instantiate the
-  model from this subset
+  model from this subset.
 \item Determine the set of data points that are within a distance
   threshold of the homography. The set is the consensus set of the sample
   and defines the inliers.
@@ -471,7 +471,7 @@ template image.
 \caption[Contour initialization using the SIFT algorithm]{The image in
   the upper-left corner is a template. It is projected into the bottom
   image. The green points in the template encompass the
-  contour of the observed object.The red lines are used to connect the matching feature
+  contour of the observed object. The red lines are used to connect the matching feature
   points. Obviously, the outliers are excluded using some algorithms
   (e.g. RANSAC). Then the homography can be estimated from these matching
   feature points.  After applying a perspective
@@ -487,7 +487,7 @@ template image.
 \includegraphics[width=\linewidth]{images/sift_result.jpg}
 \caption[The contour obtained using the CCD algorithm converges to the
 edge of the book]{After 8 iterations, the contour obtained in Fig.~\ref{fig:sift} converges to the edge of the book. However, in our
-  implementation, the SIFT algorithm can only cope with 2-Dimensional
+  implementation, the SIFT algorithm can only cope with 2D
   local features, but actually the book on the desk is a non-planar
   object. Therefore, the result is not as good as expected.}
 \label{fig:sift_result}
@@ -495,7 +495,7 @@ edge of the book]{After 8 iterations, the contour obtained in Fig.~\ref{fig:sift
 
 The model hypothesis is obtained by applying the CCD algorithm to a
 frame of a video sequence. In the following experiments, we can test
-our naive CCD tracker on PR2, the result is demonstrated in Fig.~\ref{fig:siftracker} 
+our naive CCD tracker on PR2, the result is demonstrated in Fig.~\ref{fig:sifttracker} 
 
 \begin{figure}[htbp]
   \begin{minipage}[t]{0.5\linewidth} 
@@ -534,11 +534,11 @@ our naive CCD tracker on PR2, the result is demonstrated in Fig.~\ref{fig:siftra
 \end{figure}
 
 
-\section{Track initialization from 3D point cloud}
+\section{Track Initialization from 3D Point Cloud}
 \label{sec:tifpc}
 
-A point cloud is a set of vertices created by 3-Dimensional
-scanners. The scanners measure points on the surface of a object,
+A point cloud is a set of vertices created by 3D
+scanners. The scanners measure points on the surface of an object,
 therefore, a point cloud represents the set of points measured by the
 device. Point clouds cloud are widely used to  create 3D CAD models
 for manufactured parts, a multitude of visualization, animation and
@@ -552,15 +552,15 @@ rendering.
 \end{figure}
 
 Point clouds can be rendered and inspected in software like MeshLab
-and rivtz (Fig.~\ref{fig:pointcloud}). In addition, they are usually converted to polygon or
+and rviz (Fig.~\ref{fig:pointcloud}). In addition, they are usually converted to polygon or
 triangle mesh models, NURBS surface models, or CAD models through a
 process commonly referred to as surface reconstruction.
 
-In this experiments, we plan to convert a point cloud of a object to a
+In this experiments, we plan to convert a point cloud of an object to a
 polygon, then use this polygon as the initial contour of observed
 object. In the point cloud in Fig.~\ref{fig:pointcloud}, edges of
 the observed object are not smoothed. By applying the CCD algorithm,
 we can accurately obtain the contour of a observed object. In
 comparison with the initialization from SIFT features, because the
-outlines created from point cloud is 3-Dimensional, it is more
+outlines created from point cloud is 3D, it is more
 suitable for non-planar objects.
