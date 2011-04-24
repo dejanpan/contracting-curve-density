@@ -47,7 +47,7 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{textcomp}
-\usepackage{yhmath} % f�r die adots 
+\usepackage{yhmath} % für die adots 
 %% mark text as preliminary
 %\usepackage[draft,german,scrtime]{prelim2e}
 
@@ -85,7 +85,29 @@
  %% mark pages as draft copies
  %\usepackage[english,all,light]{draftcopy}
  %% use hypertex version of hyperref
- \usepackage[hypertex,hyperindex=false,colorlinks=false]{hyperref}
+ \usepackage{hyperref}
+ \hypersetup{
+   bookmarks=true,         % show bookmarks bar?
+    unicode=false,          % non-Latin characters in Acrobat’s bookmarks
+    pdftoolbar=true,        % show Acrobat’s toolbar?
+    pdfmenubar=true,        % show Acrobat’s menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdftitle={Implementation of Contracting Curve Density Algorithm for Applications in Personal Robotics},    % title
+    pdfauthor={Shulei Zhu},     % author
+    pdfsubject={Master's Thesis},   % subject of the document
+    pdfcreator={pdflatex \& emacs},   % creator of the document
+    pdfproducer={Producer}, % producer of the document
+    pdfkeywords={CCD} {Tracking} {Bayesian Logistic Regression}, % list of keywords
+    pdfnewwindow=true,      % links in new window
+    hypertex,
+    hyperindex=false,
+    colorlinks,%
+    citecolor=black,%
+    filecolor=black,%
+    linkcolor=black,%
+    urlcolor=black
+}
 \else %% reduce output size \pdfcompresslevel=9
  %% declare pdfinfo
  %\pdfinfo { 
@@ -106,11 +128,34 @@
  %% allow rotations
  \usepackage{rotating}
  %% use pdftex version of hyperref
- \usepackage[pdftex,colorlinks=true,linkcolor=red,citecolor=red,%
- anchorcolor=red,urlcolor=red,bookmarks=true,%
- bookmarksopen=true,bookmarksopenlevel=0,plainpages=false%
- bookmarksnumbered=true,hyperindex=false,pdfstartview=%
- ]{hyperref}
+ % \usepackage[pdftex,colorlinks=true,linkcolor=red,citecolor=red,%
+ % anchorcolor=red,urlcolor=red,bookmarks=true,%
+ % bookmarksopen=true,bookmarksopenlevel=0,plainpages=false%
+ % bookmarksnumbered=true,hyperindex=false,pdfstartview=%
+ % ]{hyperref}
+ \usepackage{hyperref}
+ \hypersetup{
+   bookmarks=true,         % show bookmarks bar?
+    unicode=false,          % non-Latin characters in Acrobat’s bookmarks
+    pdftoolbar=true,        % show Acrobat’s toolbar?
+    pdfmenubar=true,        % show Acrobat’s menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdftitle={Implementation of Contracting Curve Density Algorithm for Applications in Personal Robotics},    % title
+    pdfauthor={Shulei Zhu},     % author
+    pdfsubject={Master's Thesis},   % subject of the document
+    pdfcreator={pdflatex \& emacs},   % creator of the document
+    pdfproducer={Producer}, % producer of the document
+    pdfkeywords={CCD} {Tracking} {Bayesian Logistic Regression}, % list of keywords
+    pdfnewwindow=true,      % links in new window
+    hypertex,
+    hyperindex=false,
+    colorlinks,%
+    citecolor=black,%
+    filecolor=black,%
+    linkcolor=black,%
+    urlcolor=blue
+}
 %
 %\usepackage[pdftex,colorlinks=false,linkcolor=red,citecolor=red,%
 % anchorcolor=red,urlcolor=red,bookmarks=true,%
