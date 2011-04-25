@@ -534,12 +534,12 @@ edge of the book]{After 8 iterations, the contour obtained in Fig.~\ref{fig:sift
 \section{Track Initialization from 3D Point Cloud}
 \label{sec:tifpc}
 
-A point cloud is a set of vertices created by 3D
-scanners. The scanners measure points on the surface of an object,
-therefore, a point cloud represents the set of points measured by the
-device. Point clouds cloud are widely used to  create 3D CAD models
-for manufactured parts, a multitude of visualization, animation and
-rendering.
+% A point cloud is a set of vertices created by 3D
+% scanners. The scanners measure points on the surface of an object,
+% therefore, a point cloud represents the set of points measured by the
+% device. Point clouds cloud are widely used to  create 3D CAD models
+% for manufactured parts, a multitude of visualization, animation and
+% rendering.
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\linewidth]{images/pr2b.jpg}
@@ -551,10 +551,36 @@ rendering.
   \label{fig:pointcloud}
 \end{figure}
 
-Point clouds can be rendered and inspected in software like MeshLab
-and rviz (Fig.~\ref{fig:pointcloud}). In addition, they are usually converted to polygon or
-triangle mesh models, NURBS surface models, or CAD models through a
-process commonly referred to as surface reconstruction.
+% Point clouds can be rendered and inspected in software like MeshLab
+% and rviz (Fig.~\ref{fig:pointcloud}). In addition, they are usually converted to polygon or
+% triangle mesh models, NURBS surface models, or CAD models through a
+% process commonly referred to as surface reconstruction.
+
+% In human living environments the objects of daily use
+% are typically standing on horizontal, planar surfaces or, as
+% physics-based image interpretation states it, they must be
+% in stable force-dynamic states. The scenes they are part of
+% can be cluttered or the objects are more or less isolated. To
+% account for these conditions, the ODUfinder employs two
+% alternative methods for region extraction: first, the combined
+% 2D-3D extraction for objects standing more or less isolated
+% on planar surfaces, and, second, the region-growing based
+% extraction for cluttered scenes, such as the objects standing
+% in a cupboard. These two methods are described below
+
+The combined 2D-3D object detection takes a 3D point
+cloud acquired through a tilting laser scanner or a kinect
+sensor and a camera image of the same scene. Figure 3 (left)
+shows how the ODUfinder detects major horizontal, planar
+surfaces within the point cloud and point clusters that are
+supported by the planes 3. The identified point clusters in the
+point cloud are then back-projected into the captured image
+to form the region of interest that corresponds to the object
+candidate. An accurate back-projection is possible thanks to
+the accurate robot calibration, as described by Pradeep et
+al. [10]. The sensors are calibrated using a non-linear bundleadjustment-
+like optimization to estimate various parameters
+of the TUM-PR2 Robot.
 
 In this experiments, we plan to convert a point cloud of an object to a
 polygon, then use this polygon as the initial contour of observed
@@ -564,3 +590,7 @@ we can accurately obtain the contour of a observed object. In
 comparison with the initialization from SIFT features, because the
 outlines created from point cloud is 3D, it is more
 suitable for non-planar objects.
+
+
+
+
