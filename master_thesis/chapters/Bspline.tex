@@ -5,7 +5,7 @@ restricting Region of Interest (ROI) and providing prior probability distributio
 Throughout this thesis, visual contours of observed objects are represented in terms of
 parametric spline curves which are widely applied in computer graphics.
 
-In this chapter, we introduce deformable 2-D and 3-D models called
+In this chapter, we introduce deformable two-dimensional and three-dimensional models called
 shape-space models.  In the first section, we start by explaining
 spline functions and their construction. Details on how parametric
 curves are constructed from spline functions are discussed in the
@@ -24,9 +24,8 @@ u_{m-1}]$ called knot vector, with $u_i$ called the knot, a
 B-spline of degree $n$ is parametric curve can be written as follows:
 \begin{equation}
   \label{eq:4.1}
-  \mathbf{C}(u) =  \sum_{i=0}^{m-n-2} P_{i} B_{i,n}(u) \mbox{ , } u \in [u_{n},u_{m-n-1}]\qquad.
+  \mathbf{C}(u) =  \sum_{i=0}^{m-n-2} P_{i} B_{i,n}(u) \mbox{ , } u \in [u_{n},u_{m-n-1}]\qquad,
 \end{equation}
-
 where $P_i$ are called control points, and $B_{i,n}$ are called
 basic functions. For n=0,1,...,m-2, the m-n-1 basis B-splines of degree
 n can be defined as:
@@ -70,7 +69,7 @@ points:
   \end{pmatrix}\qquad .
 \end{equation}
 $N$ denotes the number of control points, and $\mathbf{B}(u)$ is a
-vector of basis function
+vector of basis function:
 \begin{equation}
   \label{eq:4.5}
   \mathbf{B}(u) = (B_0(u), \ldots, B_{N-1}(u))^T\qquad.
@@ -130,7 +129,7 @@ the blending function is
    \end{cases}\qquad ,
 \end{equation}
 
-With the derivative being: 
+with the derivative being: 
 \begin{equation}
   \label{eq:4.7}
   \mathbf{b}_{i,3}'(u) = \begin{cases} \frac{1}{2}(-u^2+2u-1) \\
@@ -155,7 +154,7 @@ The matrix-form of uniform cubic B-spline is then given by:
 \section{Parametric B-spline Curves}
 \label{sec:pbc}
 
-In a 2-D image, a curve is composed of many discrete points which are
+In a two-dimensional image, a curve is composed of many discrete points which are
 identified by their coordinates. For those points on a curve, their axis
 components $x$, $y$ are particular instances of knots value $u$, also known
 as splines. Hence, we can define a B-spline curve as:
@@ -192,7 +191,7 @@ defined as
   \mathcal{U} =   \begin{pmatrix}
 \mathcal{B}^T & 0 \\
 0 &\mathcal{B}^T 
-  \end{pmatrix} \qquad , 
+  \end{pmatrix} \qquad .
 \end{equation}
 
 $\mathcal{B}$ denotes the metric matrix for a given class of B-spline
@@ -207,7 +206,7 @@ Cocacola bottle.
 \begin{figure}[htb]
   \centering
   \includegraphics[width=10cm]{images/bsplinenormal.jpg}
-  \caption{The contour of a bottle is sketched using a B-spline
+  \caption[A contour and its normals]{The contour of a bottle is sketched using a B-spline
     curve, the blue points are pixels on the normal of the contour.}
 \label{fig:bsplinenormal}
 \end{figure}
@@ -223,17 +222,17 @@ vector $\mathbf{\Phi} \in  \mathbb{R}^{N_{\mathbf{\Phi}}}$ to a spline vector $\
 \mathbb{R}^{Np}$:
 \begin{equation}
   \label{eq:4.16}
-  \mathbf{C} = \mathbf{A}\mathbf{X}+ \mathbf{P}_0\qquad.
+  \mathbf{C} = \mathbf{A}\mathbf{X}+ \mathbf{P}_0\qquad,
 \end{equation}
 
-where $A$ is a $N_p \times N_{\mathbf{\Phi}}$ shape-matrix. The
+where $\mathbf{A}$ is a $N_p \times N_{\mathbf{\Phi}}$ shape-matrix. The
 constant  $\mathbf{P}_0$ is a deformable template curve (\cite{blake1998active}). Usually, the
 dimension $N_{\mathbf{\Phi}}$ of the shape-space vector is clearly
 smaller than the dimension of the spline-vector $N_p$. This makes the
 problem more simple and computationally cheaper.
 
 In this chapter, we consider an important shape-space called planar
-affine. The planar affine shape-space has 6 degrees of freedom: horizontal
+affine. The planar affine shape-space has 6 DOFs: horizontal
 translation, vertical translation, rotation, horizontal scale,
 vertical scale and diagonal scale. The planar affine group can be
 thought of the class of all linear transformations that can be applied
@@ -241,12 +240,12 @@ to a template curve $\mathbf{C}$~\cite{blake1998active}.
 
 \begin{equation}
   \label{eq:4.17}
-  \mathbf{C(u)} = \mathbf{T} + \mathbf{M} \mathbf{C}_0(u)\qquad.
+  \mathbf{C(u)} = \mathbf{T} + \mathbf{M} \mathbf{C}_0(u)\qquad,
 \end{equation}
 
 where $\mathbf{T} = (T_1, T_2)^T$ represents the two-dimensional translation
 vector, and $M$ is a $2 \times 2$ matrix to control the rotation and
-scaling, such that $\mathbf{T}$ and $\mathbf{M}$ together can represent the 6 degree of
+scaling, such that $\mathbf{T}$ and $\mathbf{M}$ together can represent the 6 degrees of
 freedom of planar affine space. We can write the shape-matrix $\mathbf{A}$
 as:
 \begin{equation}
@@ -266,7 +265,7 @@ The model parameters $\mathbf{\Phi}$ can be interpreted as:
 
 The planar affine shape-space discussed above can be extended to
 three dimensions, which is more suitable for
-non-planar objects. The new space-model needs 8 degrees of freedom to
+non-planar objects. The new space-model needs 8 DOFs to
 account for horizontal
 translation, vertical translation, rotation, horizontal scale,
 vertical scale, diagonal scale and two depth-dependent terms~\cite{blake1998active}. The transformation matrix for the three-dimensional case
@@ -286,8 +285,6 @@ the following interpretation:
 \begin{equation}
   \label{eq:4.19}
   \mathbf{\Phi} =  (T_1, T_2, M_{11} - 1, M_{22} - 1, M_{21}, M_{12},
-  \nu_1, \nu_2) \qquad.
+  \nu_1, \nu_2) \qquad,
 \end{equation}
 where $\nu_1$, $\nu_2$ are the two additional basis elements.
-
-

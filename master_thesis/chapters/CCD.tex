@@ -2,7 +2,7 @@
 \label{chapter:ccd}
 In this chapter, we describe the underlying principles of the
 Contracting Curve Density algorithm, which is shown to
-out perform others in many challenging problems in the field of computer
+outperform others in many challenging problems in the field of computer
 vision and robotics (\cite{panin2006fully},~\cite{hanek2004contracting},~\cite{hahn2007tracking}). Generally, as mentioned in Section~\ref{sec:sccd},
 the algorithm includes three steps: initialization, learning of
 local statistics and refinement of model parameters. We describe the
@@ -18,7 +18,7 @@ input images, we first discuss techniques that alleviate this problem.
 Before we start the processing step, it is required to
 improve the quality of the images even though the CCD
 algorithm is proved robust to noise and clutter in
-images. Pre-processing helps solving a CCD problem more easily
+images. Pre-processing helps solve a CCD problem more easily
 because it greatly reduces the variability, and also improves the
 extraction of extract features. % Furthermore, pre-processing might be performed in order to
 % speed up computation. 
@@ -45,8 +45,8 @@ were taken.
 \section{Contour Initialization}
 \label{sec:mp}
 
-After the pre-processing of input images,  we initialize the model contour. For the moment, we only consider 2-D
-affine shape-space consisting of 6 degrees of freedom. % It is followed by the process of
+After the pre-processing of input images,  we initialize the model contour. For the moment, we only consider two-dimensional
+affine shape-space consisting of 6 DOFs. % It is followed by the process of
 % model parametrization.
 
 In our implementation, we model the
@@ -59,7 +59,8 @@ account for the complexity of the object shape (Fig.~\ref{fig:prior}).
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\linewidth]{images/cont.jpg}
-\caption[The contour of a ball ]{The contour of a ball. The blue contour
+\caption[An contour with sample points used for learning local
+statistics]{A contour with sample points used for learning local statistics. The blue contour
   divided the image into two parts: outside and inside. As depicted in
   right-bottom image, pixels inside the contour are labeled "0",
   and those outside the contour are labeled "1". For each point on the
@@ -93,7 +94,7 @@ By applying the (uniform quadratic or cubic) B-spline interpolation to the contr
 grouped by a sequence of equidistant distributed points is generated
 . The B-spline curve is defined in eq.~\ref{eq:paramcurve} and is
 composed of a sequence of points $\mathbf{C} = \{C_0, \ldots,
-C_{k}\}, k = N_{C-1}$. $N_C$ denotes the number of sample points in the
+C_{k}\}$, $k = N_{C-1}$. $N_C$ denotes the number of sample points in the
 parametric curve. $N_C$ is significant for the
 performance of the CCD algorithm, because its value is directly
 proportional to the circumference of the observed object. For a high
@@ -104,14 +105,14 @@ determining $N_C$ and sample more points near spinodals and corners to
 capture key features of the object.
 
 Since the resulting parametric curve is continuous and
-differentiable, we can compute the normal $\mathbf{n} = \{n_0, \ldots,
-n_{k}\}$ and the tangent vector $\mathbf{t} = \{t_0, \ldots, t_{k}\}$
-which was discussed in Section~\ref{sec:pbc}. 
+differentiable, we can easily compute the normal vector $\mathbf{n} = \{n_0, \ldots,
+n_{k}\}$ and the tangent vector $\mathbf{t} = \{t_0, \ldots, t_{k}\}$,
+ which was discussed in Section~\ref{sec:pbc}. 
 
 In the planar affine shape-space $\mathcal{S}$, the contour, a
 hypothetical initial estimate, can be compactly represented using a
 vector $\mathbf{\Phi}$ with 6 real elements, namely model
-parameters vector. From the perspective of probability, the hypothetical
+parameter vector. From the perspective of probability, the hypothetical
 curve gives a uncertainty, the solution of the curving problem is
 therefore no longer just a single curve, but a whole family of
 possible curves (Fig.~\ref{fig:transform}). The Gaussian probability density for these possible
@@ -122,7 +123,7 @@ curves in shape-space $\mathcal{S}$ is given as:
    p(\mathbf{\Phi}) \propto
 \mathrm{exp} \left\{ -\frac{1}{2} (\mathbf{\Phi} -
   \mathbf{m}_{\mathbf{\Phi}})^T \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} (\mathbf{\Phi} -
-  \mathbf{m}_{\mathbf{\Phi}}) \right\}
+  \mathbf{m}_{\mathbf{\Phi}}) \right\}\qquad.
 \end{equation}
 
 \begin{figure}[htb]
@@ -142,20 +143,19 @@ $\mathbf{m}_{\mathbf{\Phi}}$ is vector with $6$ elements, and current
 covariance matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}$ is a $6 \times 6$ matrix, which measures the variability of
 how much two groups of model parameters change together. The
 information matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}^{-1}$ can be
-written as 
+written as:
 \begin{equation}
   \label{eq:infomatrix}
-  \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} = \frac{N_{\mathbf{\Phi}}}{\rho_0^2} \mathbf{A}^T\mathcal{U}\mathbf{A}
+  \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} = \frac{N_{\mathbf{\Phi}}}{\rho_0^2} \mathbf{A}^T\mathcal{U}\mathbf{A}\qquad,
 \end{equation}
-
 where $\rho_0^2$ denotes the mean-square displacement along the entire
 curve (\cite{blake1998active}). $\mathbf{A}$ is the shape-matrix, and $\mathcal{U}$ is
 metric matrix for curves. $N_{\mathbf{\Phi}}$ represents
 the number of model parameters. Note $\rho_0^2$
-is a real value and can be computed easily as 
+is a real value and can be computed easily as:
 \begin{equation}
   \label{eq:trace}
-  \rho_0^2 = \mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}})
+  \rho_0^2 = \mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}})\qquad,
 \end{equation}
 where $\mathrm{tr}(\cdot)$ operation denotes the trace of a matrix.
 
@@ -163,10 +163,10 @@ The pre-processed input images and the parametric curve model have
 thus been set up. In the following sections, the iterative procedure of the
 CCD algorithm will be described in detail.
 
-\section{Local statistics}
+\section{Local Statistics}
 \label{sec:ls}
 
-\subsection{Collecting local information}
+\subsection{Collecting Local Information}
 \label{sec:cls}
 
 As claimed in Chapter~\ref{sec:ccdcfp}, one of advantages of the
@@ -186,7 +186,7 @@ search segment is determined as follows:
 
 \begin{equation}
   \label{eq:radius}
-  h = \sqrt{2} \rho_0 = \sqrt{\mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}}\mathbf{A}^T\mathcal{U}\mathbf{A})}
+  h = \sqrt{2} \rho_0 = \sqrt{\mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}}\mathbf{A}^T\mathcal{U}\mathbf{A})}\qquad.
 \end{equation}
 
 $h$ denotes the size of a \textit{window} which is used for computing
@@ -212,7 +212,7 @@ sample distance using $\Delta h$, then the overall number of spaced
 sample points $L$ ($2L$ for both sides in all) can be given by:
 \begin{equation}
   \label{eq:sample}
-  L = \lfloor \frac{h}{\Delta h} \rfloor
+  L = \lfloor \frac{h}{\Delta h} \rfloor\qquad.
 \end{equation}
 
 Note that the goal of the algorithm is to assign each pixel
@@ -225,7 +225,7 @@ posterior probabilities that lie in $(0,1)$ interval, which converts the classif
 assignments $\mathbf{a}_{v}$ for each pixel $\mathrm{v}_{k,l}$ as following:
 \begin{equation}
   \label{eq:pa}
-  \mathbf{a}_v  = (a_{v,1}, a_{v,2})^T
+  \mathbf{a}_v  = (a_{v,1}, a_{v,2})^T\qquad,
 \end{equation}
 where $a_{v,1}$ describes to which extent a pixel $v$ is expected to
 be influenced by side $1$ of the curve, and $a_{v,2}$ is equivalent
@@ -239,7 +239,7 @@ $\mathrm{v}_{k,l}$ and a given curve $\mathbf{C}$
 can be approximated by:
 \begin{equation}
   \label{eq:dis}
-  d_{k,l} = \mathbf{n}_k \cdot ( \mathbf{v}_{k,l} - C_k)
+  d_{k,l} = \mathbf{n}_k \cdot ( \mathbf{v}_{k,l} - C_k)\qquad,
 \end{equation}
 
 \begin{figure}[htbp]
@@ -263,7 +263,7 @@ and covariance of the distribution. Covariance $\sigma$ is expressed as:
 \begin{equation}
   \label{eq:cov}
   \sigma = \mathbf{n}_k \cdot \mathbf{J}_k \cdot \mathbf{\Sigma}_{\Phi}
-  \cdot \mathbf{J}_k^T \cdot \mathbf{n}_k^T
+  \cdot \mathbf{J}_k^T \cdot \mathbf{n}_k^T\qquad,
 \end{equation}
 where $\mathbf{J}_k$ is the Jacobian of curve $\mathbf{C}$. $\sigma$
 can be taken as the uncertainty of the curve along the normal
@@ -276,14 +276,14 @@ In order to apply the probabilistic generative models to the
 classification problem,
 % calculate the the probability that a point lies on side 1 of the curve
 we need to transform the linear function of $\mathbf{\Phi}$ using a
-non-linear activation function $f(\cdot)$~\cite{bishop2006pattern} so that 
+non-linear activation function $f(\cdot)$~\cite{bishop2006pattern}:
 \begin{equation}
   \label{eq:nonla}
-  a_{v,1} = f(\frac{d_{k,l}}{\sigma})
+  a_{v,1} = f(\frac{d_{k,l}}{\sigma})\qquad.
 \end{equation}
 Currently, two main non-linear activation functions are mostly used
 to solve the classification problem. The first is known as the
-\textit{logistic sigmoid} function, and is given by
+\textit{logistic sigmoid} function, and is given by:
 \begin{equation}
   \label{eq:logistic}
   a_{v,1} =
@@ -291,7 +291,7 @@ to solve the classification problem. The first is known as the
 \end{equation}
 The term \textit{sigmoid} stands for
 S-shaped~\cite{bishop2006pattern}. In~\cite{hanek2004contracting},
-another activation function named probit is used, which is defined by
+another activation function named probit is used, which is defined by:
 \begin{equation}
   \label{eq:erf}
   a_{v,1} = \frac{1}{2}erf(\frac{d_{k,l}}{\sqrt{2}\sigma} + 1)\qquad ,
@@ -308,7 +308,8 @@ S-shaped (Fig.~\ref{fig:s-shaped}).
     \centering 
     \subfloat[error function]{\includegraphics[width=8.0cm]{images/erf.jpg}}
   \end{minipage} 
-\caption[Logistic sigmoid function and error function]{Both functions
+\caption[Logistic sigmoid function and probit function]{Logistic
+  sigmoid function and probit function: Both functions
   are S-shaped}
 \label{fig:s-shaped}
 \end{figure}
@@ -317,17 +318,17 @@ In this thesis, we use both of them to implement the algorithm. They give
 similar results but have different behaviors. Logistic sigmoid function
 can be perfectly interpreted from the perspective of
 probability. Consider the side $s \in \{0,1\}$, the posterior
-distribution for side $s = 1$ can be written as
+distribution for side $s = 1$ can be written as:
 \begin{eqnarray}
   \label{eq:pdfs}
   p(s=1|I) &=& \frac{p(I|s=1)p(s=1)}{p(I|s=1)p(s=1)
     + p(I|s=2)p(s=2)}\\
-&=&  \frac{1}{1+exp(-\mathcal{S})}
+&=&  \frac{1}{1+exp(-\mathcal{R})}\qquad,
 \end{eqnarray}
-where I is pixels' RGB value, and $\mathcal{S}$ is defined as
+where I is pixels' RGB value, and $\mathcal{R}$ is defined as:
 \begin{equation}
   \label{eq:ratio}
-  \mathcal{S} = \frac{p(I|s=1)p(s=1)}{p(I|s=2)p(s=2)}
+  \mathcal{R} = \frac{p(I|s=1)p(s=1)}{p(I|s=2)p(s=2)}\qquad.
 \end{equation}
 The logistic sigmoid plays an important role in many classification
 algorithms. It satisfies the symmetry property, and its inverse 
@@ -352,15 +353,13 @@ for the probit activation function the decay is like $\mathrm{exp}(-x^2)$.
 With this assignment and following the suggested rule in~\cite{hanek2004contracting}, we now start to assign two suitable weighting functions
 $\omega_1$, $\omega_2$ to the pixels $\mathrm{v}_{k,l}$ along the
 normal for the two sides of the curve. the weighting functions are
-defined as
+defined as:
 
 \begin{equation}
   \label{eq:weight}
   \omega_{1/2}(d_{k,l}) = C\left(\frac{a_{1/2}(d_{k,l}) -
-    \gamma_1}{1-\gamma_2}\right)^4 \left[e^{-d_{k,l}/(2\hat{\sigma}^2)} - e^{-\gamma_2}\right]^+
+    \gamma_1}{1-\gamma_2}\right)^4 \left[e^{-d_{k,l}/(2\hat{\sigma}^2)} - e^{-\gamma_2}\right]^+\qquad,
 \end{equation}
-
-
 where $\gamma_1$ equals to $0.5$ (disjoint weight assignment) and $\gamma_2$
 equals to $4$ for the truncated Gaussian~\cite{hanek2004contracting}. 
 
@@ -373,7 +372,7 @@ equals to $4$ for the truncated Gaussian~\cite{hanek2004contracting}.
     \centering 
     \subfloat[]{\includegraphics[width=2.0in]{images/weight2.jpg}}
   \end{minipage} 
-\caption{the weight functions of the two sides of the contour, a) the
+\caption[Weight functions]{The weight functions of the two sides of the contour, a) the
   weight function along the positive direction (outside) in the normal of the
   contour. b) the weight function along the negative direction (inside). }
 \label{fig:weight}
@@ -385,7 +384,7 @@ which yields
 \begin{equation}
   \label{eq:deviation}
   \hat{\sigma} = \max \left[\frac{h}{\sqrt(2\gamma_2)}, \gamma_4
-  \right], \sigma  = \frac{1}{\gamma_3} \hat{\sigma}
+  \right], \sigma  = \frac{1}{\gamma_3} \hat{\sigma}\qquad,
 \end{equation}
 
 with the two additional constants $\gamma_3 = 6$ (linear dependence
@@ -399,12 +398,12 @@ limited area, and collected all statistical information required to learn
 local statistics. In the next part, we will evaluate the local
 statistics.
 
-\subsection{Learning local statistics}
+\subsection{Learning Local Statistics}
 \label{sec:lls}
 
 Given the pixel coordinates and RGB values (For the moment, we only consider raw RGB
 statistics), assignment and weight
-function, local mean vectors $\mathbf{m}_{v,s}$  and local covariance matrices
+function, local mean vectors $\mathbf{m}_{v,s}$  and local covariance matrix
 $\mathbf{\Sigma}_{\mathbf{\Phi}}$ will be derived for each side $s \in
 \{1,2\}$ of the curve.
 We first calculate the zero, first and second order weighted moments:
@@ -412,20 +411,20 @@ We first calculate the zero, first and second order weighted moments:
   \label{eq:localm}
   M_{k,s}^{(0)}(d_{k,l,s}) &=& \sum_{l=0}^{2L-1} \omega_s(d_{k,l})\\
   \mathbf{M}_{k,s}^{(1)}(d_{k,l,s}) &=& \sum_{l=0}^{2L-1} \omega_s(d_{k,l}) \mathrm{I}_{k,l}\\
-  \mathbf{M}_{k,s}^{(2)}(d_{k,l,s}) &=& \sum_{l=0}^{2L-1} \omega_s(d_{k,l}) \mathrm{I}_{k,l}\mathrm{I}_{k,l}^T
+  \mathbf{M}_{k,s}^{(2)}(d_{k,l,s}) &=& \sum_{l=0}^{2L-1} \omega_s(d_{k,l}) \mathrm{I}_{k,l}\mathrm{I}_{k,l}^T\qquad,
 \end{eqnarray}
 
-Where $\mathbf{I}$ is just the raw RGB value of a pixel, for a
+where $\mathbf{I}$ is just the raw RGB value of a pixel, for a
 3-channel image and the values of three components
 are  between 0 and 255. The local mean vectors $\mathbf{m}_{v,s}$  and
 the local covariance matrices
-$\mathbf{\Sigma}_{\mathbf{\Phi}}$  are obtained by
+$\mathbf{\Sigma}_{\mathbf{\Phi}}$  are obtained by:
 \begin{eqnarray}
   \label{eq:localmean}
   \mathbf{m}_{k,s} &=& \frac{\mathbf{M}^{(1)}_{k,s}}{M^{(0)}_{k,s}}\\
   \label{eq:localcov}
   \mathbf{\Sigma}_{k,s} &=& \frac{\mathbf{M}^{(2)}_{k,s}}{M^{(0)}_{k,s}}
-  - \mathbf{m}_{k,s}\mathbf{m}_{k,s}^T  + \kappa \mathbf{I}
+  - \mathbf{m}_{k,s}\mathbf{m}_{k,s}^T  + \kappa \mathbf{I}\qquad.
 \end{eqnarray}
 In Eq.~\ref{eq:localcov}, $\kappa I$  means an identity matrix scaled by
 $\kappa$ in order to avoid numerical singularity.Later it is namely
@@ -445,41 +444,40 @@ likelihood function   $p(\mathbf{I}_{k,l} | \mathbf{m}_{v,1}, \mathbf{m}_{v,2},
   parameter $\mathbf{\Phi}$. Here we model the pixel value
   $\hat{\mathbf{m}}_{k,l}$ and $\hat{\mathbf{\Sigma}}_{k,l}$
   for all pixels $\mathrm{v_{k,l}}$ in the vicinity of the curve as the
-  linear combination of $\mathbf{m}_{v,1}$ and $\mathbf{m}_{v,2}$
-
+  linear combination of $\mathbf{m}_{v,1}$ and $\mathbf{m}_{v,2}$:
   \begin{equation}
     \label{eq:meankl}
-    \hat{\mathbf{m}}_{k,l} = a_{v,1}(d_{k,l})\mathbf{m}_{v,1} + a_{v,2}(d_{k,l})\mathbf{m}_{v,2}
+    \hat{\mathbf{m}}_{k,l} = a_{v,1}(d_{k,l})\mathbf{m}_{v,1} + a_{v,2}(d_{k,l})\mathbf{m}_{v,2}\qquad.
   \end{equation}
 
 If we define  $\hat{\mathbf{\Sigma}}_{k,l}$ using the rule as
-$\hat{\mathbf{m}}_{k,l}$ resulting in a function about $d_{k,l}$, the computational cost in the procedure of
-parameters refinement which is discussed in the next section  will be dramatically high. Instead, we decide to
+$\hat{\mathbf{m}}_{k,l}$ resulting in a function with respect to $d_{k,l}$, the computational cost in the procedure of
+parameters refinement which is discussed in the next section  will be very high. Instead, we decide to
 model the covariance matrix $\hat{\mathbf{\Sigma}}_{k,l}$ following the
 rule in~\cite{hanek2004fitting}, but we discard this relation:
 \begin{equation}
   \label{eq:sigmakl}
-  \hat{\mathbf{\mathbf{\Sigma}}}_{k,l} = a_{v,1}(d_{k,l})\mathbf{\Sigma}_{v,1} + a_{v,2}(d_{k,l})\mathbf{\Sigma}_{v,2}
+  \hat{\mathbf{\mathbf{\Sigma}}}_{k,l} = a_{v,1}(d_{k,l})\mathbf{\Sigma}_{v,1} + a_{v,2}(d_{k,l})\mathbf{\Sigma}_{v,2}\qquad.
 \end{equation}
 
 Now for each observed pixel $\mathbf{I}_{k,l}$, the likelihood
-function is given by
+function is given by:
 \begin{equation}
   \label{eq:likelihood}
 p(\mathbf{I}_{k,l} | \mathbf{m}_{v,1}, \mathbf{m}_{v,2},
-  \mathbf{\Sigma}_{v,1}, \mathbf{\Sigma}_{v,1}) = p(\mathbf{I}_{k,l} | \hat{\mathbf{\mathbf{m}}}_{k,l},\hat{\mathbf{\mathbf{\Sigma}}}_{k,l}) 
+  \mathbf{\Sigma}_{v,1}, \mathbf{\Sigma}_{v,1}) = p(\mathbf{I}_{k,l} | \hat{\mathbf{\mathbf{m}}}_{k,l},\hat{\mathbf{\mathbf{\Sigma}}}_{k,l}) \qquad.
 \end{equation}
 However, we require the likelihood for all pixels in the vicinity of
 the curve. If we consider the coupling or other complex relation among
 different group of pixels, the problem will become intractable and the cost of computing will be very expensive. We can
 avoid these problems if we assume pixels to be drawn independently from the same distribution
 , namely independent and identically distributed
-(i.i.d)~\cite{bishop2006pattern}. Thus we can model the likelihood function as
+(i.i.d)~\cite{bishop2006pattern}. Thus we can model the likelihood function as:
 \begin{equation}
   \label{eq:liklihoodall}
   p(\mathbf{I}_{\mathcal{V}} |
   \hat{\mathbf{\mathbf{m}}}_{\mathcal{V}},\hat{\mathbf{\mathbf{\Sigma}}}_{\mathcal{V}})
-  = \prod_l \prod_k p(\mathbf{I}_{k,l} | \hat{\mathbf{\mathbf{m}}}_{k,l},\hat{\mathbf{\mathbf{\Sigma}}}_{k,l}) 
+  = \prod_l \prod_k p(\mathbf{I}_{k,l} | \hat{\mathbf{\mathbf{m}}}_{k,l},\hat{\mathbf{\mathbf{\Sigma}}}_{k,l}) \qquad.
 \end{equation}
 
 The index $\mathcal{V}$ indicates quantities for all pixels $v$ in
@@ -493,11 +491,11 @@ refinement stage to model the conditional distribution.
 
 \section{Refinement of  Parameters}
 \label{sec:ref}
-In this section, an iterative reweighted least square (IRLS) process is executed to refine parameters,
-, model parameter vector and covariance matrix.
+In this section, an iterative reweighted least square (IRLS) process
+is executed to refine parameters, model parameter vector and covariance matrix.
 
-With the likelihood function in Eq.\ref{eq:liklihoodall} and prior distribution in
-Eq.\ref{eq:prior}, we can model the conditional possibility distribution using:
+With the likelihood function in Eq.~\ref{eq:liklihoodall} and prior distribution in
+Eq.~\ref{eq:prior}, we can model the conditional possibility distribution using:
  % we can estimate the $\hat{\Phi}$ using MAP which is based the
 % Bayesian treatment.
 % Firstly, the posterior distribution holds
@@ -516,7 +514,7 @@ Eq.\ref{eq:prior}, we can model the conditional possibility distribution using:
     & \prod_{k = 0}^{N_{C}-1} \prod_{l=0}^{2L-1}{\frac{1}{(2\pi)^{1/2}}
         \frac{1}{|\hat{\mathbf{\Sigma}}_{k,l}|} \mathrm{exp}\{-\frac{1}{2}
         {\left[I_{k,l}-\hat{\mathbf{m}}_{k,l}(a_{v,1})\right]^T\hat{\mathbf{\Sigma}}_{k,l}^{-1}\left[I_{k,l}-\hat{\mathbf{m}}_{k,l}(a_{v,1})\right]}
-      }\}
+      }\}\qquad.
 \end{align}
 The difference between this conditional distribution and posterior
 distribution is that here the former function has not been normalized yet.
@@ -533,7 +531,7 @@ which is given by:
  {\mathbf{\Phi}}^T{\mathbf{\Sigma}_{\mathbf{\Phi}}}^{-1}\mathbf{\Phi}
  + 2LN_{C} \cdot \ln{2\pi} + \nonumber \\
 & 2\sum_{k = 0}^{N_{C}-1} \sum_{l=0}^{2L-1}{\ln{|\mathbf{\Sigma}_{k,l}|}} + \sum_{k = 0}^{N_{C}-1} \sum_{l=0}^{2L-1}
-\left\{{\left[I_{k,l}-\hat{\mathbf{m}}_{k,l}(a_{v,1})\right]^T\hat{\mathbf{\Sigma}}_{k,l}^{-1}\left[I_{k,l}-\hat{\mathbf{m}}_{k,l}(a_{v,1})\right]}\right\}
+\left\{{\left[I_{k,l}-\hat{\mathbf{m}}_{k,l}(a_{v,1})\right]^T\hat{\mathbf{\Sigma}}_{k,l}^{-1}\left[I_{k,l}-\hat{\mathbf{m}}_{k,l}(a_{v,1})\right]}\right\}\qquad.
 \end{align}
 
 We interpret the estimate $\hat{\mathbf{\Phi}}$ of the model
@@ -554,39 +552,39 @@ compute the partial derivatives of $\mathcal{Q}$:
 \begin{equation}
 \label{eq:partcost}
 \nabla_{\mathbf{\Phi}}\{{\mathcal{Q}(\mathbf{\Phi})}\} =  2\{{\mathbf{\Sigma}_{\mathbf{\Phi}}}^{-1}\}^{T}{\mathbf{\Phi}} - \sum_{k = 0}^{N_{C}-1} \sum_{l=0}^{2L-1}
-\left\{\mathcal{J}_{a_{v,1}}^T\hat{\mathbf{\Sigma}}_{k,l}^{-1}\left[I_{k,l}-\hat{\mathbf{m}}_{k,l}(a_{v,1})\right]\right\}
+\left\{\mathcal{J}_{a_{v,1}}^T\hat{\mathbf{\Sigma}}_{k,l}^{-1}\left[I_{k,l}-\hat{\mathbf{m}}_{k,l}(a_{v,1})\right]\right\}\qquad,
 \end{equation}
 
 with being:
 \begin{equation}
   \label{eq:jocob}
-  \mathcal{J}_{a_{v,1}} = \left( \mathbf{m}_{k,1} -\mathbf{m}_{k,2} \right)(\nabla_{\phi} a_{v,1}(d_{k,l}))^T
+  \mathcal{J}_{a_{v,1}} = \left( \mathbf{m}_{k,1} -\mathbf{m}_{k,2} \right)(\nabla_{\phi} a_{v,1}(d_{k,l}))^T\qquad,
 \end{equation}
 
-and where $a_{v,1}(d_{k,l})$ equals
+with the derivative of $a_{v,1}(d_{k,l})$ being:
 \begin{equation}
   \label{eq:nablaa}
 \nabla_{\mathbf{\Phi}} a_{v,1}(d_{k,l}) = \frac{\partial a_{v,1}(d_{k,l})}{\partial d_{k,l}}
 \left( \frac{\partial d_{k,l}}{\partial x_{k,l}}\mathbf{J}_{\mathbf{\Phi}}(\mathrm{v}_{k,l}(x)) + \frac{\partial d_{k,l}}{\partial y_{k,l}}\mathbf{J}_{\mathbf{\Phi}}(\mathrm{v}_{k,l}(y))
- \right)  
+ \right)  \qquad,
 \end{equation}
-Where $\mathrm{v}_{k,l}(x)$ and $\mathrm{v}_{k,l}(y)$ are the axis
-components of pixel $\mathrm{v}_{k,l}$, and $d_{k,l}$ is given by
+where $\mathrm{v}_{k,l}(x)$ and $\mathrm{v}_{k,l}(y)$ are the axis
+components of pixel $\mathrm{v}_{k,l}$, and $d_{k,l}$ is given by:
 \begin{equation}
   \label{eq:diskl}
-  d_{k,l} = (x_{k,l} - x_{k})n_{k}(x) +(y_{k,l} - y_{k}) n_{k}(y)
+  d_{k,l} = (x_{k,l} - x_{k})n_{k}(x) +(y_{k,l} - y_{k}) n_{k}(y)\qquad,
 \end{equation}
 with $n_{k}(x)$ and $n_{k}(y)$ being the components of the normal vector of
-curve point $C_{k}$. Moreover, we have
+curve point $C_{k}$. Moreover, we have:
 \begin{equation}
   \label{eq:nabladkl}
   \nabla_{\mathbf{\Phi}} a_{v,1}(d_{k,l}) = \frac{1}{\sqrt{2\pi}\sigma} \mathrm{exp}\left\{ -\frac{d_{k,l}^2}{2\sigma^2} \right\}
 \left( n_k(x)\mathbf{J}_{\mathbf{\Phi}}(\mathrm{v}_{k,l}(x)) + n_k(y)\mathbf{J}_{\mathbf{\Phi}}(\mathrm{v}_{k,l}(y))
- \right) 
+ \right) \qquad.
 \end{equation}
 According to the properties of  B-spline curve  and planar affine
 model-space, the coordinate of pixel $\mathrm{v}_{kl}$ can be written
-as
+as:
 \begin{eqnarray}
   \label{eq:vkl}
 \mathrm{v}_{k,l}(x) &= & \mathbf{U}_k^{T}\mathbf{A}_x \mathbf{\Phi} + \mathbf{U}_k P_0(x) + \Delta_h n_k(x) \\
@@ -597,7 +595,7 @@ as
 \mathbf{U}_k P_0(y) + \Delta_h n_k(y) \\
           &=&\Phi_1\sum_{i}^nU_{k,i} +
           (1+\Phi_3)\sum_{i}^nU_{k,i}*y_{k,i} + \Phi_{4}\sum_{i}^n
-          U_{k,i}x_{k,i} + \Delta_h n_k(y)
+          U_{k,i}x_{k,i} + \Delta_h n_k(y)\qquad.
 \end{eqnarray}
 
 Now we can compute $\mathbf{J}_{\mathbf{\Phi}}$ as follows:
@@ -608,7 +606,7 @@ Now we can compute $\mathbf{J}_{\mathbf{\Phi}}$ as follows:
 \left[ {\begin{array}{cccccc}
 \frac{\partial \mathrm{v}_{k,l}(x)}{\partial \Phi_0}& \frac{\partial \mathrm{v}_{k,l}(x)}{\partial \Phi_1}& \frac{\partial \mathrm{v}_{k,l}(x)}{\partial \Phi_2}& \frac{\partial \mathrm{v}_{k,l}(x)}{\partial \Phi_3}&\frac{\partial \mathrm{v}_{k,l}(x)}{\partial \Phi_4} &\frac{\partial \mathrm{v}_{k,l}(x)}{\partial \Phi_5}  \\
 \frac{\partial \mathrm{v}_{k,l}(y)}{\partial \Phi_0}& \frac{\partial \mathrm{v}_{k,l}(y)}{\partial \Phi_1}& \frac{\partial \mathrm{v}_{k,l}(y)}{\partial \Phi_2}& \frac{\partial \mathrm{v}_{k,l}(y)}{\partial \Phi_3}&\frac{\partial \mathrm{v}_{k,l}(y)}{\partial \Phi_4} &\frac{\partial \mathrm{v}_{k,l}(y)}{\partial \Phi_5}  \\
- \end{array} } \right]
+ \end{array} } \right]\qquad.
 \end{equation}
 
 Afterwords, the Gauss-Newton approximation to the Hessian
@@ -625,7 +623,7 @@ matrix is given by
 The overall gradient and Hessian matrices for the optimization
 are obtained by adding the prior cost function
 derivatives, and the Newton optimization step can finally be
-performed as
+performed as:
 
 \begin{eqnarray}
 \label{eq:newton}
@@ -634,7 +632,7 @@ performed as
   \mathcal{Q})^{-1} \nabla_{\mathbf{\Phi}} \mathcal{Q} \nonumber \\
   \mathbf{\Sigma}_{\mathbf{\Phi}}^{new} & = &
   c\mathbf{\Sigma}_{\mathbf{\Phi}} - (1-c)(\mathcal{H}_{\mathbf{\Phi}}
-  \mathcal{Q})^{-1}
+  \mathcal{Q})^{-1}\qquad.
 \end{eqnarray}
 with $c$ empirically set to $\frac{1}{4}$. Note that the covariance
 matrix is updated by an exponential decay rule as well. Coefficient $c$ specifies the
@@ -659,7 +657,7 @@ until convergence.
 
 The two stages of the CCD algorithm are iterated until the convergence
 criterion is satisfied. After each iteration step, there are two
-model parameters vectors $\mathbf{m}_{\mathbf{\Phi}}^{old}$ and
+model parameter vectors $\mathbf{m}_{\mathbf{\Phi}}^{old}$ and
 $\mathbf{m}_{\mathbf{\Phi}}^{\mathrm{new}}$, which correspond to the
 spline curves $\mathbf{C}^{\mathrm{old}}$ and
 $\mathbf{C}^{\mathrm{new}}$ respectively. Which kind of convergence
@@ -691,9 +689,9 @@ and can be explained intuitively.
 Traversing all points on curves, the curve-displacement equals to:
 \begin{equation}
   \label{eq:bigD}
-  D(\mathbf{C}^{new}, \mathbf{C}^{old})  = \sum_{i=0}^{N_{C}-1} [C_{i}^{new} - C_{i}^{old})] \cdot \mathbf{n}_{i}
+  D(\mathbf{C}^{new}, \mathbf{C}^{old})  = \sum_{i=0}^{N_{C}-1} [C_{i}^{new} - C_{i}^{old})] \cdot \mathbf{n}_{i}\qquad.
 \end{equation}
-In the implementation of this thesis, we use the $\mathbf{C}^{new} -
+In the implementation of this thesis, we use the $(\mathbf{C}^{new} -
 \mathbf{C}^{old})$ as the convergence criterion of the
 iteration. Moreover, the curve-displacement can also be used to detect
 and delete outliers~\cite{blake1998active}.
@@ -717,7 +715,7 @@ sequence of images captured at successive time-steps. % Some
 In this section we describe a naive tracking algorithm based on the CCD
 algorithm.
 
-A sequence of image for example, video data, consist of neighboring 2-D slices of a
+A sequence of image for example, video data, consist of neighboring two-dimensional slices of a
 higher-dimensional volume. Usually two neighboring frames have similar
 information and features and might only be distinguished by
 investigating in detail. Hence, a naive CCD tracking algorithm can be
@@ -735,13 +733,72 @@ investigating in detail. Hence, a naive CCD tracking algorithm can be
  is proposed in~\cite{hanek2004fitting}. 
 
 
-\section{Summary of the CCD algorithm and its variant}
+\section{Summary of the CCD Approach}
 \label{sec:sccd}
 In this section,  for sake of clarity, a sketch of the naive CCD
 tracker is given. Because the core stage of the naive CCD tracker
 is using the CCD algorithm to fit the contour of an observed
-object, the algorithm sketched below includes the basic steps of the CCD
+object, the algorithm sketched in Alg.~\ref{alg:ccd} includes the basic steps of the CCD
 algorithm.
+
+\SetKwComment{tcc}{/*}{*/}
+
+\begin{algorithm}[htb]
+  \DontPrintSemicolon
+  \KwData{% Sequence image data $\mathbf{I}(t)$, $t$ denotes the
+    % time-step\\A set of control points:  $\mathbf{P} =
+    % \{P_{0}, \ldots, P_{N_{cp}}\}$, $N_{cp}$ is the number of
+    % control points.
+   Sequence image data $\mathbf{I}[t]$, $t$ denotes the time-step; A set of control points:  $\mathbf{P} = \{P_{0}, \ldots, P_{N_{cp}}\}$,
+      $N_{cp}$ is the number of control points.
+  }
+  \KwResult{
+ Estimate model parameter vector $\mathbf{m}_{\mathbf{\Phi}}^{\mathrm{best}}[t]$,
+and corresponding covariance matrix
+$\mathbf{\Sigma}_{\mathbf{\Phi}}^{\mathrm{best}}[t]$ for each frame.
+  }
+  \Begin{
+    \tcc{initilization}
+    $\mathbf{m}_{\mathbf{\Phi}}[0] \longleftarrow 0$\;
+    $t  \longleftarrow 0$\;
+    $s  \longleftarrow \mathrm{\#sequence\_count}$\;
+    \While{$t < s$}{
+      \tcc{generate bspline curve using the control points}
+      $\mathbf{C}[t] \longleftarrow BSpline(\mathbf{P}[t])$\;
+      \tcc{initailize mean vector and covariance matrix}
+      $\mathbf{\Sigma}_{\mathbf{\Phi}}[t] \longleftarrow initCov(\mathbf{C}[t])$\;
+      \If{$t > 0$}
+      {
+        $\mathbf{m}_{\mathbf{\Phi}}[t] \longleftarrow \mathbf{m}_{\mathbf{\Phi}}[t-1]$\;
+      }
+      $iter \longleftarrow 0 ;\quad h \longleftarrow 0$\;
+      \While{$iter < \mathrm{\#maxIteration} \quad \mathrm{and}\quad tol > \mathrm{\#tolerance}$}{
+        \tcc{compute segment length in the perpendicular of the coutour}
+        $h \longleftarrow computerH(\mathbf{\Sigma}_{\mathbf{\Phi}}[t])$\;
+        \tcc{collect pixels in the vicinity of the contour and assign a
+          weight to each pixel}
+        $\omega_{k,l}[t] \longleftarrow computeWeight(\mathbf{\Sigma}_{\mathbf{\Phi}}[t])$\;
+        \tcc{Evaluated the observed model parameters }
+        $\mathbf{m}_{k,s}[t] \longleftarrow computeMean(\mathbf{I}_{k,l}[t], \omega_{k,l}[t])$\;
+        $\mathbf{\Sigma}_{k,s}[t] \longleftarrow computeCov(\mathbf{I}_{k,l}[t], \omega_{k,l}[t])$\;
+        \tcc{compute the local statistics }
+        $\hat{\mathbf{m}}_{k,s}[t] \longleftarrow computeLocalMean(\mathbf{I}_{k,l}[t],\omega_{k,l}[t])$\;
+        $\hat{\mathbf{\Sigma}}_{k,s}[t] \longleftarrow computeLocalCov(\mathbf{I}_{k,l}[t], \omega_{k,l}[t])$\;
+        \tcc{build cost function}
+        $\mathcal{Q} \longleftarrow \mathrm{log}(\mathbf{I}_{k,l}[t],\mathbf{m}_{k,s}[t], \mathbf{\Sigma}_{k,s}[t])$\;
+        \tcc{MAP estimate}
+        $\mathbf{m}_{\mathbf{\Phi}}^{iter}[t], \mathbf{\Sigma}_{\mathbf{\Phi}}^{iter}[t] \longleftarrow MAP(\mathcal{Q})$\;
+        \tcc{obtain the tolerance by computing the curve-displacement}
+        $tol \longleftarrow computeDist(C_{iter}[t];C_{iter-1}[t])$\;
+        $iter \longleftarrow iter + 1$
+      }
+      $\mathbf{m}_{\mathbf{\Phi}}^{\mathrm{best}}[t] \longleftarrow  \mathbf{m}_{\mathbf{\Phi}}^{iter}[t]$\;
+      $\mathbf{\Sigma}_{\mathbf{\Phi}}^{\mathrm{best}}[t] \longleftarrow  \mathbf{\Sigma}_{\mathbf{\Phi}}^{iter}[t]$\;
+      $t \longleftarrow t + 1$\;
+    }
+  }
+  \caption{Algorithm: The naive Contracting Curve Density (CCD) tracker\label{alg:ccd}}
+\end{algorithm}
 
 % \begin{algorithm}
 % \DontPrintSemicolon
@@ -764,80 +821,80 @@ algorithm.
 % \end{algorithm}
 
 % \newcommand{\redvline}{\color{red} \vrule width 4pt}
-\begin{table}[htbp]
-  \caption{Algorithm: The naive Contracting Curve Density (CCD) tracker}
-  \label{summary of CCD}
-  \centering
-  \begin{tabular*}{0.9\textwidth}{!{\color{red} \vrule width 4pt}l}
-\textbf{Input}:\parbox{13cm}{ 
-  \begin{enumerate}
-  \item Sequence image data $\mathbf{I}(t)$, $t$ denotes the time-step
-  \item A set of control points:  $\mathbf{P} = \{P_{0}, \ldots, P_{N_{cp}}\}$,
-$N_{cp}$ is the number of control points.
-  \end{enumerate}
-}
-\\
-\textbf{Output}: 
-\parbox{13cm}{
-  \begin{enumerate}
-  \item Estimate model parameter vector $\mathbf{m}_{\mathbf{\Phi}}^{best}$ 
-  \item Corresponding covariance matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}^{best}$
-  \end{enumerate}
-}
-\\
-\textbf{Initialization}:\parbox{13cm}
-{
-  \begin{enumerate}
-  \item Apply some pre-processing methods to the image data to
-    $\mathbf{I}(0)$, $0$ denotes the first frame
-  \item Compute the B-spline curve $\mathbf{C}_{0}(u)$ and
-    corresponding normal and tangent vectors 
-  \item Initialize $\mathbf{\Sigma}_{\mathbf{\Phi}}(0)$ as zero vector
-  \item Compute the $\mathbf{\Sigma}_{\mathbf{\Phi}}(0)$
-  \end{enumerate}
-}\\
-\textbf{Main loop}: 
-\parbox{13cm}
-{
-If the time-step $t > 0$, execute the \textit{initialization} step for
-the frame of image. Firstly do pre-processing, then initialize $\mathbf{\Sigma}_{\mathbf{\Phi}}(t)$ as
-$\mathbf{\Sigma}_{\mathbf{\Phi}}^{best}(t-1)$, and generate a new
-B-spline curve using $\mathbf{\Sigma}_{\mathbf{\Phi}}(t)$,
-last compute the $\mathbf{\Sigma}_{\mathbf{\Phi}}(0)$. After these
-initialization steps, go into loop of  two stages of the CCD algorithm.
-}\\
+% \begin{table}[htbp]
+%   \caption{Algorithm: The naive Contracting Curve Density (CCD) tracker}
+%   \label{summary of CCD}
+%   \centering
+%   \begin{tabular*}{0.9\textwidth}{!{\color{red} \vrule width 4pt}l}
+% \textbf{Input}:\parbox{13cm}{ 
+%   \begin{enumerate}
+%   \item Sequence image data $\mathbf{I}(t)$, $t$ denotes the time-step
+%   \item A set of control points:  $\mathbf{P} = \{P_{0}, \ldots, P_{N_{cp}}\}$,
+% $N_{cp}$ is the number of control points.
+%   \end{enumerate}
+% }
+% \\
+% \textbf{Output}: 
+% \parbox{13cm}{
+%   \begin{enumerate}
+%   \item Estimate model parameter vector $\mathbf{m}_{\mathbf{\Phi}}^{best}$ 
+%   \item Corresponding covariance matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}^{best}$
+%   \end{enumerate}
+% }
+% \\
+% \textbf{Initialization}:\parbox{13cm}
+% {
+%   \begin{enumerate}
+%   \item Apply some pre-processing methods to the image data to
+%     $\mathbf{I}(0)$, $0$ denotes the first frame
+%   \item Compute the B-spline curve $\mathbf{C}_{0}(u)$ and
+%     corresponding normal and tangent vectors 
+%   \item Initialize $\mathbf{\Sigma}_{\mathbf{\Phi}}(0)$ as zero vector
+%   \item Compute the $\mathbf{\Sigma}_{\mathbf{\Phi}}(0)$
+%   \end{enumerate}
+% }\\
+% \textbf{Main loop}: 
+% \parbox{13cm}
+% {
+% If the time-step $t > 0$, execute the \textit{initialization} step for
+% the frame of image. Firstly do pre-processing, then initialize $\mathbf{\Sigma}_{\mathbf{\Phi}}(t)$ as
+% $\mathbf{\Sigma}_{\mathbf{\Phi}}^{best}(t-1)$, and generate a new
+% B-spline curve using $\mathbf{\Sigma}_{\mathbf{\Phi}}(t)$,
+% last compute the $\mathbf{\Sigma}_{\mathbf{\Phi}}(0)$. After these
+% initialization steps, go into loop of  two stages of the CCD algorithm.
+% }\\
 
-\parbox{2cm}{$\quad$}\parbox{13cm}
-{
-  \begin{enumerate}
-  \item Compute the uncertainty norm, segment length $h$ in terms of
-    current estimate
-  \item Collect the pixels $\mathrm{v}_{k,l}$ according to the $h$ and
-    assign weights to these pixels.
-  \item Compute the local statistics $\mathbf{m}_{k,s}$ and $\mathbf{\Sigma}_{k,s}$
-  \item Evaluated the observed model parameters
-    $\hat{\mathbf{m}}_{k,l}$ and $\hat{\mathbf{\Sigma}}_{k,l}$
-  \item Compute the gradient $\nabla_{\mathbf{\Phi}}\mathcal{Q}$ and the Hessian $\mathcal{H}_{\mathbf{\Phi}}\mathcal{Q}$
-  \item Apply optimization algorithm to the  $\mathcal{Q}$ in order to
-    to compute the $\mathbf{m}_{\mathbf{\Phi}}^{new}$ and $\mathbf{\Sigma}_{\mathbf{\Phi}}^{new}$
-  \item Compute the curve-displacement $\mathbf{D}(\mathbf{C}^{new},
-    \mathbf{C}^{old})$, if it is satisfied with the convergence
-    criterion, accept the $\mathbf{m}_{\mathbf{\Phi}}^{best}(t)$ and
-    $\mathbf{\Sigma}_{\mathbf{\Phi}}^{best}$. Otherwise, go to step 1
-    and until convergence.
-  \end{enumerate}
-}
-\\
-\parbox{2cm}{$\quad$}\parbox{13cm}
-{
-Ff convergence condition is satisfied,
-$\mathbf{m}_{\mathbf{\Phi}}^{best}(t)$ and
-$\mathbf{\Phi}_{\mathbf{\Phi}}^{best}(t)$ are obtained. Then read a
-new frame of an image and go to the beginning of main loop.
-}
-  \end{tabular*}
-\end{table}
-\section{Efficiency and complexity}
+% \parbox{2cm}{$\quad$}\parbox{13cm}
+% {
+%   \begin{enumerate}
+%   \item Compute the uncertainty norm, segment length $h$ in terms of
+%     current estimate
+%   \item Collect the pixels $\mathrm{v}_{k,l}$ according to the $h$ and
+%     assign weights to these pixels.
+%   \item Compute the local statistics $\mathbf{m}_{k,s}$ and $\mathbf{\Sigma}_{k,s}$
+%   \item Evaluated the observed model parameters
+%     $\hat{\mathbf{m}}_{k,l}$ and $\hat{\mathbf{\Sigma}}_{k,l}$
+%   \item Compute the gradient $\nabla_{\mathbf{\Phi}}\mathcal{Q}$ and the Hessian $\mathcal{H}_{\mathbf{\Phi}}\mathcal{Q}$
+%   \item Apply optimization algorithm to the  $\mathcal{Q}$ in order to
+%     to compute the $\mathbf{m}_{\mathbf{\Phi}}^{new}$ and $\mathbf{\Sigma}_{\mathbf{\Phi}}^{new}$
+%   \item Compute the curve-displacement $\mathbf{D}(\mathbf{C}^{new},
+%     \mathbf{C}^{old})$, if it is satisfied with the convergence
+%     criterion, accept the $\mathbf{m}_{\mathbf{\Phi}}^{best}(t)$ and
+%     $\mathbf{\Sigma}_{\mathbf{\Phi}}^{best}$. Otherwise, go to step 1
+%     and until convergence.
+%   \end{enumerate}
+% }
+% \\
+% \parbox{2cm}{$\quad$}\parbox{13cm}
+% {
+% Ff convergence condition is satisfied,
+% $\mathbf{m}_{\mathbf{\Phi}}^{best}(t)$ and
+% $\mathbf{\Phi}_{\mathbf{\Phi}}^{best}(t)$ are obtained. Then read a
+% new frame of an image and go to the beginning of main loop.
+% }
+%   \end{tabular*}
+% \end{table}
+\section{Efficiency and Complexity}
 \label{sec:eff}
 In this section, we discuss the complexity of the CCD algorithm. 
 The time complexity of calculating the local statistics is

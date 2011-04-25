@@ -37,11 +37,11 @@
 \newcommand{\pardevF}[2]{ \frac{\partial #1}{\partial #2} }
 
 % render vectors: 3 and 4 dimensional
-\newcommand{\veciii}[3]{\left[ \begin{array}[h]{c} #1 \\ #2 \\ #3	\end{array} \right]}
-\newcommand{\veciv}[4]{\left[ \begin{array}[h]{c} #1 \\ #2 \\ #3 \\ #4	\end{array} \right]}
+\newcommand{\veciii}[3]{\left[ \begin{array}[h]{c} #1 \\ #2 \\ #3       \end{array} \right]}
+\newcommand{\veciv}[4]{\left[ \begin{array}[h]{c} #1 \\ #2 \\ #3 \\ #4  \end{array} \right]}
 
 % render matrices: 3  dimensional (arguments in row first order)
-\newcommand{\matiii}[9]{\left[ \begin{array}[h]{ccc} #1 & #2 & #3 \\ #4 & #5 & #6 \\ #7 & #8 & #9	\end{array} \right]}
+\newcommand{\matiii}[9]{\left[ \begin{array}[h]{ccc} #1 & #2 & #3 \\ #4 & #5 & #6 \\ #7 & #8 & #9       \end{array} \right]}
 %DOESN'T WORK,DON'T KNOW WHY \newcommand{\mativ}[16]{\left[ \begin{array}[h]{cccc} #1 & #2 & #3 & #4 \\ #5 & #6 & #7 & #8 \\ #9 & #10 & #11 & #12 \\ #13 & #14 & #15 & #16 \end{array} \right]}
 
 
@@ -72,18 +72,18 @@
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{equat}[theorem]{Equation}
 \newtheorem{example}[theorem]{Example}
-\newtheorem{algorithm}[theorem]{Algorithm}
+% \newtheorem{algorithm}[theorem]{Algorithm}
 
 % inserting figures
 \newcommand{\insertfigure}[4]{ % Filename, Caption, Label, Width percent of textwidth
-	\begin{figure}[htbp]
-		\begin{center}
-			\includegraphics[width=#4\textwidth]{#1}
-		\end{center}
-		\vspace{-0.4cm}
-		\caption{#2}
-		\label{#3}
-	\end{figure}
+        \begin{figure}[htbp]
+                \begin{center}
+                        \includegraphics[width=#4\textwidth]{#1}
+                \end{center}
+                \vspace{-0.4cm}
+                \caption{#2}
+                \label{#3}
+        \end{figure}
 }
 
 
@@ -92,26 +92,26 @@
 % referecing figures
 
 \newcommand{\refFigure}[1]{ %label
-	figure \ref{#1}
+        figure \ref{#1}
 }
 \newcommand{\refChapter}[1]{ %label
-	chapter \ref{#1}
+        chapter \ref{#1}
 }
 
 \newcommand{\refSection}[1]{ %label
-	section \ref{#1}
+        section \ref{#1}
 }
 
 \newcommand{\refParagraph}[1]{ %label
-	paragraph \ref{#1}
+        paragraph \ref{#1}
 }
 
 \newcommand{\refEquation}[1]{ %label
-	equation \ref{#1}
+        equation \ref{#1}
 }
 
 \newcommand{\refTable}[1]{ %label
-	table \ref{#1}
+        table \ref{#1}
 }
 
 
@@ -119,7 +119,7 @@
 
 \newcommand{\rigidTransform}[2]
 {
-	${}^{#2}\!\mathbf{H}_{#1}$
+        ${}^{#2}\!\mathbf{H}_{#1}$
 }
 
 %code, in typewriter

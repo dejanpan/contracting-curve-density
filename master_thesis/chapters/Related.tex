@@ -13,33 +13,33 @@ In this chapter we review selected publications related to the topics
 covered in this thesis and try to reveal the evolution of algorithms. The
 articles have been carefully selected based on the following criteria:
 \begin{itemize}
-\item Articles on 2-D and 3-D deformable models,
+\item Articles on two-dimensional and three-dimensional deformable models,
   such as Snakes and gradient vector flow deformable models.
 \item Articles on applying statistical knowledge to the models
 \end{itemize}
 Currently, the second category becomes very popular. The CCD algorithm proposed in
-~\cite{hanek2004contracting} is insprired those methods for solving
+~\cite{hanek2004contracting} is inspired from those methods for solving
 supervised learning problems (e.g. regression, classification) in
 the context of probability.
 
 In section~\ref{sec:2d3ddm} we will discuss the related work
-belonging to the first category. This is followed by the introduction
-of previous work on statistical models.
+belonging to the first category. In the last section, we briefly
+introduce the OpenCV library.ie 
 % The topics of active contour, the Contracting
 % Curve Density approach and model tracking have been addressed in
 % numerous research papers.
 
-\section{2-D and 3-D Deformable Models}
+\section{Two-dimensional and Three-dimensional Deformable Models}
 \label{sec:2d3ddm}
 
-\subsection{2-D \& 3-D Models}
+\subsection{Two-dimensional \& Three-dimensional Models}
 \label{sec:23m}
 Many traditional segmentation methods are effected by the assumption that the
 images studied in computer vision are usually self-contained, namely,
 the information needed for a successful segmentation can be extracted
 from the images.
 
-In 1980s, a paradigm named \textit{Active Vison}~\cite{aloimonos1988active} escaped this bind and
+In 1980s, a paradigm named \textit{Active Vision}~\cite{aloimonos1988active} escaped this bind and
 pushed the vision process in a more goal-directed fashion. After that, a
 notably successful departure, the \textit{Snakes}, is proposed in a
 seminar work conducted by Kass~\cite{kass1988snakes}. The original paper, spawned many variations
@@ -59,7 +59,7 @@ conducted on matching three-dimensional models, both on rigid
 ~\cite{harris1993tracking} and deformable~\cite{terzopoulos1991dynamic} shapes.
 \subsection{Appliocations}
 \label{sec:app}
-Model-based segmentation methods are widly used in the field of
+Model-based segmentation methods are widely used in the field of
 medical image processing. Besides the segmentation,
 dynamic models, such as the Snakes and its variations, are greatly used in application of object
 tracking. A real-time tracking system based on deformable models, such
@@ -73,7 +73,7 @@ in~\cite{schick1991simultaneous}. And last but not least,
 ~\cite{blake1998active} is a complete volume about the topics of
 geometric and probabilistic models  for shapes and their dynamics.
 
-\section{Statistical models}
+\section{Statistical Models}
 \label{sec:sm}
 Pattern recognition theory is a general statistical framework which is
 important in the study of model-based approaches. This has started from the 1970s
@@ -81,9 +81,9 @@ and 1980s when a new interpretation of image was proposed in the
 statistical community.  Analyzing the model problems in probabilistic
 context has two great advantages. The first is that it approaches the
 nature of the problems, the ranges of shapes are defined by a
-probability, this provides another viewpoint for curve-fitting problem
-in the field of computer vision. Another advantage is that after we
-convert a problem in pattern recognition, there are abundant tools to deal with such problems. 
+probability, this provides another viewpoint for the curve-fitting problem
+in the field of computer vision. Another advantage is that when we
+solve the problem in the field of pattern recognition, there are abundant tools to deal with such problems. 
 The CCD approach is a method developed in the probabilistic context. 
 
 In~\cite{kelemen1999three} and~\cite{kelemen1999elastic}, an elegant
@@ -102,15 +102,16 @@ prior distributions for curves~\cite{storvik1994bayesian}.
 
 Defining a prior distribution for shape is only part of the
 problem, prior knowledge only controls the feature interpretation in an
-image, also it just approximates the contour of an observed object. It
-is not difficult to determine the model parameters vector by maximum
-likelihood because there is usually no closed-solution. An indirect
+image, also it just approximates the contour of an observed object. In
+order to solve the problem, likelihood function is required. In some
+special cases, we can get a solution by maximizing likelihood, but
+usually it is intractable because there is no closed-solution. An indirect
 approach known as iterative reweighted least squares
 (IRLS)~\cite{bishop2006pattern} is used find the parameters of the model.
 the CCD  algorithm uses local statistics to evaluate a conditional distribution
-(Likelihood), then iterative maximum a posteriori probability (MAP)
+, then the iterative maximum a posteriori probability (MAP)
 ~\cite{sorenson1980parameter} estimate process is used to refine
-parameters instead of maximizing a complex cost function. 
+parameters instead of maximizing a complicated cost function. 
 Moreover, a blurred curve model is proposed as a efficient mean for iteratively optimizing. The algorithm
 can be used in object localization and object tracking. As an example
 of applications of the CCD approach, an efficient, robust and fully
@@ -140,13 +141,13 @@ pixels on some perpendiculars like the condensation algorithm, but
 focuses on the vicinity of the contour. This means the CCD tracker can
 save time and improve performance.
 
-In the CCD algorithm and its variations, the curve fitting process is
+In the CCD algorithm and its variations, the curve-fitting process is
 often addressed in an optimization stage. The optimization step is
 very important for the CCD approach. There are many methods to
 deal with optimization, which can be classified into two
 categories, one is that global optimization and another is the local
 optimization. The latter one is used in the CCD
-approach. First, a smoothed objective function is obtained by fitting
+approach and it works as follows: First, a smoothed objective function is obtained by fitting
 the curve model to a large scale description. Then the window's size is
 gradually reduced. During the process, many types of  numerical
 optimization methods such as  conjugate gradient method , Newton's

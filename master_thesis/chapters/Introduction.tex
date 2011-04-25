@@ -4,13 +4,13 @@ In the field of computer vison and pattern recognition, determining a
 model from a finite set of samples or a complex image without a prior
 knowledge is an ill-posed problem. Due to the the ill-posedness, in
 the sense that a unique model may not exist, models specifying a prior
-knowledge plays an very important role in solving many important
+knowledge play a very important role in solving many important
 computer vision problems, such as object tracking, shape recognition,
 pose estimation, segmentation, edge detection, stereo matching and 3-D
 reconstruction.
 
 Some parametric curve models, also known as deformable models,
-deformable templates, snakes, or active contours, have been developed
+deformable templates, Snakes, or active contours, have been developed
 to guide the image interpretation process towards particularly
 likely interpretations~\cite{hanek2004fitting}. These parametric curve
 models have had two outstanding influences on the
@@ -18,10 +18,10 @@ development of related algorithms. The first is the Snakes which
 represent a fundamentally new framework for delineating an object
 outline in an image. This algorithm attempts to minimize energy
 associated to the current contour as a sum of an internal and an external
-energy~\cite{kass1988snakes}. The goal of snakes is to balance the prior
+energy~\cite{kass1988snakes}. The goal of Snakes is to balance the prior
 knowledge with evidence from an image. The second outstanding
 influence is in the field of pattern recognition and machine learning,
-where statistical distributions plays a key role.  There treatment
+where statistical distributions play a key role.  There treatment
 of a prior knowledge about shape is put into a probabilistic
 context. Any shape is regarded as the result of applying some
 distortion to an ideal prototype shape, and an appropriate
@@ -45,31 +45,31 @@ curve-fitting problem.
 
 Suppose we have an observed object in an
 image. Boundaries of the object can be completely or partially defined
-by an either open or closed curve obtained by human intervention or
+by an either open or closed contour obtained by human intervention or
 some object recognition techniques, such as SIFT features or reconstruction. The goal of
-curve-fitting problem is to accurately identify \textit{decision boundaries} (2-D) or
-\textit{decision surfaces} (3-D)~\cite{bishop2006pattern} by
-distorting the curve. Since the approximate boundaries of the observed
-object have been been given by the prior curve, there is no need to organise or group features in the
-image, and the analysis can be restricted to a relatively narrow
-ROI (region of interest), as a result, performance of such algorithms
-is boosted up. In the resulting ROI, we aim to distort the contour in a specific
-shape-space and make it attach to the boundary of a given object. This
-is a curve-fitting problem, and the CCD approach discussed in this
-thesis is a powerful model-based algorithm to solve the curve-fitting
-problem.
+the curve-fitting problem is to find the best visual fit of the contour to the boundary of
+the observed object. Since the approximate boundaries of the observed
+object have been given by the prior contour, there is no need to organise or group features in the
+image, thus the analysis can be restricted to a relatively narrow
+region of interest (ROI) and, as a result, performances of such algorithms
+are boosted up. In the resulting ROI, we aim to distort the contour in a specific
+shape-space and make it attach to the boundary of a given
+object. There are many methods which can be used to cope with the
+curve-fitting problem, the CCD approach discussed in this
+thesis is a powerful model-based algorithm to solve it.
 
-The CCD algorithm can be described as follows. Given one or multiple images as input
+The CCD algorithm can be described as follows: Given one or multiple images as input
 data and a parametric curve model with a prior distribution of model
 parameters, through curve-fitting process we estimate the model
 parameters which determine the approximation of the posterior
 distribution in order to make the curve models best matching the image data.
-Fig.~\ref{fig:fitting} depicts a curve-fitting problem, and the corresponding solution is obtained by the
+Fig.~\ref{fig:fitting} depicts a curve-fitting problem and the corresponding solution obtained by the
 CCD algorithm.
 \begin{figure}[htb]
   \centering
   \includegraphics[width=10cm]{images/fitting.jpg}
-  \caption[The description of curve-fitting problem]{a) an input
+  \caption[The description of curve-fitting problem]{The curve-fitting
+    problem: a) an input
     image is given but not showing the pre-processing step. b) A series of
     parametric curve model contours which can be used to evaluate the
     prior distribution. These contours represent only a few possible
@@ -137,15 +137,15 @@ the objects (e.g. cardiac motion and deformation). Probability theory
 provides a consistent framework for the quantification and
 manipulation of uncertainty.  In this section, we view curve-fitting
 problem from a probabilistic perspective and turn us towards to
-Bayesian logistic regression problem.
+a classification problem.
 
 In the CCD algorithm, we aim to find the contour of observed object
-and thus segment it from the background. Therefore, a hypothesis
+and thus segment it from the background. Therefore, a hypothetical 
 contour divides the image into two part (Fig.\ref{fig:divide}), inside
 and outside. For probabilistic model, we can represent this using
 binary representation (e.g. $\{0, 1\}$). The goal of the CCD algorithm
-is equivalent to accurately
-assign a class label to each pixels in the image (Actually we only need assign those pixels in the vicinity of the
+is to accurately
+assign a class label to each pixel in the image (Actually, we only need assign those pixels in the vicinity of the
 contour), thus the curve-fitting problem becomes a classification
 one. A powerful approach to solve this problem involves modeling a
 conditional probability distribution in an inference stage, and then
@@ -163,7 +163,7 @@ likelihood function should be given.
     \centering 
     \subfloat[]{\includegraphics[width=8.0cm]{images/divide2.jpg}}
   \end{minipage} 
-  \caption[A contour divide an image into two parts]{a) The red
+  \caption[A classification problem]{A classification problem: a) The red
     contour successfully segment the box from the background. b) The
     blue one is outside, the golden one is inside.}
   \label{fig:divide}
@@ -263,12 +263,13 @@ After evaluating the CCD algorithm, some new questions are posed.
 \begin{itemize}
 \item How to create a parametric curve model as prior knowledge and
   make it well approximate the distribution of contour shapes? 
-There are a variety of active shape models available, such as principally snakes,
-  deformable templates and dynamic contours. For curve-fitting
-  problem, deformable template is a good choice to match the image
-  data. Model parameters control the complexity of parametric curve,
-  as well degrees of freedom. There is a trade-off between the degree
-  of contour and complexity, with very flexible models having high
+There are a variety of active shape models available, such as principally Snakes,
+  deformable templates and dynamic contours. Selecting a suitable model
+  is essential for the curve-fitting
+  problem. Furthermore, 
+  model parameters control the complexity of parametric curve,
+  as well degrees of freedom (DOFs). There is a trade-off between the
+  degree and the complexity, with very flexible models having high
   computational cost and design barrier, and relatively rigid models
   having low accuracy and high misclassification rate. 
 
@@ -277,7 +278,8 @@ There are a variety of active shape models available, such as principally snakes
   we avoid too much manual intervention?
 
 \item How can the local statistics in the image be efficiently
-  evaluated? First, it is necessary to establish the relation between the model parameters
+  evaluated? It is necessary to establish the relation between the
+  model parameters
   and the image data. This is especially challenging in the presence
   of clutter and strong texture if we consider the factors, such as
   illumination, surface properties, characteristics of the camera and
@@ -285,7 +287,7 @@ There are a variety of active shape models available, such as principally snakes
 
 \item How can the fit be optimized efficiently? Many
   nonlinear optimization algorithms used to estimate MAP could find
-  multiple local maxima and  are not guaranteed to find the largest
+  multiple local maxima and are not guaranteed to find the largest
   out of these maxima.
 \end{itemize}
 
@@ -295,18 +297,17 @@ following aspects:
 \item We will use parametric B-Spline curve as
 parametric model curve. It is proved that this type of curve model is
 flexible enough and can well represent the contour of the
-object. Both 6-D and 8-D model parameters vector
-are provided in our implementation. The parametric model with 8
-degrees of freedom can efficiently fit objects in non-planar affine
-space. Parametric B-Spline curve will be described in
-Chapter~\ref{chapter:bspline}.
+object. Both six-dimensional and 8-dimensional model parameter vector
+are provided in our implementation. The parametric model with 8 DOFs
+can efficiently fit objects in three-dimensional affine
+shape-space. Parametric B-Spline curve will be described in Chapter~\ref{chapter:bspline}.
 \item In order to avoid human intervention, we add a feature to 
   initialize a contour from Scale-invariant feature transform (SIFT)
-  features or a point cloud polygon.
+  features and from a point cloud.
 \item The local statistics is the main feature of the CCD
   algorithms. The blurred curve models can considerably decrease the
   computational cost. However, excessive sparse samples may ignore some
-  features in the vicinity of the curve. Hence, before we blur the
+  features (e.g. spinodals and corners) in the vicinity of the contour. Hence, before we blur the
   model, we compute the circumference of a contour thus reasonably
   sample pixels from the vicinity of the curve.
 \item Experiments show that the probit regression function used
@@ -329,7 +330,7 @@ The algorithm will be released under the open source BSD license. Some
 related information can be found on\\
 \url{http://www.ros.org/wiki/contracting\_curve\_density\_algorithm}
 
-\subsection{Sketch of the CCD algorithm}
+\subsection{Sketch of the CCD Algorithm}
 \label{sec:sccd}
 
 In this section, the basic steps of the CCD algorithm will be
@@ -337,10 +338,10 @@ sketched.
 \begin{enumerate}
 \item \textbf{Initialization}: Given an input image as training data, we first choose an initial
 contour for an object or feature which will be fitted or tracked, and
-some initial values for the means, covariances. For most practical
-application, pre-processing stage is necessary to make the problem
-easier to solve. 
-\item \textbf{Local statistics}: In the step of learning local
+some initial values for the means and covariances. In addition, for most practical
+applications, 
+pre-processing stage is necessary to make the problem easier to solve. 
+\item \textbf{Learning of local statistics}: In the step of learning local
   statistics, for each pixel in the
 vicinity of the expected curve, two sets of local statistics
 are computed, one set for each side of the curve. The local statistics are obtained from
@@ -348,11 +349,11 @@ pixels that are close to the pixel on the contour and most likely lie
 on the corresponding side of the curve, according to the current
 estimate of the model parameters. The resulting local statistics
 represent an expectation of "what the two sides of the curve look
-like"~\cite{hanek2004contracting}, which is known as likelihood.
-\item \textbf{Refining parameters}: The conditional distribution, namely
+like"~\cite{hanek2004contracting}, also known as likelihood.
+\item \textbf{Refinement of model parameters}: The conditional distribution, namely
   the product of prior distribution and  the likelihood, is evaluated
   as the cost function. Then MAP estimate is executed to optimize the
-  parameters, as a result, MAP value of model parameters vector and
+  parameters, as a result, MAP value of model parameter vector and
   covariance will be given in this step.
 \item \textbf{Checking Convergence}: Check for convergence of either
   the parameters or log cost function. If the convergence criterion is
@@ -363,7 +364,7 @@ Fig.\ref{fig:flowchart} gives the flow chart of the CCD algorithm.
   \centering
   \includegraphics[width=10cm]{images/flowchart.jpg}
   \caption[The flow chart of
-  the CCD algorithm ]{The flow chart of the CCD algorithm}
+  the CCD algorithm]{The flow chart of the CCD algorithm}
   \label{fig:flowchart}
 \end{figure}
 
@@ -385,7 +386,7 @@ follows. Chapter~\ref{chapter:related} describes the related work on
 active contour, model-based image segmentation and tracking, as well
 as optimization methods. In Chapter~\ref{chapter:SHI}, we give a brief introduction of software
 and hardware infrastructure used in the implementation of the CCD
-approach. We will concern the OpenCV library, ROS and PR2. Details on shape-space models and parametric
+approach. We will focus on the OpenCV library, ROS and PR2. Details on shape-space models and parametric
 B-Spline curves are discussed in Chapter~\ref{chapter:bspline},  and
 Chapter~\ref{chapter:ccd} explains the CCD approach in detail. 
 In Chapter~\ref{chapter:experiments}, experiments and results are demonstrated.%  In

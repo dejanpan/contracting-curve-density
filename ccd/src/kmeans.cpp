@@ -60,15 +60,10 @@ int main( int argc, char** argv )
     (ptr+i*step)[2] = points.ptr<double>(i)[2];
   }
 
+  
   CvMat labelsMat = labelsKmeans;
   CvMat *labels = &labelsMat;
-
-  CvMat **initCovs = (CvMat**)cvAlloc( clusterCount * sizeof(*initCovs));
-  // for (int i = 0; i < clusterCount; ++i)
-  // {
-  //   cvCalcCovarMatrix( vec, cluster_size, initCovs[i], &avg, CV_COVAR_NORMAL | CV_COVAR_SCALE )
-  // }
-
+  
   CvMat *initMeans = cvCreateMat(clusterCount,3, CV_64FC1);
   cvZero(initMeans);
   double *mptr = initMeans->data.db;
@@ -82,6 +77,7 @@ int main( int argc, char** argv )
     (mptr+labelsKmeans.at<int>(i)*dstep)[1] += (ptr+i*step)[1];
     (mptr+labelsKmeans.at<int>(i)*dstep)[2] += (ptr+i*step)[2];
   }
+  
   for (int i = 0; i < clusterCount; ++i)
   {
     (mptr+i*dstep)[0] /= clusterPoints[i];
@@ -89,7 +85,20 @@ int main( int argc, char** argv )
     (mptr+i*dstep)[2] /= clusterPoints[i];
   }
 
+  CvMat **clusters = (CvMat**)cvAlloc( clusterCount * sizeof(*clusters));
+  for (int i ; i < clusterCount; ++i)
+  {
+    clusters[i] = cvCreateMat(clusterPoints[i], 3, CV_64FC1);
+  }
 
+
+  CvMat **initCovs = (CvMat**)cvAlloc( clusterCount * sizeof(*initCovs));
+  for (int i = 0; i < clusterCount; ++i)
+  {
+    cvCalcCovarMatrix( , clusterPoints[i], initCovs[i], mptr+i*dstep, CV_COVAR_NORMAL | CV_COVAR_SCALE );
+  }
+
+  
   CvMat *initWeights = cvCreateMat(1, clusterCount, CV_64FC1);
   mptr = initWeights->data.db;
   for (int i = 0; i < clusterCount; ++i)

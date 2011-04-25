@@ -63,10 +63,13 @@ powerful method which is combined with the prior knowledge. By
 converting a pure segmentation problem to a problem from pattern
 recognition field, a large amount of techniques in the field of pattern
 recognition are introduced to solve segmentation problems, which are
-proved to be effective and helpful. Compared with other segmentation
-methods (Fig.~\ref{fig:seg_comparison}), such as intensive-based method,  cluster method, region-based
-method and compression-based methods, the CCD algorithm has following
-advantages:
+proved to be effective and helpful. In comparison with other segmentation
+methods, such as
+edge detection (Fig.~\ref{fig:seg_comparison}a), watershed
+transformation methods (Fig.~\ref{fig:seg_comparison}b), graph
+partitioning methods (Fig.~\ref{fig:seg_comparison}c)
+and cluster methods (Fig.~\ref{fig:seg_comparison}d and Fig.~\ref{fig:seg_comparison}e),
+, the CCD algorithm has following advantages:
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
@@ -107,7 +110,7 @@ advantages:
 
 \begin{itemize}
 \item restrict segmentation problem to a limited explicit region: it is helpful
-  to decrease the computation cost;
+  to decrease the computational cost;
 \item probabilistic representation of the variation of the registered
   samples could be easily given, thus statistical inference between
   the model and the image will be applied. All these are helpful to
@@ -121,8 +124,8 @@ In the following, we apply the proposed CCD algorithm to 4 kind of
 objects:
 \begin{enumerate}
 \item segmentation of a spherical object;
-\item segmentation of a 3D object;
-\item segmentation of a transparent object;
+\item segmentation of a three-dimensional object;
+\item segmentation of a half-transparent object;
 \item fitting a rigid wire frame.
 \end{enumerate}
 
@@ -210,11 +213,11 @@ sub-pixel accuracy.}
 In the experiments of segmenting a spherical object, a planar
 affine space of contour is generated. It works very well because the
 contour of the ball is always a circle, there is no parallax effect
-for such objects. In this case, a 6-dimensional model parameter vector
+for such objects. In this case, a six-dimensional model parameter vector
 can cope with basic geometrical transformation of an object. However,
-clearly a 6-dimension model parameters vector can not
+clearly a six-dimensional model parameter vector can not
 suffice for non-planar surfaces. Imagine a scenario where we generate the  planar affine
-space contour of a non-planar cube in the first view (Fig.~\ref{fig:box_mismatch}a). In the
+space contour of a three-dimensional cube in the first view (Fig.~\ref{fig:box_mismatch}a). In the
 subsequent view the cube does not lie in the old
 space. Due to the parallax effect the mismatch in the fitted contour
 will be detected. This is demonstrated in the fitting experiment (Fig.~\ref{fig:box_mismatch}).
@@ -227,7 +230,7 @@ will be detected. This is demonstrated in the fitting experiment (Fig.~\ref{fig:
     \centering 
     \subfloat[]{\includegraphics[width=2.5in]{images/box2_mismatch.jpg}}
   \end{minipage} 
-  \caption[Planar space can not encompass a general non-planar
+  \caption[Planar space can not encompass a general three-dimensional
   contour]{a) A planar affine space of contours has been fitted from
     the outline of the first view of the cuboid. b) As the viewpoint
     is changed, the outline of the cuboid in the subsequent view does
@@ -237,15 +240,15 @@ will be detected. This is demonstrated in the fitting experiment (Fig.~\ref{fig:
 \end{figure}
 
 
-% The new 3D affine shape-space with 8 degree of freedom,
+% The new three-dimensional affine shape-space with 8 degree of freedom,
 % made up of the 6-parameter planar affine space and a two-parameter
 % extension, is designed to cope with such problem. 
-In order to account for this issue we introduced the 3D affine
+In order to account for this issue we introduced the three-dimensional affine
 shape-space with 8 DOFs.
 Two added components
 account for the depth variation that is not visible in the template
 view. After adding the two new parameters to the shape matrix, the form
-of shape matrix for 3D case can be given as follows:
+of shape matrix for three-dimensional case can be given as follows:
 \begin{equation}
   \label{eq:4.18}
   A =
@@ -264,13 +267,13 @@ of shape matrix for 3D case can be given as follows:
     \centering 
     \subfloat[]{\includegraphics[width=2.5in]{images/box2_ok.jpg}}
   \end{minipage} 
-  \caption[Fitting the contour of non-planar object]{Using 3D
-    affine shape-space fitting of a contour to the non-planar object
+  \caption[Fitting the contour of three-dimensional object]{Using three-dimensional
+    affine shape-space fitting of a contour to the observed object
     becomes possible.}
 \label{fig:box_match}
 \end{figure}
 
-The 3D affine shape-space model parameters have
+The three-dimensional affine shape-space model parameters have
 the following interpretation
 
 \begin{equation}
@@ -281,7 +284,7 @@ the following interpretation
 The expanded space now encompasses the object in all views as depicted
 in Fig.~\ref{fig:box_match}. At last, we do
 another experiment for an object with an irregular shape (Fig.~\ref{fig:container}). This
-demonstrates that the CCD works well for 3D non-planar object, too.
+demonstrates that the CCD works well for three-dimensional object, too.
 
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
@@ -300,8 +303,8 @@ demonstrates that the CCD works well for 3D non-planar object, too.
     \centering 
     \subfloat[iteration 7]{\includegraphics[width=2.5in]{images/container/5.jpg}}
   \end{minipage} 
-\caption[3D affine shape-space for rigid object]{The
-  non-planar polyhedron is encompassed by a 3D affine space.}
+\caption[three-dimensional affine shape-space for rigid object]{The
+  non-planar polyhedron is encompassed by a three-dimensional affine space.}
 \label{fig:container}
 \end{figure}
 
@@ -314,7 +317,7 @@ target is a Cocacola bottle whose upper part is nearly transparent and the
 lower part is opaque. The result in Fig.~\ref{fig:cola} shows that the CCD algorithm
 segments the lower part but fails to completely encompass the contour in the
 upper part. However, because the model only has 6 (or 8
-for 3D object) DOFs, the convergence of the lower part will aid the convergence for the whole object.
+for three-dimensional object) DOFs, the convergence of the lower part will aid the convergence for the whole object.
 
 
 \begin{figure}[htbp] 
@@ -347,7 +350,7 @@ in the right. The transparency leads to the difficulties. }
 % \subsection{Fitting a Rigid Wire Frame}
 % \label{sec:fdo}
 % In the following, we fit a rigid wire frame model to the image
-% depicted in Fig.~\ref{fig:wireframe}.  The degrees of freedom
+% depicted in Fig.~\ref{fig:wireframe}.  The DOFs
 % are the 8 pose parameters. This experiment demonstrates that the CCD
 % algorithm is not only able to exploit object contours, but it can also
 % use internal model edges separating multiple, possibly dependent,
@@ -418,7 +421,7 @@ features and advantages:
   identification and easy to match against a database of local
   features. 
 \item Need few features (as few as 3) from an object to compute its location
-  and pose. Computation cost is moderate on modern computer hardware.
+  and pose. Computational cost is moderate on modern computer hardware.
 \end{itemize}
 
 % Based on these features, SIFT is usable for object recognition, the
@@ -468,7 +471,7 @@ into the test image to obtain the estimate of the contour
 position. This is illustrated in Fig.~\ref{fig:sift} and
 Fig.~\ref{fig:sift_result}. Note that because SIFT is only invariant
 to minor changes in view points, the method does not always work for
-non-planar objects which have substantially different view points.
+three-dimensional objects which have substantially different view points.
 
 \begin{figure}[htbp]
   \centering
@@ -531,21 +534,21 @@ edge of the book]{After 8 iterations, the contour obtained in Fig.~\ref{fig:sift
 \end{figure}
 
 
-\section{Track Initialization from 3D Point Cloud}
+\section{Track Initialization from Three-dimensional Point Cloud}
 \label{sec:tifpc}
 
-% A point cloud is a set of vertices created by 3D
+% A point cloud is a set of vertices created by three-dimensional
 % scanners. The scanners measure points on the surface of an object,
 % therefore, a point cloud represents the set of points measured by the
-% device. Point clouds cloud are widely used to  create 3D CAD models
+% device. Point clouds cloud are widely used to  create three-dimensional CAD models
 % for manufactured parts, a multitude of visualization, animation and
 % rendering.
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\linewidth]{images/pr2b.jpg}
   \caption[Kinect camera of the PR2 Robot and object candidate
-  segmented in 3D point cloud.]{Kinect camera of
-    the PR2 Robot and object candidate segmented in 3D point
+  segmented in three-dimensional point cloud.]{Kinect camera of
+    the PR2 Robot and object candidate segmented in three-dimensional point
     cloud. Encompassing a contour of the back-projected points onto
     the image is used as an initial contour for the CCD algorithm.}
   \label{fig:pointcloud}
@@ -556,41 +559,29 @@ edge of the book]{After 8 iterations, the contour obtained in Fig.~\ref{fig:sift
 % triangle mesh models, NURBS surface models, or CAD models through a
 % process commonly referred to as surface reconstruction.
 
-% In human living environments the objects of daily use
-% are typically standing on horizontal, planar surfaces or, as
-% physics-based image interpretation states it, they must be
-% in stable force-dynamic states. The scenes they are part of
-% can be cluttered or the objects are more or less isolated. To
-% account for these conditions, the ODUfinder employs two
-% alternative methods for region extraction: first, the combined
-% 2D-3D extraction for objects standing more or less isolated
-% on planar surfaces, and, second, the region-growing based
-% extraction for cluttered scenes, such as the objects standing
-% in a cupboard. These two methods are described below
+In this section, we describe an initialization method which utilizes three-dimensional
+point cloud for finding contours.
 
-The combined 2D-3D object detection takes a 3D point
-cloud acquired through a tilting laser scanner or a kinect
-sensor and a camera image of the same scene. Figure 3 (left)
-shows how the ODUfinder detects major horizontal, planar
-surfaces within the point cloud and point clusters that are
-supported by the planes 3. The identified point clusters in the
+As depicted in Fig.~\ref{fig:pointcloud}, the PR2 robot simultaneously takes a three-dimensional scan and captures
+an image of the scene in front of it. The robot generates
+object hypotheses by detecting candidate point clusters in
+the three-dimensional point cloud acquired by the depth sensor. % These
+% object hypotheses are then back-projected into the captured
+% image as regions of interest and searched for detecting and
+% recognizing objects.
+The identified point clusters in the
 point cloud are then back-projected into the captured image
 to form the region of interest that corresponds to the object
 candidate. An accurate back-projection is possible thanks to
-the accurate robot calibration, as described by Pradeep et
-al. [10]. The sensors are calibrated using a non-linear bundleadjustment-
-like optimization to estimate various parameters
-of the TUM-PR2 Robot.
-
-In this experiments, we plan to convert a point cloud of an object to a
-polygon, then use this polygon as the initial contour of observed
-object. In the point cloud in Fig.~\ref{fig:pointcloud}, edges of
-the observed object are not smoothed. By applying the CCD algorithm,
-we can accurately obtain the contour of a observed object. In
-comparison with the initialization from SIFT features, because the
-outlines created from point cloud is 3D, it is more
-suitable for non-planar objects.
-
-
-
-
+the accurate robot calibration. The sensors are calibrated using a non-linear bundle-
+adjustment-like optimization to estimate various parameters
+of the PR2 Robot. However,
+the resulting polygons of the observed object are not smoothed,
+usually it can not completely encompass the whole object.
+By applying the CCD algorithm, we can accurately obtain the contour of
+a observed object. The result of the experiment is similar to the one
+obtained from the SIFT features.
+%  In
+% comparison with the initialization from SIFT features, because the
+% outlines created from point cloud is three-dimensional, it is more
+% suitable for non-planar objects.

@@ -7,5 +7,42 @@
 #+BEAMER_HEADER_EXTRA: \usetheme{dimilar}\usecolortheme{rose}
 #+COLUMNS: %35ITEM %10BEAMER_env(Env) %10BEAMER_envargs(Args) %4BEAMER_col(Col) %8BEAMER_extra(Ex)
 
-* Overview
-** The Contracting Curve Density (CCD) Algorithm
+# * Overview
+# ** Motivation
+# *** A 2-Class classification problem                                :B_block:
+#     :PROPERTIES:
+#     :BEAMER_env: block
+#     :END:
+# #+CAPTION: 2-Class classification problem
+#     #+LABEL:   fig:class
+#     #+ATTR_LaTeX: width=9.5cm,angle=0
+#     [[/home/dimilar/ros/external/contracting-curve-density/master_thesis/ppt/images/classification.png]]
+
+# ** The Contracting Curve Density (CCD) Algorithm
+# *** Bayesian Logistic Regression
+# **** A supervised machine learning problem
+# **** Logistic regression is a linear probabilistic discriminative model
+* Motivation: Video of tracking the book or an obejct in clutter (1 slide)
+** Motivation: 
+* Outline of the talk (1 slide)
+** Outline of the talk
+* How the original CCD works?(2 or 3 slides) 
+** How the original CCD works? (flowchart)
+###shape-space, contour initialization, local statistics, optimization step
+** figure of the ball
+* Related work (1 slides)
+** 3-4 papers
+* Improvements of the original algorithm. (4 slides)
+** Cubic and quadratic b-spline
+** logitic and probit
+** three-dimensional affine shape-space
+** initilization from SIFT.
+### planar affine shape-space, non-planar->three-dimensional affine shape-space.
+* The CCD tracker (1 slide)
+** algorithm
+* Results of the experiments (2 slides)
+** manually initialization
+** initialization from SIFT
+### open source, ros package
+* Summary and Future work (1 slide)
+* Thanks( 1 slide)
