@@ -442,7 +442,7 @@ images. However, SIFT matching
 might lead to lots of "false" matches. % In order
 % to evaluate the homography, firstly we have to exclude the
 % mismatches. 
-For filtering out false positives, we use RANSAC, which is an
+For filtering out false positives, we use \acronym{RANSAC}{RANdom SAmple Consensus}, which is an
 iterative process that randomly selects enough matches to fit the
 homography. It contains the following steps~\cite{fischler1981random}.
 
@@ -461,7 +461,7 @@ homography. It contains the following steps~\cite{fischler1981random}.
 \end{itemize}
 Fast way to compute the homography in a least squares sense is to use the Normalized
 Direct Linear Transform (normalized
-DLT)~\cite{hartley2003multiple}. The Normalized DLT algorithm computes
+\acronym{DLT}{Direct Linear Transform})~\cite{hartley2003multiple}. The Normalized DLT algorithm computes
 a homography for a projective transformation by using at least 4 point
 correspondences and then minimizing corresponding norm.
 

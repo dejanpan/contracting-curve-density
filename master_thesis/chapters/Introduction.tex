@@ -30,7 +30,7 @@ For both kinds of methods, the common aim is to strengthen the visual
 interpretation of the shape via the establishing influence of prior
 expectations of the shapes that are likely to be
 seen~\cite{blake1998active}. This thesis dwells upon the Contracting
-Curve Density (CCD) algorithm whose basic step is solving a
+Curve Density (\acronym{CCD}{Contracting Curve Density}) algorithm whose basic step is solving a
 curve-fitting problem in a probabilistic context.
 
 
@@ -46,12 +46,12 @@ curve-fitting problem.
 Suppose we have an observed object in an
 image. Boundaries of the object can be completely or partially defined
 by an either open or closed contour obtained by human intervention or
-some object recognition techniques, such as SIFT features or reconstruction. The goal of
+some object recognition techniques, such as \acronym{SIFT}{Scale-invariant feature transform} features or reconstruction. The goal of
 the curve-fitting problem is to find the best visual fit of the contour to the boundary of
 the observed object. Since the approximate boundaries of the observed
 object have been given by the prior contour, there is no need to organise or group features in the
 image, thus the analysis can be restricted to a relatively narrow
-region of interest (ROI) and, as a result, performances of such algorithms
+region of interest (\acronym{ROI}{Region of Interest}) and, as a result, performances of such algorithms
 are boosted up. In the resulting ROI, we aim to distort the contour in a specific
 shape-space and make it attach to the boundary of a given
 object. There are many methods which can be used to cope with the
@@ -216,9 +216,9 @@ The likelihood function obtained from the local statistics has
 not a closed-form solution. In addition, the prior distribution is just
 an approximate to the true distribution. Therefore, Maximization
 likelihood method does not work here, we have to use an alternative
-approach known as iterative reweighted least squares (IRLS) to find
+approach known as iterative reweighted least squares (\acronym{IRLS}{Iterative Reweighted Least Squares}) to find
 the solution. Here the IRLS process is called Maximum a Posterior, or
-simply MAP.
+simply \acronym{MAP}{Maximum a Posteriori Probability}
 
 In the CCD algorithm, because we just need a parameter vector determining
 the shape of specified contour, we do not plan to calculate the
@@ -268,7 +268,7 @@ There are a variety of active shape models available, such as principally Snakes
   is essential for the curve-fitting
   problem. Furthermore, 
   model parameters control the complexity of parametric curve,
-  as well degrees of freedom (DOFs). There is a trade-off between the
+  as well degrees of freedom (\acronym{DOFs}{degrees of freedom}). There is a trade-off between the
   degree and the complexity, with very flexible models having high
   computational cost and design barrier, and relatively rigid models
   having low accuracy and high misclassification rate. 
@@ -386,7 +386,7 @@ follows. Chapter~\ref{chapter:related} describes the related work on
 active contour, model-based image segmentation and tracking, as well
 as optimization methods. In Chapter~\ref{chapter:SHI}, we give a brief introduction of software
 and hardware infrastructure used in the implementation of the CCD
-approach. We will focus on the OpenCV library, ROS and PR2. Details on shape-space models and parametric
+approach. We will focus on the \acronym{OpenCV}{Open Source Computer Vision Library}, \acronym{ROS}{Robot Operating System} and \acronym{PR2}{Personal Robot 2}. Details on shape-space models and parametric
 B-Spline curves are discussed in Chapter~\ref{chapter:bspline},  and
 Chapter~\ref{chapter:ccd} explains the CCD approach in detail. 
 In Chapter~\ref{chapter:experiments}, experiments and results are demonstrated.%  In

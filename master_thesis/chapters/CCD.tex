@@ -642,7 +642,8 @@ convergence process will be very slow. On one hand if $c$ is
 very small, CCD might diverge.
 
 We can investigate the iteration process of the CCD algorithm by
-comparing it to the counterpart of K-means or EM algorithms, both of
+comparing it to the counterpart of K-means or
+Expectation Maximization (\acronym{EM}{Expectation Maximization}) algorithms, both of
 which also include two stages. First it is required to choose some
 initial values for the parameters governing the posterior
 distribution. Then in the E (expectation) step, a cost function is
@@ -742,7 +743,6 @@ object, the algorithm sketched in Alg.~\ref{alg:ccd} includes the basic steps of
 algorithm.
 
 \SetKwComment{tcc}{/*}{*/}
-
 \begin{algorithm}[htb]
   \DontPrintSemicolon
   \KwData{% Sequence image data $\mathbf{I}(t)$, $t$ denotes the
@@ -797,7 +797,9 @@ $\mathbf{\Sigma}_{\mathbf{\Phi}}^{\mathrm{best}}[t]$ for each frame.
       $t \longleftarrow t + 1$\;
     }
   }
-  \caption{Algorithm: The naive Contracting Curve Density (CCD) tracker\label{alg:ccd}}
+  \caption{Algorithm: The naive Contracting Curve Density (CCD)
+    tracker}
+\label{alg:ccd}
 \end{algorithm}
 
 % \begin{algorithm}

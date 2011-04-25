@@ -140,3 +140,16 @@
 
 
 \newcommand{\etAl}{\emph{et al.}\mbox{ }}
+
+\makeatletter
+\newcommand{\acronym}[2]{%
+ \addcontentsline{acr}{acron}{\protect\makebox[2.6cm][l]{#1}#2}#1%
+}
+
+\newcommand{\listofacronyms}{%
+ \chapter*{List of Acronyms}
+ \@starttoc{acr}
+}
+
+\newcommand\l@acron[2]{\par\noindent #1, #2}
+\makeatother

@@ -97,7 +97,7 @@ furthermore, the statistical shape models enforce the prior
 probabilities on objects by designing a complicated energy function.  In this thesis, we assume that the shapes' priors have a Gaussian form in
 shape-space. In the case of a norm-squared density over  quadratic spline space,
 the prior is a Gaussian Markov Random Field
-(MRF)~\cite{blake1998active}, which is used widely  for modelling
+(\acronym{MRF}{Markov Random Field})~\cite{blake1998active}, which is used widely  for modeling
 prior distributions for curves~\cite{storvik1994bayesian}.
 
 Defining a prior distribution for shape is only part of the
@@ -118,7 +118,7 @@ of applications of the CCD approach, an efficient, robust and fully
 automatic real-time system for 3D object pose tracking in
 image sequences is presented in~\cite{panin2006fully}
 and~\cite{panin2006efficient}. MultiOcular Contracting Curve Density
-algorithm (MOCCD)~\cite{hahn2007tracking} is an extension of the CCD
+algorithm (\acronym{MOCCD}{MultiOcular Contracting Curve Density})~\cite{hahn2007tracking} is an extension of the CCD
 approach. In the paper, it is integrated into the tracking system of
 the human body. 
 % A successful segmentation or curve fitting requires to
@@ -133,7 +133,7 @@ system. However, they are limited by the performance and stability
 problems. Several methods achieve a speed-up by propagating a Gaussian
 distribution of the model parameters over time, such as tracking based
 Kalman filter in~\cite{brookner1998tracking}. The method is limited by the range of probability
-distributions they presented. The condensation algorithm (Conditional
+distributions they presented. The \acronym{condensation}{Conditional Density Propagation} (Conditional
 Density Propagation)~\cite{isard1998icondensation} is proved as a marked improvement in tracking performance. Another feature of
 this method is that it only considers the pixels on some
 perpendiculars of a contour. The CCD tracker~\cite{hanek2004fitting} uses only
@@ -152,5 +152,7 @@ the curve model to a large scale description. Then the window's size is
 gradually reduced. During the process, many types of  numerical
 optimization methods such as  conjugate gradient method , Newton's
 method, Gaussian-Newton and Levenberg-Marquardt
+(\acronym{LMM}{Levenberg-Marquardt method})
 algorithm~\cite{contourpanin2011}, least squares support vector
-machine (LS-SVM)~\cite{vapnik2000nature} can be used.
+machine (\acronym{LS-SVM}{least squares support vector
+machine})~\cite{vapnik2000nature} can be used.
