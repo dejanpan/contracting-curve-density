@@ -26,6 +26,8 @@ snake:snake.cpp
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $< $(LDFLAGS)
 em:em.cpp
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $< $(LDFLAGS)
+curve:curve.cpp $(OBJECTS)
+	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $(OBJECTS) $< $(LDFLAGS)
 kmeans:kmeans.cpp
 	$(CC) $(INCDIR) $(CFLAGS)  -o $@ $< $(LDFLAGS)
 test:test.cpp $(OBJECTS) sift_init.o

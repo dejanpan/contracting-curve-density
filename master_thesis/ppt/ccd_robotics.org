@@ -6,43 +6,159 @@
 #+BEAMER_FRAME_LEVEL: 2
 #+BEAMER_HEADER_EXTRA: \usetheme{dimilar}\usecolortheme{rose}
 #+COLUMNS: %35ITEM %10BEAMER_env(Env) %10BEAMER_envargs(Args) %4BEAMER_col(Col) %8BEAMER_extra(Ex)
+#+LaTeX_Header:\usepackage{algorithm2e}
 
-# * Overview
-# ** Motivation
-# *** A 2-Class classification problem                                :B_block:
-#     :PROPERTIES:
-#     :BEAMER_env: block
-#     :END:
-# #+CAPTION: 2-Class classification problem
-#     #+LABEL:   fig:class
-#     #+ATTR_LaTeX: width=9.5cm,angle=0
-#     [[/home/dimilar/ros/external/contracting-curve-density/master_thesis/ppt/images/classification.png]]
+* Motivation
+** Motivation
+*** Some challenging task in personal robotics                      :B_alertblock:
+    :PROPERTIES:
+    :BEAMER_env: alertblock
+    :END:
+**** Image segmentation
+**** Pose estimation
+**** Object recognition and tracking
 
+*** Model-based methods: these problems require much information external to the image
+*** Curve-fitting process: a crucial part of these problems
+*** Requirements                                             :B_exampleblock:
+    :PROPERTIES:
+    :BEAMER_env: exampleblock
+    :END:
+**** Robustness: stable in texture, clutter, poor contrast environment
+**** Accuracy: high sub-pixel accuracy
+**** Efficiency: time-constrained, limited computer hardware resources in personal robotics
 # ** The Contracting Curve Density (CCD) Algorithm
-# *** Bayesian Logistic Regression
-# **** A supervised machine learning problem
-# **** Logistic regression is a linear probabilistic discriminative model
-* Motivation: Video of tracking the book or an obejct in clutter (1 slide)
-** Motivation: 
-* Outline of the talk (1 slide)
+# # *** Bayesian Logistic Regression
+# # **** A supervised machine learning problem
+# # **** Logistic regression is a linear probabilistic discriminative model
+* Outline of the talk
 ** Outline of the talk
-* How the original CCD works?(2 or 3 slides) 
-** How the original CCD works? (flowchart)
-###shape-space, contour initialization, local statistics, optimization step
-** figure of the ball
-* Related work (1 slides)
+* How the original CCD works?
+** How the original CCD works?
+#+CAPTION: the CCD algorithm
+   #+LABEL:   fig: flowchart
+   #+ATTR_LaTeX: width=6cm,angle=0
+   [[./flowchart.jpg]]
+** Sketch of the CCD algorithm
+*** Basic steps of the CCD algorithm                         :B_exampleblock:
+    :PROPERTIES:
+    :BEAMER_env: exampleblock
+    :END:
+**** Contour initialization
+**** Learning of local statistics
+**** Refinement of model parameters
+###shape-space, contour initialization, local statistics, optimization
+#+CAPTION: The contour of a pan
+     #+LABEL:   fig:contour
+     #+ATTR_LaTeX: width=6cm,angle=0
+     [[./pan_contour.jpg]]
+** An alternative view of the CCD algorithm
+*** Bayesian logistic regression                             :B_exampleblock:
+    :PROPERTIES:
+    :BEAMER_env: exampleblock
+    :END:
+**** Evaluation of conditional distribution $p(\Phi|\mathbf{I})$
+\begin{displaymath}
+p(\Phi|\mathbf{I})
+\propto \underbrace{p(\mathbf{I}|\mathbf{m}_{\Phi},
+\Sigma_{\Phi})}_{\mathrm{local\ statistics}}\quad\times\quad
+\underbrace{p(\Phi)}_{\mathrm{prior\ distribution}}
+\end{displaymath}
+**** Goal: MAP (maximum a posteriori probability) solution of cost function $\mathcal{Q}(\Phi)$
+\begin{displaymath}
+\mathcal{Q}(\Phi) = \underset{\Phi}{\arg\max}\ \mathrm{ln}(p(\Phi|\mathbf{I}))
+\end{displaymath}
+Approach: iterative reweighted least  squares (IRLS) e.g. Gaussian
+Newton method, SVM
+** An alternative view of the CCD algorithm
+*** A classification problem                                 :B_exampleblock:
+    :PROPERTIES:
+    :BEAMER_env: exampleblock
+    :END:
+#+CAPTION: A classification problem
+    #+LABEL:   fig:class
+    #+ATTR_LaTeX: width=9cm,angle=0
+    [[./images/classification.png]]
+
+* Related work
 ** 3-4 papers
-* Improvements of the original algorithm. (4 slides)
-** Cubic and quadratic b-spline
-** logitic and probit
-** three-dimensional affine shape-space
-** initilization from SIFT.
-### planar affine shape-space, non-planar->three-dimensional affine shape-space.
-* The CCD tracker (1 slide)
+* Improvements of the original algorithm
+** Quadratic and Cubic B-spline curves
+*** B-spline curves                      :B_exampleblock:
+    :PROPERTIES:
+    :BEAMER_env: exampleblock
+    :END:
+\begin{equation*}
+  \mathbf{C}(u) =  \sum_{i=0}^{m-n-2} P_{i} B_{i,n}(u) \mbox{ , } u \in [u_{n},u_{m-n-1}]
+\end{equation*}
+#+CAPTION: B-spline curves of degree = 1, 2, 3
+#+LABEL:   fig: bspline
+#+ATTR_LaTeX: width=6cm,angle=0
+[[./bspline.jpg]]
+
+** Logitic and Probit function
+*** Logistic function                                  :BMCOL:B_exampleblock:
+    :PROPERTIES:
+    :BEAMER_col: 0.5
+    :BEAMER_env: exampleblock
+    :BEAMER_envargs: <1->
+    :END:
+#+CAPTION: Logistic function
+    #+LABEL:   fig:log
+    #+ATTR_LaTeX: width=4cm,angle=0
+    [[./logistic.jpg]]
+\begin{displaymath}
+f(\cdot) = \frac{1}{1+\mathrm{e}^{-x}}
+\end{displaymath}
+*** Probit function                                    :BMCOL:B_exampleblock:
+    :PROPERTIES:
+    :BEAMER_col: 0.5
+    :BEAMER_env: exampleblock
+    :BEAMER_envargs: <2->
+    :END:
+#+CAPTION: Probit function
+    #+LABEL:   fig: probit
+    #+ATTR_LaTeX: width=4cm,angle=0
+    [[./erf.jpg]]
+\begin{displaymath}
+f(\cdot) = \frac{1}{2}(\frac{1}{\sqrt{2}}erf(x) + 1)
+\end{displaymath}
+
+** Three-dimensional Affine Shape-space
+*** Parallax effect in two-dimensional affine shape-space     :BMCOL:B_block:
+    :PROPERTIES:
+    :BEAMER_col: 0.5
+    :BEAMER_env: block
+    :END:
+#+CAPTION: Parallax effect
+    #+LABEL:   fig:parallax effect
+    #+ATTR_LaTeX: width=3cm,angle=0
+    [[./planar.jpg]]
+*** Three-dimensional affine shape-space                      :BMCOL:B_block:
+    :PROPERTIES:
+    :BEAMER_col: 0.5	
+    :BEAMER_env: block
+    :END:
+#+CAPTION: Three-dimensional affine shape-space
+    #+LABEL:   fig:3das
+    #+ATTR_LaTeX: width=3cm,angle=0
+    [[./nonplanar.jpg]]
+** Initialization from SIFT Features
+*** Initialization from SIFT Features                               :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+#+CAPTION: Initialization from SIFT Features
+    #+LABEL:   fig:sift
+    #+ATTR_LaTeX: width=6cm,angle=0
+    [[./sift.jpg]]
+
+* The CCD tracker
 ** algorithm
-* Results of the experiments (2 slides)
+
+* Results of the experiments
 ** manually initialization
 ** initialization from SIFT
-### open source, ros package
-* Summary and Future work (1 slide)
-* Thanks( 1 slide)
+# open source, ros package
+* Summary and Future work
+* Thanks

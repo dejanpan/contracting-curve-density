@@ -245,7 +245,7 @@ void CCD::local_statistics(BSpline &bs)
       // y_{k,l}
       tmp1.y = round(bs[i].y + j*nv_ptr[1]);
 
-      // cv::circle(canvas_tmp, cv::Point2d(tmp1.x, tmp1.y), 1, CV_RGB(0,0,255), 1);
+      cv::circle(canvas_tmp, cv::Point2d(tmp1.x, tmp1.y), 1, CV_RGB(255,0,0), 1);
 
       // distance between x_{k,l} and x_{k,0} in the normal direction
       // appoximately it is l*h, l = {1,2,3,.....}
@@ -308,7 +308,7 @@ void CCD::local_statistics(BSpline &bs)
       /////////////////////////////////////////////////////////////////////////////////////////      
       tmp2.x = round(bs[i].x - j*nv_ptr[0]);
       tmp2.y = round(bs[i].y - j*nv_ptr[1]);
-      // cv::circle(canvas_tmp, cv::Point2d(tmp2.x, tmp2.y), 1, CV_RGB(0,0,255), 1);
+      cv::circle(canvas_tmp, cv::Point2d(tmp2.x, tmp2.y), 1, CV_RGB(255,0,0), 1);
 #ifdef DEBUG
       if(i == 0)
         std::cout << "tmp2 " << tmp2.x  << " " << tmp2.y << std::endl;
