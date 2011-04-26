@@ -175,6 +175,7 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
 	cvReleaseMat( &H );
   }
 
+  cvSaveImage("stacked.jpg", stacked,0);
   cvReleaseImage( &stacked );
   kdtree_release( kd_root );
   free( feat1 );

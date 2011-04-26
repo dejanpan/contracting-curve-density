@@ -6,8 +6,8 @@
 #+BEAMER_FRAME_LEVEL: 2
 #+BEAMER_HEADER_EXTRA: \usetheme{dimilar}\usecolortheme{rose}
 #+COLUMNS: %35ITEM %10BEAMER_env(Env) %10BEAMER_envargs(Args) %4BEAMER_col(Col) %8BEAMER_extra(Ex)
-#+LaTeX_Header:\usepackage{algorithm2e}
-
+#+LaTeX_Header:\usepackage{algorithmic}
+#+LaTeX_Header:\usepackage{algorithm}
 * Motivation
 ** Motivation
 *** Some challenging task in personal robotics                      :B_alertblock:
@@ -31,9 +31,9 @@
 # # *** Bayesian Logistic Regression
 # # **** A supervised machine learning problem
 # # **** Logistic regression is a linear probabilistic discriminative model
-* Outline of the talk
-** Outline of the talk
-* How the original CCD works?
+# * Outline of the talk
+# ** Outline of the talk
+* How the original CCD algorithm works?
 ** How the original CCD works?
 #+CAPTION: the CCD algorithm
    #+LABEL:   fig: flowchart
@@ -53,7 +53,7 @@
      #+ATTR_LaTeX: width=6cm,angle=0
      [[./pan_contour.jpg]]
 ** An alternative view of the CCD algorithm
-*** Bayesian logistic regression                             :B_exampleblock:
+*** Probit regression                                        :B_exampleblock:
     :PROPERTIES:
     :BEAMER_env: exampleblock
     :END:
@@ -64,6 +64,8 @@ p(\Phi|\mathbf{I})
 \Sigma_{\Phi})}_{\mathrm{local\ statistics}}\quad\times\quad
 \underbrace{p(\Phi)}_{\mathrm{prior\ distribution}}
 \end{displaymath}
+Local statistics, namely the likelihood, is a probit function with
+respect to $\Phi$
 **** Goal: MAP (maximum a posteriori probability) solution of cost function $\mathcal{Q}(\Phi)$
 \begin{displaymath}
 \mathcal{Q}(\Phi) = \underset{\Phi}{\arg\max}\ \mathrm{ln}(p(\Phi|\mathbf{I}))
@@ -154,11 +156,76 @@ f(\cdot) = \frac{1}{2}(\frac{1}{\sqrt{2}}erf(x) + 1)
     [[./sift.jpg]]
 
 * The CCD tracker
-** algorithm
+** Contracting Curve Density (CCD) Tracker Algorithm
+  \begin{algorithm}[H]
+    \caption{Contracting Curve Density (CCD) tracker}
+    \begin{algorithmic}[1]
+      \STATE $\Phi \gets 0$
+      \STATE $\mathbf{C} \gets contour\_initialization()$
+      \WHILE{$NewFrame$}
+	\STATE $ \mathbf{I} \gets pre\_processing()$
+	\STATE $ \mathbf{C} \gets contour\_distortion(\Phi)$
+        \STATE $\Sigma \gets covariance\_initialization()$
+	\STATE $\Phi \gets \Phi^{\mathrm{old}}$
+	\WHILE{$convergence = FALSE$}
+	  \STATE $local\_statistics\_learning() $
+	  \STATE $cost\_function\_MAP() $
+	\ENDWHILE
+	\STATE $\Phi \gets \Phi_{MAP}$
+	\STATE $\Sigma \gets \Sigma_{MAP}$
+      \ENDWHILE
+    \end{algorithmic}
+  \end{algorithm}
+* Results of the Experiments
+** Segmentation
+#+CAPTION: A Comparison of Image Segmentation Algorithms
+   #+LABEL:   fig:seg
+   #+ATTR_LaTeX: width=6cm,angle=0
+   [[./segmentation.jpg]]
+** Manual initialization
+*** Shadow effects                                             :B_alertblock:
+    :PROPERTIES:
+    :BEAMER_env: alertblock
+    :END:
+#+CAPTION: Shadow effects
+    #+LABEL:   fig:shadow
+    #+ATTR_LaTeX: width=8cm,angle=0
+    [[./edge.jpg]]
+** Initialization from SIFT Features
+*** Tracking initiated from SIFT features                    :B_exampleblock:
+    :PROPERTIES:
+    :BEAMER_env: exampleblock
+    :END:
+**** Match SIFT keypoints between the template image and the test image
+**** Discard the false matching points using the RANSAC algorithm
+**** Compute the homography
+**** Transform the contour of the template image onto the test image
+**** Apply the CCD tracker to the video
 
-* Results of the experiments
-** manually initialization
-** initialization from SIFT
 # open source, ros package
 * Summary and Future work
-* Thanks
+** Summary
+*** Investigate and implement the CCD approach                      :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+**** Based on the OpenCV library
+**** A ros-package
+**** Released under open source BSD license
+*** Improvements                                                    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+**** B-spline curve and three-dimensional affine shape-space
+**** Logistic regression and sofmax regression
+**** Automated contour initialization methods: SIFT features and point clouds
+** Future work
+*** Future work                                              :B_exampleblock:
+    :PROPERTIES:
+    :BEAMER_env: exampleblock
+    :END:
+**** Use statistics based on other image features instead of the RGB statistics
+**** Integration of the CCD algorithm into a more complex tracking framework (e.g. the Lucas-Kanade method (LKM), the extended Kalman  filter (EKF))
+**** Port to Android system to support mobile applications
+**** ....
+* Acknowledgment

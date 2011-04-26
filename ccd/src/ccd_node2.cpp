@@ -34,9 +34,9 @@ class CCDNode
   {
     // n_.param("image_topic", image_topic_, std::string("/narrow_stereo/left/image_rect"));
     // n_.param("image_topic", image_topic_, std::string("/wide_stereo/left/image_rect_color"));
-    n_.param("image_topic", image_topic_, std::string("/camera/rgb/image_color"));
-//    n_.param("image_topic", image_topic_, std::string("/prosilica/image_raw"));
-    n_.param("polygon_points_topic", polygon_points_topic_, std::string("/pointcloud_to_image_projector_opencv_node/polygon_points"));
+    // n_.param("image_topic", image_topic_, std::string("/camera/rgb/image_color"));
+   n_.param("image_topic", image_topic_, std::string("/prosilica/image_raw"));
+    // n_.param("polygon_points_topic", polygon_points_topic_, std::string("/pointcloud_to_image_projector_opencv_node/polygon_points"));
 //    n_.param("init_method", init_method_, 1);
     init_method_ = init_method;
     image_sub_ = it_.subscribe(image_topic_, 1, &CCDNode::imageCallback, this);
@@ -129,6 +129,7 @@ class CCDNode
   void imageCallback(const sensor_msgs::ImageConstPtr& msg_ptr)
   {
       count_++;
+      char key;
       cv::Mat cv_image = readImage(msg_ptr);
       std::cerr << "col: " <<cv_image.cols << "  rows:" <<  cv_image.rows<< std::endl;
       std::cerr << "init_method_: " << init_method_ << std::endl;
@@ -136,6 +137,7 @@ class CCDNode
       cv_image.copyTo(ccd.image);
       if (count_ == 1)
       {
+        cv::imwrite("book_test.png", ccd.image);
         if (init_method_ == 0) //manually 
           contourManually();
         else if (init_method_ == 1) //initialized from SIFT
@@ -170,11 +172,19 @@ class CCDNode
         ccd.init_cov(bs, (int)ccd.degree());
       }      
       ccd.run_ccd();
-       cv::imshow("CCD", ccd.canvas);
-       cv::waitKey(300);
-//      std::stringstream name;
- //     name << count_;
- //     cv::imwrite(name.str() + ".png", ccd.canvas);
+       // cv::imshow("CCD", ccd.canvas);
+      if(count_ == 1)
+      {
+        while(1)
+        {
+          key = cv::waitKey(10);
+          if(key == 27) break;
+        }
+      }
+        
+     std::stringstream name;
+     name << count_;
+     cv::imwrite(name.str() + ".png", ccd.canvas);
   }
       // sleep(1);
   //protected:
@@ -209,9 +219,12 @@ class CCDNode
       case CV_EVENT_LBUTTONDOWN:
         break;
       case CV_EVENT_LBUTTONUP:
-        cv::circle(image,cv::Point(x,y),1,cv::Scalar(0,0,255),1);
+        cv::circle(image,cv::Point(x,y),2,cv::Scalar(0,0,255),2);
         my_node->pts_.push_back(cv::Point3d(x,y,1));
         cv::imshow("CCD", image);
+        std::stringstream name;
+        name << my_node->pts_.size();
+        cv::imwrite(name.str() + "i.png", image);
         break;
     }
   }

@@ -245,7 +245,7 @@ void CCD::local_statistics(BSpline &bs)
       // y_{k,l}
       tmp1.y = round(bs[i].y + j*nv_ptr[1]);
 
-      cv::circle(canvas_tmp, cv::Point2d(tmp1.x, tmp1.y), 1, CV_RGB(255,0,0), 1);
+      // cv::circle(canvas_tmp, cv::Point2d(tmp1.x, tmp1.y), 1, CV_RGB(255,0,0), 1);
 
       // distance between x_{k,l} and x_{k,0} in the normal direction
       // appoximately it is l*h, l = {1,2,3,.....}
@@ -308,7 +308,7 @@ void CCD::local_statistics(BSpline &bs)
       /////////////////////////////////////////////////////////////////////////////////////////      
       tmp2.x = round(bs[i].x - j*nv_ptr[0]);
       tmp2.y = round(bs[i].y - j*nv_ptr[1]);
-      cv::circle(canvas_tmp, cv::Point2d(tmp2.x, tmp2.y), 1, CV_RGB(255,0,0), 1);
+      // cv::circle(canvas_tmp, cv::Point2d(tmp2.x, tmp2.y), 1, CV_RGB(255,0,0), 1);
 #ifdef DEBUG
       if(i == 0)
         std::cout << "tmp2 " << tmp2.x  << " " << tmp2.y << std::endl;
@@ -621,8 +621,8 @@ void CCD::run_ccd()
     for (int i = 0; i < params_.resolution; ++i)
     {
         int j = (i+1)%params_.resolution;
-        cv::line(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 0, 0, 255 ),2,8,0);
-        cv::line(canvas, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 0, 0, 255 ),2,8,0);
+        cv::line(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB(255, 0, 0 ),2,8,0);
+        // cv::line(canvas, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 0, 0, 255 ),2,8,0);
     }
 
     // converge condition
@@ -660,20 +660,21 @@ void CCD::run_ccd()
 
     std::stringstream name;
     name << iter;
-    cv::imwrite(name.str() + ".png", canvas_tmp);
+    cv::imwrite(name.str() + "c.png", canvas_tmp);
     canvas_tmp.release();
     // cv::imwrite(name.str() + ".png", canvas);
 
-    cv::imshow("CCD", canvas);    
-    cv::waitKey(200);
+    // cv::imshow("CCD", canvas);    
+    // cv::waitKey(200);
 
-    if(iter >= 100)
+    if(iter >= 20)
     {
       for (int i = 0; i < params_.resolution; ++i)
       {
         // std::cout << bs[i].x << " " << bs[i].y << " " <<bs[i].z << std::endl;
         int j = (i+1)%params_.resolution;
-        cv::line(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 255, 0, 0 ),2,8,0);
+        // cv::line(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 255, 0, 0 ),2,8,0);
+        cv::line(canvas, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 255, 0, 0 ),2,8,0);
         // cv::circle(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y), 2 ,CV_RGB(255,0,0), 2); 
         // cv::circle(canvas, cv::Point2d(bs[i].x, bs[i].y), 1 ,CV_RGB(0,255,0), 1); 
       }

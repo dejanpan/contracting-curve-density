@@ -148,6 +148,12 @@ int main( int argc, char** argv )
   }
   cvNamedWindow( "SIFT", 1 );
   cvShowImage( "SIFT", stacked);
+  char newfilename[100];
+  for (i = 0; i < 10; ++i){
+    snprintf(newfilename, 100, "stacked%d.png",i);
+    cvSaveImage(newfilename, stacked, 0);    
+  }
+
   cvWaitKey( 0 );
   cvReleaseImage( &xformed );
   cvReleaseMat( &H );

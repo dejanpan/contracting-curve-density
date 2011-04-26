@@ -7,9 +7,9 @@
 <alpha>1.2</alpha>
 <kappa>0.5</kappa>
 <c>0.25</c>
-<h>50</h>
-<delta_h>10</delta_h>
+<h>80</h>
+<delta_h>1</delta_h>
 <resolution>200</resolution>
 <degree>4</degree>
-<phi_dim>6</phi_dim>
+<phi_dim>8</phi_dim>
 </opencv_storage>
