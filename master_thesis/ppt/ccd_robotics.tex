@@ -1,4 +1,4 @@
-% Created 2011-04-26 Tue 18:37
+% Created 2011-04-27 Wed 13:53
 
 \documentclass[english,10pt,presentation]{beamer}
 \usepackage[english]{babel}
@@ -68,12 +68,13 @@
 \setcounter{tocdepth}{2}
 \tableofcontents
 \end{frame}
+
 \section{Motivation}
 \label{sec-1}
 \begin{frame}
 \frametitle{Motivation}
 \label{sec-1_1}
-\begin{alertblock}{Some challenging task in personal robotics}
+\begin{alertblock}{Some challenging tasks in personal robotics}
 \label{sec-1_1_1}
 \begin{itemize}
 
@@ -85,113 +86,122 @@
 \label{sec-1_1_1_3}%
 \end{itemize} % ends low level
 \end{alertblock}
+\begin{block}{Model-base method}
+\label{sec-1_1_2}
 \begin{itemize}
 
-\item Model-based methods: these problems require much information external to the image\\
-\label{sec-1_1_2}%
-\item Curve-fitting process: a crucial part of these problems\\
-\label{sec-1_1_3}%
+\item require much information external to the image\\
+\label{sec-1_1_2_1}%
+\item Curve-fitting: a crucial part of these problems\\
+\label{sec-1_1_2_2}%
 \end{itemize} % ends low level
+\end{block}
 \begin{exampleblock}{Requirements}
-\label{sec-1_1_4}
+\label{sec-1_1_3}
 \begin{itemize}
 
-\item Robustness: stable in texture, clutter, poor contrast environment\\
-\label{sec-1_1_4_1}%
+\item Robustness: stable even in the presence of heavy texture, clutter, poor contrast, partial occlusion\\
+\label{sec-1_1_3_1}%
 \item Accuracy: high sub-pixel accuracy\\
-\label{sec-1_1_4_2}%
+\label{sec-1_1_3_2}%
 \item Efficiency: time-constrained, limited computer hardware resources in personal robotics\\
-\label{sec-1_1_4_3}%
+\label{sec-1_1_3_3}%
 \end{itemize} % ends low level
 \end{exampleblock}
 \end{frame}
 \section{How the original CCD algorithm works?}
 \label{sec-2}
 \begin{frame}
-\frametitle{How the original CCD works?}
+\frametitle{How the original CCD algorithm works?}
 \label{sec-2_1}
+\begin{columns}
+\begin{column}{0.4\textwidth}
+\begin{exampleblock}{Flowchart of the CCD algorithm}
+\label{sec-2_1_1}
 
    \begin{figure}[htb]
    \centering
-   \includegraphics[width=6cm,angle=0]{./flowchart.jpg}
+   \includegraphics[width=4cm,angle=0]{./flowchart.jpg}
    \caption{\label{fig: flowchart}the CCD algorithm}
    \end{figure}
+\end{exampleblock}
+\end{column}
+\begin{column}{0.6\textwidth}
+\begin{exampleblock}{Basic steps of the CCD algorithm}
+\label{sec-2_1_2}
+
+\begin{enumerate}
+\item <1-> Contour initialization : initialize the model parameter vector
+$\Phi$ (6-DOF or 8-DOF) and covariance matrix $\Sigma_{\Phi}$
+\item <2-> Learning of local statistics : evaluate the likelihood; build
+the cost function 
+\item <3-> Refinement of model parameters : Maximize the cost function
+using optimization algorithms
+\item <4-> Check for convergence, if not, go to Step 2
+\end{enumerate}
+\end{exampleblock}
+\end{column}
+\end{columns}
 \end{frame}
 \begin{frame}
 \frametitle{Sketch of the CCD algorithm}
 \label{sec-2_2}
-\begin{exampleblock}{Basic steps of the CCD algorithm}
-\label{sec-2_2_1}
-\begin{itemize}
 
-\item Contour initialization\\
-\label{sec-2_2_1_1}%
-\item Learning of local statistics\\
-\label{sec-2_2_1_2}%
-\item Refinement of model parameters\\
-\label{sec-2_2_1_3}%
-\begin{figure}[htb]
+     \begin{figure}[htb]
      \centering
      \includegraphics[width=6cm,angle=0]{./pan_contour.jpg}
      \caption{\label{fig:contour}The contour of a pan}
      \end{figure}
-\end{itemize} % ends low level
-\end{exampleblock}
 \end{frame}
 \begin{frame}
 \frametitle{An alternative view of the CCD algorithm}
 \label{sec-2_3}
-\begin{exampleblock}{Probit regression}
+\begin{exampleblock}{A classification problem}
 \label{sec-2_3_1}
+
+    \begin{figure}[htb]
+    \centering
+    \includegraphics[width=7cm,angle=0]{./classification.png}
+    \caption{\label{fig:class}A classification problem   \cite{prml}}
+    \end{figure}
+\end{exampleblock}
+\end{frame}
+\begin{frame}
+\frametitle{An alternative view of the CCD algorithm}
+\label{sec-2_4}
+\begin{exampleblock}{Probit regression}
+\label{sec-2_4_1}
 \begin{itemize}
 
 \item Evaluation of conditional distribution $p(\Phi|\mathbf{I})$
-\label{sec-2_3_1_1}%
+\label{sec-2_4_1_1}%
 \begin{displaymath}
 p(\Phi|\mathbf{I})
 \propto \underbrace{p(\mathbf{I}|\mathbf{m}_{\Phi},
 \Sigma_{\Phi})}_{\mathrm{local\ statistics}}\quad\times\quad
 \underbrace{p(\Phi)}_{\mathrm{prior\ distribution}}
 \end{displaymath}
-Local statistics, namely the likelihood, is a probit function with
+Local statistics (likelihood): a probit function with
 respect to $\Phi$
 
 \item Goal: MAP (maximum a posteriori probability) solution of cost function $\mathcal{Q}(\Phi)$
-\label{sec-2_3_1_2}%
+\label{sec-2_4_1_2}%
 \begin{displaymath}
 \mathcal{Q}(\Phi) = \underset{\Phi}{\arg\max}\ \mathrm{ln}(p(\Phi|\mathbf{I}))
 \end{displaymath}
 Approach: iterative reweighted least  squares (IRLS) e.g. Gaussian
-Newton method, SVM
+Newton method, Gradient decent and SVM Least Squares.
+
 \end{itemize} % ends low level
 \end{exampleblock}
 \end{frame}
-\begin{frame}
-\frametitle{An alternative view of the CCD algorithm}
-\label{sec-2_4}
-\begin{exampleblock}{A classification problem}
-\label{sec-2_4_1}
-
-    \begin{figure}[htb]
-    \centering
-    \includegraphics[width=9cm,angle=0]{./images/classification.png}
-    \caption{\label{fig:class}A classification problem}
-    \end{figure}
-\end{exampleblock}
-\end{frame}
-\section{Related work}
+\section{Improvements of the original algorithm}
 \label{sec-3}
 \begin{frame}
-\frametitle{3-4 papers}
-\label{sec-3_1}
-\end{frame}
-\section{Improvements of the original algorithm}
-\label{sec-4}
-\begin{frame}
 \frametitle{Quadratic and Cubic B-spline curves}
-\label{sec-4_1}
+\label{sec-3_1}
 \begin{exampleblock}{B-spline curves}
-\label{sec-4_1_1}
+\label{sec-3_1_1}
 
 \begin{equation*}
   \mathbf{C}(u) =  \sum_{i=0}^{m-n-2} P_{i} B_{i,n}(u) \mbox{ , } u \in [u_{n},u_{m-n-1}]
@@ -204,12 +214,12 @@ Newton method, SVM
 \end{exampleblock}
 \end{frame}
 \begin{frame}
-\frametitle{Logitic and Probit function}
-\label{sec-4_2}
+\frametitle{Logistic and Probit function}
+\label{sec-3_2}
 \begin{columns}
 \begin{column}{0.5\textwidth}
 \begin{exampleblock}<1->{Logistic function}
-\label{sec-4_2_1}
+\label{sec-3_2_1}
 
     \begin{figure}[htb]
     \centering
@@ -223,7 +233,7 @@ f(\cdot) = \frac{1}{1+\mathrm{e}^{-x}}
 \end{column}
 \begin{column}{0.5\textwidth}
 \begin{exampleblock}<2->{Probit function}
-\label{sec-4_2_2}
+\label{sec-3_2_2}
 
     \begin{figure}[htb]
     \centering
@@ -238,12 +248,22 @@ f(\cdot) = \frac{1}{2}(\frac{1}{\sqrt{2}}erf(x) + 1)
 \end{columns}
 \end{frame}
 \begin{frame}
+\frametitle{Logistic and Probit function}
+\label{sec-3_3}
+
+    \begin{figure}[htb]
+    \centering
+    \includegraphics[width=7cm,angle=0]{./outliers.png}
+    \caption{\label{fig:class}Probit function is highly sensitive for outliers \cite{prml}}
+    \end{figure}
+\end{frame}
+\begin{frame}
 \frametitle{Three-dimensional Affine Shape-space}
-\label{sec-4_3}
+\label{sec-3_4}
 \begin{columns}
 \begin{column}{0.5\textwidth}
 \begin{block}{Parallax effect in two-dimensional affine shape-space}
-\label{sec-4_3_1}
+\label{sec-3_4_1}
 
     \begin{figure}[htb]
     \centering
@@ -254,7 +274,7 @@ f(\cdot) = \frac{1}{2}(\frac{1}{\sqrt{2}}erf(x) + 1)
 \end{column}
 \begin{column}{0.5\textwidth}
 \begin{block}{Three-dimensional affine shape-space}
-\label{sec-4_3_2}
+\label{sec-3_4_2}
 
     \begin{figure}[htb]
     \centering
@@ -266,10 +286,10 @@ f(\cdot) = \frac{1}{2}(\frac{1}{\sqrt{2}}erf(x) + 1)
 \end{columns}
 \end{frame}
 \begin{frame}
-\frametitle{Initialization from SIFT Features}
-\label{sec-4_4}
+\frametitle{Automated initialization methods (I)}
+\label{sec-3_5}
 \begin{block}{Initialization from SIFT Features}
-\label{sec-4_4_1}
+\label{sec-3_5_1}
 
     \begin{figure}[htb]
     \centering
@@ -278,11 +298,24 @@ f(\cdot) = \frac{1}{2}(\frac{1}{\sqrt{2}}erf(x) + 1)
     \end{figure}
 \end{block}
 \end{frame}
-\section{The CCD tracker}
-\label{sec-5}
 \begin{frame}
-\frametitle{Contracting Curve Density (CCD) Tracker Algorithm}
-\label{sec-5_1}
+\frametitle{Automated initialization methods (II)}
+\label{sec-3_6}
+\begin{block}{Initialization from projection of point clouds onto the image}
+\label{sec-3_6_1}
+
+    \begin{figure}[htb]
+    \centering
+    \includegraphics[width=6cm,angle=0]{./pr2b.jpg}
+    \caption{\label{fig:sift}Initialization from projection of point clouds onto the image}
+    \end{figure}
+\end{block}
+\end{frame}
+\section{The CCD tracker}
+\label{sec-4}
+\begin{frame}
+\frametitle{Contracting Curve Density (CCD) Tracker}
+\label{sec-4_1}
 
   \begin{algorithm}[H]
     \caption{Contracting Curve Density (CCD) tracker}
@@ -305,10 +338,10 @@ f(\cdot) = \frac{1}{2}(\frac{1}{\sqrt{2}}erf(x) + 1)
   \end{algorithm}
 \end{frame}
 \section{Results of the Experiments}
-\label{sec-6}
+\label{sec-5}
 \begin{frame}
 \frametitle{Segmentation}
-\label{sec-6_1}
+\label{sec-5_1}
 
    \begin{figure}[htb]
    \centering
@@ -318,9 +351,9 @@ f(\cdot) = \frac{1}{2}(\frac{1}{\sqrt{2}}erf(x) + 1)
 \end{frame}
 \begin{frame}
 \frametitle{Manual initialization}
-\label{sec-6_2}
+\label{sec-5_2}
 \begin{alertblock}{Shadow effects}
-\label{sec-6_2_1}
+\label{sec-5_2_1}
 
     \begin{figure}[htb]
     \centering
@@ -331,73 +364,98 @@ f(\cdot) = \frac{1}{2}(\frac{1}{\sqrt{2}}erf(x) + 1)
 \end{frame}
 \begin{frame}
 \frametitle{Initialization from SIFT Features}
-\label{sec-6_3}
-\begin{exampleblock}{Tracking initiated from SIFT features}
-\label{sec-6_3_1}
+\label{sec-5_3}
+\begin{exampleblock}{Tracking initialized from SIFT features}
+\label{sec-5_3_1}
 \begin{itemize}
 
 \item Match SIFT keypoints between the template image and the test image\\
-\label{sec-6_3_1_1}%
+\label{sec-5_3_1_1}%
 \item Discard the false matching points using the RANSAC algorithm\\
-\label{sec-6_3_1_2}%
+\label{sec-5_3_1_2}%
 \item Compute the homography\\
-\label{sec-6_3_1_3}%
+\label{sec-5_3_1_3}%
 \item Transform the contour of the template image onto the test image\\
-\label{sec-6_3_1_4}%
+\label{sec-5_3_1_4}%
 \item Apply the CCD tracker to the video\\
-\label{sec-6_3_1_5}%
+\label{sec-5_3_1_5}%
 \end{itemize} % ends low level
 \end{exampleblock}
 \end{frame}
 \section{Summary and Future work}
-\label{sec-7}
+\label{sec-6}
 \begin{frame}
 \frametitle{Summary}
-\label{sec-7_1}
+\label{sec-6_1}
 \begin{block}{Investigate and implement the CCD approach}
-\label{sec-7_1_1}
+\label{sec-6_1_1}
 \begin{itemize}
 
-\item Based on the OpenCV library\\
-\label{sec-7_1_1_1}%
-\item A ros-package\\
-\label{sec-7_1_1_2}%
+\item Based on the OpenCV\\
+\label{sec-6_1_1_1}%
+\item A ROS package: provide a ROS node interface to the ccd class\\
+\label{sec-6_1_1_2}%
+\url{http://www.ros.org/wiki/contracting-curve-density}
+
 \item Released under open source BSD license\\
-\label{sec-7_1_1_3}%
+\label{sec-6_1_1_3}%
 \end{itemize} % ends low level
 \end{block}
 \begin{block}{Improvements}
-\label{sec-7_1_2}
+\label{sec-6_1_2}
 \begin{itemize}
 
 \item B-spline curve and three-dimensional affine shape-space\\
-\label{sec-7_1_2_1}%
-\item Logistic regression and sofmax regression\\
-\label{sec-7_1_2_2}%
+\label{sec-6_1_2_1}%
+\item Logistic regression\\
+\label{sec-6_1_2_2}%
 \item Automated contour initialization methods: SIFT features and point clouds\\
-\label{sec-7_1_2_3}%
+\label{sec-6_1_2_3}%
 \end{itemize} % ends low level
 \end{block}
 \end{frame}
 \begin{frame}
 \frametitle{Future work}
-\label{sec-7_2}
+\label{sec-6_2}
 \begin{exampleblock}{Future work}
-\label{sec-7_2_1}
+\label{sec-6_2_1}
 \begin{itemize}
 
 \item Use statistics based on other image features instead of the RGB statistics\\
-\label{sec-7_2_1_1}%
+\label{sec-6_2_1_1}%
 \item Integration of the CCD algorithm into a more complex tracking framework (e.g. the Lucas-Kanade method (LKM), the extended Kalman  filter (EKF))\\
-\label{sec-7_2_1_2}%
+\label{sec-6_2_1_2}%
+\item B-spline can not precisely represent many useful simple curves such as circles and ellipses, thus, Non-uniform rational B-spline (NURBS) is required for the CCD algorithm.\\
+\label{sec-6_2_1_3}%
 \item Port to Android system to support mobile applications\\
-\label{sec-7_2_1_3}%
+\label{sec-6_2_1_4}%
 \item \ldots{}.\\
-\label{sec-7_2_1_4}%
+\label{sec-6_2_1_5}%
 \end{itemize} % ends low level
 \end{exampleblock}
 \end{frame}
-\section{Acknowledgment}
-\label{sec-8}
+\begin{frame}
+\frametitle{Thank you}
+\label{sec-6_3}
+
+\setbeamercolor{bgcolor}{fg=black,bg=blue!50}
+\begin{beamercolorbox}[rounded=true, shadow=true, wd=10cm]{bgcolor}
+\label{sec-6_3_1}
+
+\begin{center}
+\large Thank you for your attention!
+\end{center}
+\end{beamercolorbox}
+\end{frame}
+\begin{frame}
+\frametitle{References}
+\label{sec-6_4}
+
+\begin{thebibliography}{10}
+\bibitem{prml}[Bishop, 2006]
+Christopher M. Bishop
+  \newblock Pattern recognition and machine learning
+\end{thebibliography}
+\end{frame}
 
 \end{document}

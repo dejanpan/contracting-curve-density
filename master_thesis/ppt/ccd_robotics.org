@@ -8,9 +8,10 @@
 #+COLUMNS: %35ITEM %10BEAMER_env(Env) %10BEAMER_envargs(Args) %4BEAMER_col(Col) %8BEAMER_extra(Ex)
 #+LaTeX_Header:\usepackage{algorithmic}
 #+LaTeX_Header:\usepackage{algorithm}
+
 * Motivation
 ** Motivation
-*** Some challenging task in personal robotics                      :B_alertblock:
+*** Some challenging tasks in personal robotics                :B_alertblock:
     :PROPERTIES:
     :BEAMER_env: alertblock
     :END:
@@ -18,13 +19,17 @@
 **** Pose estimation
 **** Object recognition and tracking
 
-*** Model-based methods: these problems require much information external to the image
-*** Curve-fitting process: a crucial part of these problems
+*** Model-base method                                               :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+**** require much information external to the image 
+**** Curve-fitting: a crucial part of these problems
 *** Requirements                                             :B_exampleblock:
     :PROPERTIES:
     :BEAMER_env: exampleblock
     :END:
-**** Robustness: stable in texture, clutter, poor contrast environment
+**** Robustness: stable even in the presence of heavy texture, clutter, poor contrast, partial occlusion
 **** Accuracy: high sub-pixel accuracy
 **** Efficiency: time-constrained, limited computer hardware resources in personal robotics
 # ** The Contracting Curve Density (CCD) Algorithm
@@ -34,24 +39,46 @@
 # * Outline of the talk
 # ** Outline of the talk
 * How the original CCD algorithm works?
-** How the original CCD works?
-#+CAPTION: the CCD algorithm
-   #+LABEL:   fig: flowchart
-   #+ATTR_LaTeX: width=6cm,angle=0
-   [[./flowchart.jpg]]
-** Sketch of the CCD algorithm
-*** Basic steps of the CCD algorithm                         :B_exampleblock:
+** How the original CCD algorithm works?
+*** Flowchart of the CCD algorithm                     :BMCOL:B_exampleblock:
     :PROPERTIES:
+    :BEAMER_col: 0.4
     :BEAMER_env: exampleblock
     :END:
-**** Contour initialization
-**** Learning of local statistics
-**** Refinement of model parameters
+#+CAPTION: the CCD algorithm
+   #+LABEL:   fig: flowchart
+   #+ATTR_LaTeX: width=4cm,angle=0
+   [[./flowchart.jpg]]
+*** Basic steps of the CCD algorithm                   :B_exampleblock:BMCOL:
+    :PROPERTIES:
+    :BEAMER_env: exampleblock
+    :BEAMER_col: 0.6
+    :END:
+\begin{enumerate}
+\item <1-> Contour initialization : initialize the model parameter vector
+$\Phi$ (6-DOF or 8-DOF) and covariance matrix $\Sigma_{\Phi}$
+\item <2-> Learning of local statistics : evaluate the likelihood; build
+the cost function 
+\item <3-> Refinement of model parameters : Maximize the cost function
+using optimization algorithms
+\item <4-> Check for convergence, if not, go to Step 2
+\end{enumerate}
 ###shape-space, contour initialization, local statistics, optimization
+** Sketch of the CCD algorithm
 #+CAPTION: The contour of a pan
      #+LABEL:   fig:contour
      #+ATTR_LaTeX: width=6cm,angle=0
      [[./pan_contour.jpg]]
+** An alternative view of the CCD algorithm
+*** A classification problem                                 :B_exampleblock:
+    :PROPERTIES:
+    :BEAMER_env: exampleblock
+    :END:
+#+CAPTION: A classification problem   \cite{prml}
+    #+LABEL:   fig:class
+    #+ATTR_LaTeX: width=7cm,angle=0
+    [[./classification.png]]
+
 ** An alternative view of the CCD algorithm
 *** Probit regression                                        :B_exampleblock:
     :PROPERTIES:
@@ -64,26 +91,17 @@ p(\Phi|\mathbf{I})
 \Sigma_{\Phi})}_{\mathrm{local\ statistics}}\quad\times\quad
 \underbrace{p(\Phi)}_{\mathrm{prior\ distribution}}
 \end{displaymath}
-Local statistics, namely the likelihood, is a probit function with
+Local statistics (likelihood): a probit function with
 respect to $\Phi$
 **** Goal: MAP (maximum a posteriori probability) solution of cost function $\mathcal{Q}(\Phi)$
 \begin{displaymath}
 \mathcal{Q}(\Phi) = \underset{\Phi}{\arg\max}\ \mathrm{ln}(p(\Phi|\mathbf{I}))
 \end{displaymath}
 Approach: iterative reweighted least  squares (IRLS) e.g. Gaussian
-Newton method, SVM
-** An alternative view of the CCD algorithm
-*** A classification problem                                 :B_exampleblock:
-    :PROPERTIES:
-    :BEAMER_env: exampleblock
-    :END:
-#+CAPTION: A classification problem
-    #+LABEL:   fig:class
-    #+ATTR_LaTeX: width=9cm,angle=0
-    [[./images/classification.png]]
+Newton method, Gradient decent and SVM Least Squares.
 
-* Related work
-** 3-4 papers
+# * Related work
+# ** 3-4 papers
 * Improvements of the original algorithm
 ** Quadratic and Cubic B-spline curves
 *** B-spline curves                      :B_exampleblock:
@@ -98,7 +116,7 @@ Newton method, SVM
 #+ATTR_LaTeX: width=6cm,angle=0
 [[./bspline.jpg]]
 
-** Logitic and Probit function
+** Logistic and Probit function
 *** Logistic function                                  :BMCOL:B_exampleblock:
     :PROPERTIES:
     :BEAMER_col: 0.5
@@ -126,6 +144,11 @@ f(\cdot) = \frac{1}{1+\mathrm{e}^{-x}}
 f(\cdot) = \frac{1}{2}(\frac{1}{\sqrt{2}}erf(x) + 1)
 \end{displaymath}
 
+** Logistic and Probit function
+#+CAPTION: Probit function is highly sensitive for outliers \cite{prml}
+    #+LABEL:   fig:class
+    #+ATTR_LaTeX: width=7cm,angle=0
+    [[./outliers.png]]
 ** Three-dimensional Affine Shape-space
 *** Parallax effect in two-dimensional affine shape-space     :BMCOL:B_block:
     :PROPERTIES:
@@ -145,7 +168,7 @@ f(\cdot) = \frac{1}{2}(\frac{1}{\sqrt{2}}erf(x) + 1)
     #+LABEL:   fig:3das
     #+ATTR_LaTeX: width=3cm,angle=0
     [[./nonplanar.jpg]]
-** Initialization from SIFT Features
+** Automated initialization methods (I)
 *** Initialization from SIFT Features                               :B_block:
     :PROPERTIES:
     :BEAMER_env: block
@@ -155,8 +178,17 @@ f(\cdot) = \frac{1}{2}(\frac{1}{\sqrt{2}}erf(x) + 1)
     #+ATTR_LaTeX: width=6cm,angle=0
     [[./sift.jpg]]
 
+** Automated initialization methods (II)
+*** Initialization from projection of point clouds onto the image   :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+#+CAPTION: Initialization from projection of point clouds onto the image
+    #+LABEL:   fig:sift
+    #+ATTR_LaTeX: width=6cm,angle=0
+    [[./pr2b.jpg]]
 * The CCD tracker
-** Contracting Curve Density (CCD) Tracker Algorithm
+** Contracting Curve Density (CCD) Tracker 
   \begin{algorithm}[H]
     \caption{Contracting Curve Density (CCD) tracker}
     \begin{algorithmic}[1]
@@ -192,7 +224,7 @@ f(\cdot) = \frac{1}{2}(\frac{1}{\sqrt{2}}erf(x) + 1)
     #+ATTR_LaTeX: width=8cm,angle=0
     [[./edge.jpg]]
 ** Initialization from SIFT Features
-*** Tracking initiated from SIFT features                    :B_exampleblock:
+*** Tracking initialized from SIFT features                  :B_exampleblock:
     :PROPERTIES:
     :BEAMER_env: exampleblock
     :END:
@@ -209,15 +241,18 @@ f(\cdot) = \frac{1}{2}(\frac{1}{\sqrt{2}}erf(x) + 1)
     :PROPERTIES:
     :BEAMER_env: block
     :END:
-**** Based on the OpenCV library
-**** A ros-package
+**** Based on the OpenCV
+**** A ROS package: provide a ROS node interface to the ccd class
+#+BEGIN_LATEX
+\url{http://www.ros.org/wiki/contracting-curve-density}
+#+END_LATEX
 **** Released under open source BSD license
 *** Improvements                                                    :B_block:
     :PROPERTIES:
     :BEAMER_env: block
     :END:
 **** B-spline curve and three-dimensional affine shape-space
-**** Logistic regression and sofmax regression
+**** Logistic regression
 **** Automated contour initialization methods: SIFT features and point clouds
 ** Future work
 *** Future work                                              :B_exampleblock:
@@ -226,6 +261,24 @@ f(\cdot) = \frac{1}{2}(\frac{1}{\sqrt{2}}erf(x) + 1)
     :END:
 **** Use statistics based on other image features instead of the RGB statistics
 **** Integration of the CCD algorithm into a more complex tracking framework (e.g. the Lucas-Kanade method (LKM), the extended Kalman  filter (EKF))
+**** B-spline can not precisely represent many useful simple curves such as circles and ellipses, thus, Non-uniform rational B-spline (NURBS) is required for the CCD algorithm. 
 **** Port to Android system to support mobile applications
 **** ....
-* Acknowledgment
+** Thank you
+\setbeamercolor{bgcolor}{fg=black,bg=blue!50}
+*** bgcolor                                                :B_beamercolorbox:
+    :PROPERTIES:
+    :BEAMER_env: beamercolorbox
+    :BEAMER_envargs: [rounded=true, shadow=true, wd=10cm]
+    :END:
+#+begin_center 
+\large Thank you for your attention!
+#+end_center
+** References
+#+BEGIN_LATEX
+\begin{thebibliography}{10}
+\bibitem{prml}[Bishop, 2006]
+Christopher M. Bishop
+  \newblock Pattern recognition and machine learning
+\end{thebibliography}
+#+END_LATEX
