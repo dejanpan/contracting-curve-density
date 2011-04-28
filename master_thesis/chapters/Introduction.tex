@@ -218,7 +218,7 @@ an approximate to the true distribution. Therefore, Maximization
 likelihood method does not work here, we have to use an alternative
 approach known as iterative reweighted least squares (\acronym{IRLS}{Iterative Reweighted Least Squares}) to find
 the solution. Here the IRLS process is called Maximum a Posterior, or
-simply \acronym{MAP}{Maximum a Posteriori Probability}
+simply \acronym{MAP}{Maximum a Posteriori Probability}.
 
 In the CCD algorithm, because we just need a parameter vector determining
 the shape of specified contour, we do not plan to calculate the
@@ -226,7 +226,7 @@ predictive distribution. Therefore, the MAP solution mentioned above
 is our objective.
 
 However, take account into the fact that exact inference for the
-regression is always intractable, we could encounter some issues before
+regression is always intractable, we have encountered some issues before
 implementing the algorithm. In the next section, we will discuss these
 problems.
 
@@ -294,7 +294,7 @@ There are a variety of active shape models available, such as principally Snakes
 Based on these questions, we improve the CCD algorithm from the
 following aspects:
 \begin{itemize}
-\item We will use parametric B-Spline curve as
+\item We will use parametric B-Spline curves as
 parametric model curve. It is proved that this type of curve model is
 flexible enough and can well represent the contour of the
 object. Both six-dimensional and 8-dimensional model parameter vector
@@ -304,7 +304,7 @@ shape-space. Parametric B-Spline curve will be described in Chapter~\ref{chapter
 \item In order to avoid human intervention, we add a feature to 
   initialize a contour from Scale-invariant feature transform (SIFT)
   features and from a point cloud.
-\item The local statistics is the main feature of the CCD
+\item The local statistics are the main feature of the CCD
   algorithms. The blurred curve models can considerably decrease the
   computational cost. However, excessive sparse samples may ignore some
   features (e.g. spinodals and corners) in the vicinity of the contour. Hence, before we blur the
@@ -335,6 +335,13 @@ related information can be found on\\
 
 In this section, the basic steps of the CCD algorithm will be
 sketched. 
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=12cm]{images/flowchart.jpg}
+  \caption[The flow chart of
+  the CCD algorithm]{The flow chart of the CCD algorithm}
+  \label{fig:flowchart}
+\end{figure}
 \begin{enumerate}
 \item \textbf{Initialization}: Given an input image as training data, we first choose an initial
 contour for an object or feature which will be fitted or tracked, and
@@ -360,14 +367,6 @@ like"~\cite{hanek2004contracting}, also known as likelihood.
   not satisfied return to step 2.
 \end{enumerate}
 Fig.\ref{fig:flowchart} gives the flow chart of the CCD algorithm.
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=10cm]{images/flowchart.jpg}
-  \caption[The flow chart of
-  the CCD algorithm]{The flow chart of the CCD algorithm}
-  \label{fig:flowchart}
-\end{figure}
-
 
 % The CCD algorithm has some interesting similarities to the Expectation-Maximization
 % (EM) algorithm (Dempster et al., 1977), which is often used for clustering-based image
@@ -387,13 +386,13 @@ active contour, model-based image segmentation and tracking, as well
 as optimization methods. In Chapter~\ref{chapter:SHI}, we give a brief introduction of software
 and hardware infrastructure used in the implementation of the CCD
 approach. We will focus on the \acronym{OpenCV}{Open Source Computer Vision Library}, \acronym{ROS}{Robot Operating System} and \acronym{PR2}{Personal Robot 2}. Details on shape-space models and parametric
-B-Spline curves are discussed in Chapter~\ref{chapter:bspline},  and
+B-Spline curves are discussed in Chapter~\ref{chapter:bspline}, and
 Chapter~\ref{chapter:ccd} explains the CCD approach in detail. 
-In Chapter~\ref{chapter:experiments}, experiments and results are demonstrated.%  In
+In Chapter~\ref{chapter:experiments}, experiments and results are
+demonstrated. In Chapter~\ref{chapter:conclusion}, the work of this
+thesis is concluded with the future work for improvement.
+
+%  In
 % addition, we evaluate the performance of the CCD algorithm and the CCD
 % tracker in terms of robustness, accuracy, and runtime.
-In Chapter~\ref{chapter:conclusion},
-the work of this thesis is concluded with the future work for improvement.
-
-
 

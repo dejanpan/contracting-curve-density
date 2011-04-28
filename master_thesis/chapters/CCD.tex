@@ -64,7 +64,7 @@ statistics]{A contour with sample points used for learning local statistics. The
   divided the image into two parts: outside and inside. As depicted in
   right-bottom image, pixels inside the contour are labeled "0",
   and those outside the contour are labeled "1". For each point on the
-  contour (skyblue point), we sample some points (red points) along both positive
+  contour (the skyblue point), we sample some points (red points) along both positive
   and negative direction.}
 \label{fig:prior}
 \end{figure}
@@ -139,7 +139,7 @@ curves in shape-space $\mathcal{S}$ is given as:
 \end{figure}
 
 In two dimensions, the current mean model parameter
-$\mathbf{m}_{\mathbf{\Phi}}$ is vector with $6$ elements, and current
+$\mathbf{m}_{\mathbf{\Phi}}$ is a vector with $6$ elements, and current
 covariance matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}$ is a $6 \times 6$ matrix, which measures the variability of
 how much two groups of model parameters change together. The
 information matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}^{-1}$ can be
@@ -344,8 +344,17 @@ to cope with other complex distributions. The results of logistic
 sigmoid function and probit function tend to be similar, except that the
 probit function is sensitive to outliers because the logistic sigmoid
 decays asymptotically like $\mathrm{exp}(-x)$ for $x \rightarrow \infty$, whereas
-for the probit activation function the decay is like $\mathrm{exp}(-x^2)$.
-
+for the probit activation function the decay is like
+$\mathrm{exp}(-x^2)$ (Fig.~\ref{fig:outliers}).
+\begin{figure} 
+  \includegraphics[width=\linewidth]{images/outliers.jpg}
+\caption[Classification problem]{Classification problem: The
+  right plot shows the corresponding results obtained when outliers
+  are added at the bottom left of the diagram, showing  that probit
+  regression is highly sensitive to outliers, unlike logistic
+  regression~\cite{bishop2006pattern}}
+\label{fig:outliers}
+\end{figure}
 % Generally, we can call this approximation process as \textit{fuzzy} (or \textit{smooth})
 % assignment. The accuracy of this assignment will increase as the
 % uncertainty of curve governed by covariance $\mathbf{\Sigma}_{\mathrm{\Phi}}$ decreases.
@@ -364,13 +373,13 @@ where $\gamma_1$ equals to $0.5$ (disjoint weight assignment) and $\gamma_2$
 equals to $4$ for the truncated Gaussian~\cite{hanek2004contracting}. 
 
 \begin{figure} 
-  \begin{minipage}[t]{0.45\linewidth} 
+  \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-        \subfloat[]{\includegraphics[width=2.0in]{images/weight1.jpg}}
+        \subfloat[]{\includegraphics[width=3.0in]{images/weight1.jpg}}
   \end{minipage}% 
-  \begin{minipage}[t]{0.45\linewidth} 
+  \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-    \subfloat[]{\includegraphics[width=2.0in]{images/weight2.jpg}}
+    \subfloat[]{\includegraphics[width=3.0in]{images/weight2.jpg}}
   \end{minipage} 
 \caption[Weight functions]{The weight functions of the two sides of the contour, a) the
   weight function along the positive direction (outside) in the normal of the
@@ -413,7 +422,6 @@ We first calculate the zero, first and second order weighted moments:
   \mathbf{M}_{k,s}^{(1)}(d_{k,l,s}) &=& \sum_{l=0}^{2L-1} \omega_s(d_{k,l}) \mathrm{I}_{k,l}\\
   \mathbf{M}_{k,s}^{(2)}(d_{k,l,s}) &=& \sum_{l=0}^{2L-1} \omega_s(d_{k,l}) \mathrm{I}_{k,l}\mathrm{I}_{k,l}^T\qquad,
 \end{eqnarray}
-
 where $\mathbf{I}$ is just the raw RGB value of a pixel, for a
 3-channel image and the values of three components
 are  between 0 and 255. The local mean vectors $\mathbf{m}_{v,s}$  and
@@ -427,7 +435,7 @@ $\mathbf{\Sigma}_{\mathbf{\Phi}}$  are obtained by:
   - \mathbf{m}_{k,s}\mathbf{m}_{k,s}^T  + \kappa \mathbf{I}\qquad.
 \end{eqnarray}
 In Eq.~\ref{eq:localcov}, $\kappa I$  means an identity matrix scaled by
-$\kappa$ in order to avoid numerical singularity.Later it is namely
+$\kappa$ in order to avoid numerical singularity. Later it is namely
 required to calculate the inverse matrix of
 $\mathbf{\Sigma}_{k,s}$. In our experiments, we choose $\kappa$ to be
 $\kappa = 0.5$, which is efficient to avoid numerical problems in the
@@ -504,12 +512,12 @@ Eq.~\ref{eq:prior}, we can model the conditional possibility distribution using:
     p(\mathbf{\Phi}|\mathbf{\mathbf{I}}_{\mathcal{V}}) 
     \propto &
     p(\mathbf{\mathbf{I}_{\mathcal{V}}}
-    |\hat{\mathbf{\mathbf{m}}}_{\mathcal{V}}(\mathrm{\Phi}),\hat{\mathbf{\mathbf{\Sigma}}}_{\mathcal{V}}(\mathrm{\Phi}))p(\mathbf{\Phi}
+    |\hat{\mathbf{\mathbf{m}}}_{\mathcal{V}}(\mathbf{\Phi}),\hat{\mathbf{\mathbf{\Sigma}}}_{\mathcal{V}}(\mathbf{\Phi}))p(\mathbf{\Phi}
     | \mathbf{m}_{\mathbf{\Phi}},
     \mathbf{\mathbf{\Sigma}}_{\mathbf{\Phi}})\nonumber\\
     = & {\frac{1}{{(2\pi)}^{1/2}}}
       \frac{1}{|\mathbf{\Sigma}_{\mathbf{\Phi}}|}
-      \mathrm{exp}\{-\frac{1}{2}{(\phi-m_{\mathbf{\Phi}})^T{\mathbf{\Sigma}_{\mathbf{\Phi}}}^{-1}(\phi-\mathbf{m}_{\mathbf{\Phi}})}\}\cdot
+      \mathrm{exp}\{-\frac{1}{2}{(\mathbf{\Phi}-m_{\mathbf{\Phi}})^T{\mathbf{\Sigma}_{\mathbf{\Phi}}}^{-1}(\mathbf{\Phi}-\mathbf{m}_{\mathbf{\Phi}})}\}\cdot
     \nonumber\\ 
     & \prod_{k = 0}^{N_{C}-1} \prod_{l=0}^{2L-1}{\frac{1}{(2\pi)^{1/2}}
         \frac{1}{|\hat{\mathbf{\Sigma}}_{k,l}|} \mathrm{exp}\{-\frac{1}{2}
@@ -524,7 +532,7 @@ which is given by:
 \begin{align}
   \label{eq:costd}
   \mathcal{Q} = & -2 \ln \left\{  p(\mathbf{\mathbf{I}_{\mathcal{V}}}
-    |\hat{\mathbf{\mathbf{m}}}_{\mathcal{V}}(\mathrm{\Phi}),\hat{\mathbf{\mathbf{\Sigma}}}_{\mathcal{V}}(\mathrm{\Phi}))p(\mathbf{\Phi}
+    |\hat{\mathbf{\mathbf{m}}}_{\mathcal{V}}(\mathbf{\Phi}),\hat{\mathbf{\mathbf{\Sigma}}}_{\mathcal{V}}(\mathbf{\Phi}))p(\mathbf{\Phi}
     | \mathbf{m}_{\mathbf{\Phi}},
     \mathbf{\mathbf{\Sigma}}_{\mathbf{\Phi}})\right\}\nonumber\\
  = & \ln{(2\pi)} + 2\ln{|\mathbf{\Sigma}_{\mathbf{\Phi}}|} +

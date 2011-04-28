@@ -88,6 +88,9 @@ it has the following limitations or shortcomings:
 \item In many cases, if the automated global initialization of contours does
   not work, the manual intervention has to be executed at the beginning or
   in case of tracking loss.
+\item B-spline can not precisely represent many useful simple curves
+  such as circles and ellipses, thus, Non-uniform Rational B-spline
+  (NURBS) is required for the CCD algorithm.
 \item For an object like e.g. a ring, there are two extremely similar
   contours which are very close. The separating criteria, i.e. local
   statistics, is thus not capable of distinguishing two contours.

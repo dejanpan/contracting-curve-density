@@ -13,9 +13,9 @@ different kinds of model fitting and object tracking problems:
 \end{enumerate}
 
 Experiments have been carried out on the PR2 robot, we analyze the performance
-of the approach in terms of robustness, accuracy and runtime. In the
-end of the section, the comparison between the CCD approach and  other
-model-based methods is given.
+of the approach in terms of robustness, accuracy and runtime. % In the
+% end of the section, the comparison between the CCD approach and  other
+% model-based methods is given.
 
 
 % by the experimental evaluation of the CCD
@@ -120,26 +120,6 @@ and cluster methods (Fig.~\ref{fig:seg_comparison}d and Fig.~\ref{fig:seg_compar
   taken into account in the end of iteration.
 \end{itemize}
 
-In the following, we apply the proposed CCD algorithm to 4 kind of
-objects:
-\begin{enumerate}
-\item segmentation of a spherical object;
-\item segmentation of a three-dimensional object;
-\item segmentation of a half-transparent object;
-\item fitting a rigid wire frame.
-\end{enumerate}
-
-\subsection{Segmentation of a Ball}
-\label{sec:sb}
-Like other contour-based methods, we model a contour of the ball as the
-prior knowledge. Because the contour for a rigid spherical object is a
-circle, besides manually initialization, we can use built-in function in
-OpenCV library to generate the contour with given center and
-radius. According to the definition of prior distribution, it is required
-that the hypothesis is in the range of the variation of
-registered samples, namely, the initial contour can not be too far away
-from the observed object.
-
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
@@ -167,19 +147,17 @@ from the observed object.
 }
 \end{figure}
 
-In Fig.~\ref{fig:sab}, we intentionally set a hypothesis which is far away
-from the ball, but after about 15 iterations, we successfully fit the
-contour of the ball. % For the sake of a ground truth we need
-% to investigate the pixels used in the iterations. 
-Fig.~\ref{fig:pon} shows
-that only a small number of pixels are taken into account after the
-contour starts to converge but these pixels contain all the
-necessary information for refinement of the fitting. Because the
-number of sample points used to compute local statistics 
-becomes less and less, only a small number of pixels near the boundary
-are considered. This makes the CCD algorithm achieve high
-sub-pixel accuracy.
+In the following, we apply the proposed CCD algorithm to 4 kind of
+objects:
+\begin{enumerate}
+\item segmentation of a spherical object;
+\item segmentation of a three-dimensional object;
+\item segmentation of a half-transparent object;
+\item fitting a rigid wire frame.
+\end{enumerate}
 
+\subsection{Segmentation of a Ball}
+\label{sec:sb}
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
@@ -206,7 +184,27 @@ are considered. This makes the CCD algorithm achieve high
 sub-pixel accuracy.}
 \label{fig:pon}
 \end{figure}
+Like other contour-based methods, we model a contour of the ball as the
+prior knowledge. Because the contour for a rigid spherical object is a
+circle, besides manually initialization, we can use built-in function in
+OpenCV library to generate the contour with given center and
+radius. According to the definition of prior distribution, it is required
+that the hypothesis is in the range of the variation of
+registered samples, namely, the initial contour can not be too far away
+from the observed object.
 
+In Fig.~\ref{fig:sab}, we intentionally set a hypothesis which is far away
+from the ball, but after about 15 iterations, we successfully fit the
+contour of the ball. % For the sake of a ground truth we need
+% to investigate the pixels used in the iterations. 
+Fig.~\ref{fig:pon} shows
+that only a small number of pixels are taken into account after the
+contour starts to converge but these pixels contain all the
+necessary information for refinement of the fitting. Because the
+number of sample points used to compute local statistics 
+becomes less and less, only a small number of pixels near the boundary
+are considered. This makes the CCD algorithm achieve high
+sub-pixel accuracy.
 
 \subsection{Segmentation of a Cuboid-shaped Object}
 \label{sec:s3o}
@@ -281,11 +279,6 @@ the following interpretation
   \mathbf{\Phi} =  (T_1, T_2, M_{11} - 1, M_{22} - 1, M_{21}, M_{12}, \nu_1, \nu_2)
 \end{equation}
 
-The expanded space now encompasses the object in all views as depicted
-in Fig.~\ref{fig:box_match}. At last, we do
-another experiment for an object with an irregular shape (Fig.~\ref{fig:container}). This
-demonstrates that the CCD works well for three-dimensional object, too.
-
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
@@ -308,6 +301,11 @@ demonstrates that the CCD works well for three-dimensional object, too.
 \label{fig:container}
 \end{figure}
 
+The expanded space now encompasses the object in all views as depicted
+in Fig.~\ref{fig:box_match}. At last, we do
+another experiment for an object with an irregular shape (Fig.~\ref{fig:container}). This
+demonstrates that the CCD works well for three-dimensional object,
+too.
 \subsection{Segmentation of a Transparent Object}
 \label{sec:sto}
 In this thesis, local statistical information is collected in terms of
@@ -318,8 +316,6 @@ lower part is opaque. The result in Fig.~\ref{fig:cola} shows that the CCD algor
 segments the lower part but fails to completely encompass the contour in the
 upper part. However, because the model only has 6 (or 8
 for three-dimensional object) DOFs, the convergence of the lower part will aid the convergence for the whole object.
-
-
 \begin{figure}[htbp] 
   \begin{minipage}[t]{0.5\linewidth} 
     \centering 
@@ -345,8 +341,6 @@ closely attaches to the edge in the left but stays away from the edge
 in the right. The transparency leads to the difficulties. }
 \label{fig:cola}
 \end{figure}
-
-
 % \subsection{Fitting a Rigid Wire Frame}
 % \label{sec:fdo}
 % In the following, we fit a rigid wire frame model to the image
@@ -387,9 +381,77 @@ in the right. The transparency leads to the difficulties. }
 % \label{fig:wireframe}
 % \end{figure}
 
+\section{Tracking Initialized Manually}
+\begin{figure}[htbp]
+  \begin{minipage}[t]{0.5\linewidth} 
+    \centering  
+    \subfloat[Control points initialized manually]{\includegraphics[width=2.5in]{images/plate/1.jpg}}    
+  \end{minipage}% 
+  \begin{minipage}[t]{0.5\linewidth} 
+    \centering 
+    \subfloat[Initial B-spline contour]{\includegraphics[width=2.5in]{images/plate/2.jpg}}
+  \end{minipage} 
+  \begin{minipage}[t]{0.5\linewidth} 
+    \centering 
+    \subfloat[Frame 1]{\includegraphics[width=2.5in]{images/plate/3.jpg}}
+  \end{minipage} 
+  \begin{minipage}[t]{0.5\linewidth} 
+    \centering 
+    \subfloat[Frame 50]{\includegraphics[width=2.5in]{images/plate/4.jpg}}
+  \end{minipage} 
+  \begin{minipage}[t]{0.5\linewidth} 
+    \centering 
+    \subfloat[Frame 100]{\includegraphics[width=2.5in]{images/plate/5.jpg}}
+  \end{minipage} 
+  \begin{minipage}[t]{0.5\linewidth} 
+    \centering 
+    \subfloat[Frame 144]{\includegraphics[width=2.5in]{images/plate/6.jpg}}
+  \end{minipage} 
+  \caption[Tracking initialized manually]{Tracking initialized
+    manually: a) Manually draw some control points, the contour is not
+    required to  be closed the edge of the object. Now approximately
+    it is a ellipse. b) The B-spline
+    curve generated from the interpolation of the control points. c) -
+    f) The results of frame 1, 50, 100, 144.
+  }
+  \label{fig:plate}
+\end{figure}
+In this experiment, we use the CCD approach to track a plate on a
+table and analyze the experimental results. 
+In Fig.~\ref{fig:plate}, apparently, the tracker has successfully
+captured the contour of the observed plate. However, we find that the
+contour does not completely encompass the edge of the object in the
+beginning of the motion. The edge of the plate is analyzed by the
+Sobel operator, it is shown that the edge in that region is not
+sharp. Moreover, the pixels values of the shadow is
+close to and the ones of the edge of the plate (Fig. ~\ref{fig:rgb}). Hence,
+the contour can not snap to the edge. But the changes of the control
+points in this region have not changed the shape of the whole
+contour, because the contour has limited DOFs. There are two solution
+for this problem:
+\begin{itemize}
+\item Using other local statistics based on other features to replace
+  the RGB statistics.
+\item Sharpen the edge of the observed object.
+\end{itemize}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=12cm]{images/edge.jpg}
+  \caption[Shadow effects]{The contour does not completely encompass
+    the edge because of shadow effects.}
+  \label{fig:rgb}
+\end{figure}
 
 \section{Track Initialization from SIFT Features}
 \label{sec:sift_init}
+\begin{figure}[htbp]
+  \centering
+\includegraphics[width=12cm]{images/sift_result.jpg}
+\caption[The contour obtained using the CCD algorithm converges to the
+edge of the book]{After 8 iterations, the contour obtained in Fig.~\ref{fig:sift} converges to the edge of the book.}
+\label{fig:sift_result}
+\end{figure}
 Scale-invariant feature transform (or SIFT) is an algorithm to detect
 and describe local features in images.  It is widely used to solve
 many problems in the field of Computer Vision, such as object
@@ -434,48 +496,9 @@ features and advantages:
 %   training images.
 % \end{itemize}
 
-In this thesis, we use the SIFT algorithm to initialize the
-contour of an object. Assume we have marked the boundary points in the
-training images. In order to project these boundary points to the test
-image, it is essential to estimate the homography between the
-images. However, SIFT matching
-might lead to lots of "false" matches. % In order
-% to evaluate the homography, firstly we have to exclude the
-% mismatches. 
-For filtering out false positives, we use \acronym{RANSAC}{RANdom SAmple Consensus}, which is an
-iterative process that randomly selects enough matches to fit the
-homography. It contains the following steps~\cite{fischler1981random}.
-
-\begin{itemize}
-\item  Randomly select a sample of matched points and instantiate the
-  model from this subset.
-\item Determine the set of data points that are within a distance
-  threshold of the homography. The set is the consensus set of the sample
-  and defines the inliers.
-\item If the size of the set (e.g. the number of inliers) is greater
-  than some threshold, re-estimate the homography using all the matched
-  points and terminate. Otherwise, select a new subset and repeat the
-  above.
-\item After some trials the largest consensus set is selected, and the
-  homography is re-estimated using all the points in the subset.
-\end{itemize}
-Fast way to compute the homography in a least squares sense is to use the Normalized
-Direct Linear Transform (normalized
-\acronym{DLT}{Direct Linear Transform})~\cite{hartley2003multiple}. The Normalized DLT algorithm computes
-a homography for a projective transformation by using at least 4 point
-correspondences and then minimizing corresponding norm.
-
-After obtaining the homography between the template image and the
-test image, the contour of object can be easily projected
-into the test image to obtain the estimate of the contour
-position. This is illustrated in Fig.~\ref{fig:sift} and
-Fig.~\ref{fig:sift_result}. Note that because SIFT is only invariant
-to minor changes in view points, the method does not always work for
-three-dimensional objects which have substantially different view points.
-
 \begin{figure}[htbp]
   \centering
-\includegraphics[width=\linewidth]{images/sift.jpg}
+\includegraphics[width=12cm]{images/sift.jpg}
 \caption[Contour initialization using the SIFT algorithm]{The image in
   the upper-left corner is a template. It is projected into the bottom
   image. The green points in the template image encompass the
@@ -489,17 +512,17 @@ three-dimensional objects which have substantially different view points.
 \label{fig:sift}
 \end{figure}
 
-\begin{figure}[htbp]
-  \centering
-\includegraphics[width=\linewidth]{images/sift_result.jpg}
-\caption[The contour obtained using the CCD algorithm converges to the
-edge of the book]{After 8 iterations, the contour obtained in Fig.~\ref{fig:sift} converges to the edge of the book.}
-\label{fig:sift_result}
-\end{figure}
-
-% The model hypothesis is obtained by applying the CCD algorithm to a
-% frame of a video sequence. In the following experiments, we can test
-% our naive CCD tracker on PR2, the result is demonstrated in Fig.~\ref{fig:sifttracker} 
+In this thesis, we use the SIFT algorithm to initialize the
+contour of an object. Assume we have marked the boundary points in the
+training images. In order to project these boundary points to the test
+image, it is essential to estimate the homography between the
+images. However, SIFT matching
+might lead to lots of "false" matches. % In order
+% to evaluate the homography, firstly we have to exclude the
+% mismatches. 
+For filtering out false positives, we use \acronym{RANSAC}{RANdom SAmple Consensus}, which is an
+iterative process that randomly selects enough matches to fit the
+homography. It contains the following steps~\cite{fischler1981random}.
 
 \begin{figure}[htbp]
   \begin{minipage}[t]{0.5\linewidth} 
@@ -533,7 +556,48 @@ edge of the book]{After 8 iterations, the contour obtained in Fig.~\ref{fig:sift
   \label{fig:sifttracker}
 \end{figure}
 
+\begin{itemize}
+\item  Randomly select a sample of matched points and instantiate the
+  model from this subset.
+\item Determine the set of data points that are within a distance
+  threshold of the homography. The set is the consensus set of the sample
+  and defines the inliers.
+\item If the size of the set (e.g. the number of inliers) is greater
+  than some threshold, re-estimate the homography using all the matched
+  points and terminate. Otherwise, select a new subset and repeat the
+  above.
+\item After some trials the largest consensus set is selected, and the
+  homography is re-estimated using all the points in the subset.
+\end{itemize}
+Fast way to compute the homography in a least squares sense is to use the Normalized
+Direct Linear Transform (normalized
+\acronym{DLT}{Direct Linear Transform})~\cite{hartley2003multiple}. The Normalized DLT algorithm computes
+a homography for a projective transformation by using at least 4 point
+correspondences and then minimizing corresponding norm.
 
+After obtaining the homography between the template image and the
+test image, the contour of object can be easily projected
+into the test image to obtain the estimate of the contour
+position. This is illustrated in Fig.~\ref{fig:sift} and
+Fig.~\ref{fig:sift_result}. Note that because SIFT is only invariant
+to minor changes in view points, the method does not always work for
+three-dimensional objects which have substantially different view points.
+
+% The model hypothesis is obtained by applying the CCD algorithm to a
+% frame of a video sequence. In the following experiments, we can test
+% our naive CCD tracker on PR2, the result is demonstrated in Fig.~\ref{fig:sifttracker} 
+
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=12cm]{images/pr2b.jpg}
+  \caption[Kinect camera of the PR2 Robot and object candidate
+  segmented in three-dimensional point cloud.]{Kinect camera of
+    the PR2 Robot and object candidate segmented in three-dimensional point
+    cloud. Encompassing a contour of the back-projected points onto
+    the image is used as an initial contour for the CCD algorithm.}
+  \label{fig:pointcloud}
+\end{figure}
 \section{Track Initialization from Three-dimensional Point Cloud}
 \label{sec:tifpc}
 
@@ -543,17 +607,6 @@ edge of the book]{After 8 iterations, the contour obtained in Fig.~\ref{fig:sift
 % device. Point clouds cloud are widely used to  create three-dimensional CAD models
 % for manufactured parts, a multitude of visualization, animation and
 % rendering.
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=\linewidth]{images/pr2b.jpg}
-  \caption[Kinect camera of the PR2 Robot and object candidate
-  segmented in three-dimensional point cloud.]{Kinect camera of
-    the PR2 Robot and object candidate segmented in three-dimensional point
-    cloud. Encompassing a contour of the back-projected points onto
-    the image is used as an initial contour for the CCD algorithm.}
-  \label{fig:pointcloud}
-\end{figure}
-
 % Point clouds can be rendered and inspected in software like MeshLab
 % and rviz (Fig.~\ref{fig:pointcloud}). In addition, they are usually converted to polygon or
 % triangle mesh models, NURBS surface models, or CAD models through a
