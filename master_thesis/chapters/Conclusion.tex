@@ -42,17 +42,17 @@ convergence area is important, if too fast, the algorithm will stop
 converging, on the other hand, if too slow, it is difficult to achieve
 notably performance improvement. In this thesis we have investigated the relation between
 the rate and the convergence speed. In total the following set of
-improvements over the original implementation is brought into our system.
+improvements over the original implementation is brought into our system:
 \begin{itemize}
-\item use of the logistic sigmoid function instead of Gaussian error
+\item Use of the logistic sigmoid function instead of Gaussian error
   function to convert a curve-fitting problem to a Gaussian logistic
-  regression problem;
-\item modeling the parametric curve is implemented using the quadratic or
+  regression problem.
+\item Modeling the parametric curve is implemented using the quadratic or
 cubic B-spline curve  to avoid the Runge phenomenon without increasing
 the degree.
-\item supports for both planar affine and three-dimensional affine
+\item Supports for both planar affine and three-dimensional affine
   shape-space. This makes the system viewpoint invariant.
-\item full automatic initialization of contour from SIFT keypoints or
+\item Full automatic initialization of contour from SIFT keypoints or
   point clouds is developed to avoid
   intervention from human.
 \end{itemize}
