@@ -5,7 +5,7 @@
  */
 struct CCDParams
 {
- CCDParams(): gamma_1(0.5), gamma_2(4), gamma_3(4), gamma_4(3),alpha(1.3), kappa(0.5),c(0.25), h(40), delta_h(1),resolution(100), degree(4), phi_dim(8)
+ CCDParams(): gamma_1(0.5), gamma_2(4), gamma_3(4), gamma_4(3),alpha(1.3), beta(0.06), kappa(0.5),c(0.25), h(40), delta_h(1),resolution(100), degree(4), phi_dim(8)
   {
   }
   CCDParams(double p1,
@@ -15,11 +15,12 @@ struct CCDParams
             double p5,
             double p6,
             double p7,
-            int p8,
+            double p8,
             int p9,
             int p10,
             int p11,
-            int p12
+            int p12,
+            int p13
             )
   {
     gamma_1 = p1;
@@ -27,13 +28,14 @@ struct CCDParams
     gamma_3 = p3;
     gamma_4 = p4;
     alpha = p5;
-    kappa = p6;
-    c = p7;
-    h = p8;
-    delta_h = p9;
-    resolution = p10;
-    degree = p11;
-    phi_dim = p12;
+    beta = p6;
+    kappa = p7;
+    c = p8;
+    h = p9;
+    delta_h = p10;
+    resolution = p11;
+    degree = p12;
+    phi_dim = p13;
   }
 
   ~CCDParams()
@@ -44,6 +46,7 @@ struct CCDParams
   double gamma_3;
   double gamma_4;
   double alpha;
+  double beta;
   double kappa;
   double c;
   int h;

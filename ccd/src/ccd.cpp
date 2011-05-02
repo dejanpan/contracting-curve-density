@@ -8,12 +8,6 @@
 #include "ccd/ccd.h"
 cv::Mat canvas_tmp;
 
-inline cv::Scalar random_color(CvRNG* rng)
-{
-  int color = cvRandInt(rng);
-  return CV_RGB(color&255, (color>>8)&255, (color>>16)&255);
-}
-
 inline double logistic(double x)
 {
   return 1.0/(1.0+exp(-x));
@@ -24,30 +18,11 @@ inline double probit(double x)
   return 0.5*(1+1/sqrt(2)*erf(x));
 }
 
-
-
-
-// void on_mouse(int event, int x, int y, int flags, void *param )
-// {
-//   CCD *my_ccd = (CCD *)param;
-//   cv::Mat image = my_ccd->canvas;
-//   if( image.empty())
-//     return ;
-
-//   //caution: check
-//   // if( image1.at<double>() )
-//   //   y = image1->height - y;
-//   switch( event )
-//   {
-//     case CV_EVENT_LBUTTONDOWN:
-//       break;
-//     case CV_EVENT_LBUTTONUP:
-//       cv::circle(image,cv::Point(x,y),1,cv::Scalar(0,0,255),1);
-//       my_ccd->pts.push_back(cv::Point3d(x,y,1));
-//       cv::imshow("CCD", image);
-//       break;
-//   }
-// }
+inline cv::Scalar random_color(CvRNG* rng)
+{
+  int color = cvRandInt(rng);
+  return CV_RGB(color&255, (color>>8)&255, (color>>16)&255);
+}
 
 void CCD::read_params( const std::string& filename)
 {
@@ -56,7 +31,8 @@ void CCD::read_params( const std::string& filename)
   params_.gamma_2 = double(fs["gamma_2"]);      
   params_.gamma_3 = double(fs["gamma_3"]);      
   params_.gamma_4 = double(fs["gamma_4"]);      
-  params_.alpha   = double(fs["alpha"]);        
+  params_.alpha   = double(fs["alpha"]);
+  params_.beta   = double(fs["beta"]);
   params_.kappa   = double(fs["kappa"]);        
   params_.c       = double(fs["c"]);            
   params_.h       = int(fs["h"]);            
@@ -64,17 +40,17 @@ void CCD::read_params( const std::string& filename)
   params_.resolution = int(fs["resolution"]);   
   params_.degree  = int(fs["degree"]);
   params_.phi_dim  = int(fs["phi_dim"]);
-  std::cerr<< params_.gamma_1<< " ";
-  std::cerr<< params_.gamma_2<< " ";
-  std::cerr<< params_.gamma_3<< " ";
-  std::cerr<< params_.gamma_4<< " ";
-  std::cerr<< params_.alpha<< " ";
-  std::cerr<< params_.kappa<< " ";
-  std::cerr<< params_.c<< " ";
-  std::cerr<< params_.delta_h<< " ";
-  std::cerr<< params_.resolution<< " ";
-  std::cerr<< params_.degree<< " ";
-  std::cerr<< params_.phi_dim<< std::endl;
+  // std::cerr<< params_.gamma_1<< " ";
+  // std::cerr<< params_.gamma_2<< " ";
+  // std::cerr<< params_.gamma_3<< " ";
+  // std::cerr<< params_.gamma_4<< " ";
+  // std::cerr<< params_.alpha<< " ";
+  // std::cerr<< params_.kappa<< " ";
+  // std::cerr<< params_.c<< " ";
+  // std::cerr<< params_.delta_h<< " ";
+  // std::cerr<< params_.resolution<< " ";
+  // std::cerr<< params_.degree<< " ";
+  // std::cerr<< params_.phi_dim<< std::endl;
 }
 
 void CCD::init_mat()
@@ -144,16 +120,8 @@ void CCD::init_cov(BSpline &bs, int degree)
   }
 
   cv::Mat tmp_cov;
-  cv::gemm(W, U, 6/100,  cv::Mat(), 0, tmp_cov, cv::GEMM_1_T);
+  cv::gemm(W, U, params_.beta,  cv::Mat(), 0, tmp_cov, cv::GEMM_1_T);
   cv::gemm(tmp_cov, W, 1,  cv::Mat(), 0, Sigma_Phi, 0);
-  //Sigma_Phi = 6/(10*10)*W.t()*U*W;
-  // cov = Nx/rou_0^2 * H
-  // cov = 6/25*cov;
-  // clean....
-  // W.release();
-  // U.release();
-  // tmp_cov.release();
-  // tmp_mat.release();
 }
 
 
@@ -493,30 +461,18 @@ void CCD::refine_parameters(BSpline &bs)
           tmp_cov_ptr[n] = vic_ptr[10*j+4] * cov_vic_ptr[m*3+n] +(1-vic_ptr[10*j+4])* cov_vic_ptr[m*3+n+9];
         }
       }
-
-      // std::cout << "debug " << std::endl;
-
-      // for (int m = 0; m < 3; ++m){
-      //   double *tmp_cov_ptr = tmp_cov.ptr<double>(m);
-      //   for (int n =0; n < 3; ++n){
-      //     std::cout << tmp_cov_ptr[n] << " " ;   
-      //   }
-      //   std::cout<< std::endl;
-      // }
       
       tmp_cov_inv = tmp_cov.inv(cv::DECOMP_SVD);
  
       tmp_pixel_diff = cv::Mat::zeros(3, 1, CV_64F);
 
-      // std::cout << " pixel_diff: " ;
       //compute the difference between I_{kl} and \hat{I_{kl}}
       for (int m = 0; m < 3; ++m)
       {
         tmp_pixel_diff.at<double>(m,0) = img(vic_ptr[10*j+0], vic_ptr[10*j+1])[m]- vic_ptr[10*j+4] * mean_vic_ptr[m]- (1-vic_ptr[10*j+4])* mean_vic_ptr[m+3];
       }
-      // std::cout << std::endl;
-      //compute jacobian matrix
-        
+      
+      //compute jacobian matrix        
       tmp_jacobian = cv::Mat::zeros(params_.phi_dim,3,CV_64F);
  
       for (int n = 0; n < 3; ++n)
@@ -685,37 +641,3 @@ void CCD::run_ccd()
     // bs.release();
   }while(!convergence);
 }
-
-// void CCD::contour_sift()
-// {
-//   int row;
-//   IplImage sift_tpl = tpl;
-//   IplImage sift_tpl_img = canvas;
-//   IplImage *tpl_ptr = &sift_tpl;
-//   IplImage *tpl_img_ptr = &sift_tpl_img;
-//   // CvMat points_mat = sift_init(tpl_ptr, tpl_img_ptr, 30);
-//   CvMat points_mat = sift_init(tpl_ptr, tpl_img_ptr, 30);
-//   CvMat *points_mat_ptr = &points_mat;
-//   double *ptr = points_mat_ptr->data.db;
-//   int step = points_mat.step/sizeof(double);
-//   for (row = 0; row < points_mat_ptr->rows; ++row)
-//   {
-//     pts.push_back(cv::Point3d((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2], 1));
-//     // cv::circle(my_ccd.canvas, cvPoint((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]), 2, CV_RGB(0,255,0), 2, 8, 0);
-//   }
-//   //clean..........
-// }
-
-
-// void CCD::contour_manually()
-// {
-//   int key;
-//   cv::namedWindow("CCD", 1);
-//   cv::setMouseCallback( "CCD", on_mouse,  (void*)this);
-//   cv::imshow("CCD", canvas);
-//   while (1)
-//   {
-//     key = cv::waitKey(10);
-//     if (key == 27) break;
-//   }
-// }
