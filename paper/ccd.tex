@@ -4,7 +4,6 @@
 \ifCLASSINFOpdf
   % \usepackage[pdftex]{graphicx}
   % declare the path(s) where your graphic files are
-  % \graphicspath{{../pdf/}{../jpeg/}}
   % and their extensions so you won't have to specify these with
   % every instance of \includegraphics
   % \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
@@ -20,10 +19,27 @@
   % \DeclareGraphicsExtensions{.eps}
 \fi
 
+\usepackage{cite}
+\usepackage{times}
+\usepackage{wrapfig}
+\usepackage{tweaklist}
+\usepackage{xspace}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{url}
+\usepackage{bm}
+\usepackage{color}
+\usepackage{colortbl}
+\usepackage{subfig}
+\usepackage[ruled,vlined]{algorithm2e}
+
 % correct bad hyphenation here
 \hyphenation{op-tical net-works semi-conduc-tor}
+\graphicspath{{../master_thesis/}}
 
-
+\newcommand{\todo}[1]{\textbf{\textcolor{red}{TODO: #1}}}
 \begin{document}
 %
 % paper title
@@ -34,23 +50,147 @@
 % author names and affiliations
 % use a multiple column layout for up to three different
 % affiliations
-\author{\IEEEauthorblockN{Dejan Pangercic and Shulei Zhu and Michael Beetz}
+\author{\IEEEauthorblockN{Shulei Zhu and Dejan Pangercic and Michael Beetz}
 \IEEEauthorblockA{Intelligent Autonomous Systems Group, TU Munich \\
-Email: \{pangercic, shulei.zhu, beetz\}@cs.tum.edu}
+Email: \{shulei.zhu, pangercic, beetz\}@cs.tum.edu}
 }
 
 % make the title area
 \maketitle
 
 \begin{abstract}
-%\boldmath
-The abstract goes here.
+This paper investigates an extended and optimized
+implementation of the state-of-the-art local curve fitting algorithm
+named Contracting Curve Density (CCD) algorithm, originally developed 
+by Hanek et al. In particular, we investigate its application  
+in the field of personal robotics for the tasks such as the segmentation
+of objects in clutter and the tracking of objects. 
+The developed system mainly consists of two functional parts, the CCD
+algorithm to fit the model curve in still images and the CCD tracker to
+track the model in the videos. We demonstrate algorithm's working 
+in various scenes using handheld camera and the cameras from the 
+PR2 robot. Achieved results show that the CCD algorithm achieves 
+robustness and sub-pixel accuracy even in the presence of clutter, 
+partial occlusion, and changes of illumination.
 \end{abstract}
 
 \IEEEpeerreviewmaketitle
 
 \section{Introduction}
+The CCD algorithm can be best described as follows. Given one or multiple images as input
+data and a parametric curve model with a priori distribution of model
+parameters, through curve-fitting process, we estimate the model
+parameters which determine the approximation of the posterior
+distribution in order to make the curve models best matching the image data.
 
+The curve-fitting problem and its variants have a wide range of
+applications in the field of robotics, medical processing, user
+interface, surveillance and biometrics~\cite{hanek2004fitting}. In order to be
+widely applicable to practical personal robotics problems (such as
+perception of mobile manipulation), robustness,
+accuracy, efficiency and versatility should be
+considered when a novel approach is designed and implemented.
+However, in the computer vision community, solving object segmentation and the
+related object contour tracking problems are always challenging,
+especially in natural and unconstrained scenes. Due to clutter,
+shading, texture, and highlights it is very difficult to segment
+an object from an inhomogeneous background. Furthermore, some physical
+conditions, such as the illumination or surface properties, will
+influence the efficiency and stability of related approaches. It is
+necessary and significant to develop a method which determines adequate segmentation
+in advance or a single criterion that is applicable for all parts of objects boundaries.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\columnwidth]{images/divide1.jpg}\\
+  \includegraphics[width=\columnwidth]{images/divide2.jpg}
+  \caption[A classification problem]{A classification problem: Top) The red
+    contour successfully segment the box from the background. Bottom) The
+    blue one is outside, the golden one is inside.}
+  \label{fig:divide}
+\end{figure}
+
+\subsection{An Alternative View of the CCD Algorithm}
+\label{sec:overview}
+
+In the field of pattern recognition, the key concept is that of
+uncertainty. In image data, the uncertainty arises both
+through noise from measurements, as well as through the nature of
+the objects (e.g. cardiac motion and deformation). Probability theory
+provides a consistent framework for the quantification and
+manipulation of uncertainty.  In this section, we view curve-fitting
+problem from a probabilistic perspective and turn us towards to
+a classification problem.
+
+In the CCD algorithm, we aim to find the contour of observed object
+and thus segment it from the background. Therefore, a hypothetical 
+contour divides the image into two part (Fig.\ref{fig:divide}), inside
+and outside. For probabilistic model, we can represent this using
+binary representation (e.g. $\{0, 1\}$). The goal of the CCD algorithm
+is to accurately
+assign a class label to each pixel in the image (Actually, we only need assign those pixels in the vicinity of the
+contour), thus the curve-fitting problem becomes a classification
+one. A powerful approach to solve this problem involves modeling a
+conditional probability distribution in an inference stage, and then
+subsequently uses this distribution to make optimal decisions. In
+order to derive the conditional probability, prior distribution and
+likelihood function should be given.
+
+We assume that a parametric curve model is governed by a prior distribution
+over the model parameters (usually a multi-dimensional vector). There
+exists a range of probability distributions which can be used to model
+the distribution of shapes. In this thesis, for simplicity, let us
+consider the Gaussian distribution, which is commonly used in computer
+vison because of its several outstanding features. 
+
+Defining the prior distribution is only a step of the problem.
+According to the Bayesian theorem, the conditional distribution
+is proportional to the product of prior distribution and the likelihood
+function. Hence, the next step is to define the likelihood function.
+
+In the implementation of the CCD algorithm, it is suggested to use
+local image pixels as the training data to determine the
+likelihood function. If the data is assumed to be drawn  independently
+from the distribution, then the likelihood function is given by the accumulation of all the components.
+By pixel value we denote the vector containing the local single-or multichannel
+image data associated to a pixel. In our experiments, we directly use the sensed RGB
+values as pixel values. However, other types of local features computed in a pre-processing
+step may also be used, e.g. texture descriptors or color values in
+other color spaces.
+
+The likelihood function obtained from the local statistics has
+not a closed-form solution. In addition, the prior distribution is just
+an approximate to the true distribution. Therefore, Maximization
+likelihood method does not work here, we have to use an alternative
+approach known as iterative reweighted least squares (IRLS) to find
+the solution. Here the IRLS process is called Maximum a Posterior (MAP).
+
+In the CCD algorithm, because we just need a parameter vector determining
+the shape of specified contour, we do not plan to calculate the
+predictive distribution. Therefore, the MAP solution mentioned above
+is our objective.
+
+However, take account into the fact that exact inference for the
+regression is always intractable, we have encountered some issues before
+implementing the algorithm. In the next section, we will discuss these
+problems.
+
+\subsection{Contributions}
+In order to improve the stability, accuracy and robustness over the original
+implementation we introduce the following novel improvements. Firstly, we use the logistic sigmoid
+function instead of a Gaussian error function which renders a
+curve-fitting problem as a Gaussian logistic regression problem known in the
+field of pattern recognition. Secondly, a quadratic or
+a cubic B-spline curve is used to model the parametric curve
+to avoid the Runge phenomenon without increasing the degree of the
+B-spline. Thirdly, the system supports both planar affine (6-DOF) and
+three-dimensional affine (8-DOF) shape-space. The latter affine space can avoid
+curve mismatching caused by major viewpoint changes. Lastly, in
+order to avoid manual intervention by the user, the developed system
+also supports robust global initial curve initialization modules based on both keypoint
+feature matching and back-projections from the 3D point clouds.
+
+\todo{In the remainder of this document ...}
 \section{Related Work}
 \cite{hanek2004contracting}
 
