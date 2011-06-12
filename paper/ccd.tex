@@ -358,12 +358,439 @@ Fig.\ref{fig:flowchart} gives the flow chart of the CCD algorithm.
 \section{Contracting Curve Density Algorithm}
 
 \subsection{Logistic Sigmoid Function}
+As claimed in Chapter~\ref{sec:ccdcfp}, one of advantages of the
+model-based approach is that we can restrict a task at hand to the ROI
+which is
+expected to reduce the computational cost. Hence, we first define
+the region which contains pixels in the vicinity of the expected image
+curve. Considering the complexity and the expense of computing, it is practicable
+to choose those pixels that are actually required for interpolation along
+normals of the curve (Fig.~\ref{fig:prior}). This is proved useful and important for image
+perception and real-time tracking system. In the implementation of
+this thesis, the processing is limited to a segment of each normal within
+a search region. A fixed distance $h$ along the normal segment is
+chosen according to the hypothetical uncertainty of the parametric curve. In the
+special case of the norm-squared prior in spline space, a reasonable
+search segment is determined as follows:
+
+\begin{equation}
+  \label{eq:radius}
+  h = \sqrt{2} \rho_0 = \sqrt{\mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}}\mathbf{A}^T\mathcal{U}\mathbf{A})}\qquad.
+\end{equation}
+
+$h$ denotes the size of a \textit{window} which is used for computing
+the local statistics. In the beginning of the iterative procedure, the value
+is relatively big and only roughly approximates the vicinity of the image curve
+. The
+uncertainty is reduced after further iteration steps and as a result, the $h$ becomes smaller and
+smaller. After determining the length of the search segment, 
+a set of points located on these segments can be collected and
+evaluated. Note that the parametric model curve is not required to be
+closed, but it shall always encompass a limited area. We only plan to
+analyze the pixels located in the vicinity of the contour (red sample
+pixels in Fig.~\ref{fig:prior}). Therefore,
+we should pay attention to limit the search distance on the
+\textit{inner} side in order to avoid crossing the opposite
+boundary to sample pixels from the wrong area~\cite{panin2006fully}. In order to
+decrease the computational expense, it is advisable to uniformly sample those
+pixels on both segments in the vicinity of the contour. On the other
+hand, we should avoid to collect too small number of pixels, because
+it is statistically invalid and can not
+capture all features (e.g. spinodals and corners) of the contour. Let us denote the
+sample distance using $\Delta h$, then the overall number of spaced
+sample points $L$ ($2L$ for both sides in all) can be given by:
+\begin{equation}
+  \label{eq:sample}
+  L = \lfloor \frac{h}{\Delta h} \rfloor\qquad.
+\end{equation}
+
+Note that the goal of the algorithm is to assign each pixel
+($\mathrm{v}_{k,l}, k \in [0,\ldots,N_{\mathrm{C}}-1], l \in [0,
+2L-1]$) on either side of the contour. By doing so we thus run into a
+classification problem.
+Although each pixel should be assigned to one and only
+one class so that the target variable is discrete, we can model the
+posterior probabilities that lie in $(0,1)$ interval, which converts the classification into the regression problem. To achieve the latter, we model the probabilistic
+assignments $\mathbf{a}_{v}$ for each pixel $\mathrm{v}_{k,l}$ as following:
+\begin{equation}
+  \label{eq:pa}
+  \mathbf{a}_v  = (a_{v,1}, a_{v,2})^T\qquad,
+\end{equation}
+where $a_{v,1}$ describes to which extent a pixel $v$ is expected to
+be influenced by side $1$ of the curve, and $a_{v,2}$ is equivalent
+for side 2 given by $a_{v,2} = 1- a_{v,1}$. For arbitrary curve
+$\mathbf{C}$, it is difficult to give a closed form of $a_v$. In the
+following, an efficient approximation of the assignment is derived.
+
+We will first evaluate the \textbf{signed} distance $d_{k,l}$ between pixel
+$\mathrm{v}_{k,l}$ and a given curve $\mathbf{C}$
+(Fig.~\ref{fig:dis}), which
+can be approximated by:
+\begin{equation}
+  \label{eq:dis}
+  d_{k,l} = \mathbf{n}_k \cdot ( \mathbf{v}_{k,l} - C_k)\qquad,
+\end{equation}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=10cm]{images/dis.jpg}
+  \caption[The distance between a curve point and a pixel in the vicinity
+  of a contour]{The distance between a curve point and a pixel in the
+    vicinity of a contour: $C_k$ is the curve point, $v_{k,l}$ is a
+    pixel in the perpendicular of the contour, $d_{k,l}$ is the
+    distance between $C_k$ and $v_{k,l}$.}
+  \label{fig:dis}
+\end{figure}
+
+where $\mathbf{v}_{k,l} = {x_{k,l} \choose y_{k,l}}$ is the axis
+components of a pixel
+$\mathrm{v}_{k,l}$, and $C_k$ is the equivalent for point $C$ on the
+curve given by ${x_k \choose y_k}$. Now consider that the curve is
+distorted by a Gaussian $p(\mathbf{\Phi})$ which makes the displacement $d_{k,l}$ also Gaussian distributed: $p(d_{k,l}) \sim
+\mathcal{N}(d_{k,l}|m_d, \sigma)$, where $m_d$ and $\sigma$ are mean
+and covariance of the distribution. Covariance $\sigma$ is expressed as:
+\begin{equation}
+  \label{eq:cov}
+  \sigma = \mathbf{n}_k \cdot \mathbf{J}_k \cdot \mathbf{\Sigma}_{\Phi}
+  \cdot \mathbf{J}_k^T \cdot \mathbf{n}_k^T\qquad,
+\end{equation}
+where $\mathbf{J}_k$ is the Jacobian of curve $\mathbf{C}$. $\sigma$
+can be taken as the uncertainty of the curve along the normal
+introduced by the covariance
+$\mathbf{\Sigma}_{\mathbf{\Phi}}$, it is a constant and can be
+evaluated offline. The variable
+$\frac{d_{k,l}}{\sigma}$ now becomes a linear function with respect to $\mathbf{\Phi}$.
+
+In order to apply the probabilistic generative models to the
+classification problem,
+% calculate the the probability that a point lies on side 1 of the curve
+we need to transform the linear function of $\mathbf{\Phi}$ using a
+non-linear activation function $f(\cdot)$~\cite{bishop2006pattern}:
+\begin{equation}
+  \label{eq:nonla}
+  a_{v,1} = f(\frac{d_{k,l}}{\sigma})\qquad.
+\end{equation}
+Currently, two main non-linear activation functions are mostly used
+to solve the classification problem. The first is known as the
+\textit{logistic sigmoid} function, and is given by:
+\begin{equation}
+  \label{eq:logistic}
+  a_{v,1} =
+  \frac{1}{1+\mathrm{exp}(\frac{d_{k,l}}{\sqrt{2}\sigma}))}\qquad .
+\end{equation}
+The term \textit{sigmoid} stands for
+S-shaped~\cite{bishop2006pattern}. In~\cite{hanek2004contracting},
+another activation function named probit is used, which is defined by:
+\begin{equation}
+  \label{eq:erf}
+  a_{v,1} = \frac{1}{2}erf(\frac{d_{k,l}}{\sqrt{2}\sigma} + 1)\qquad ,
+\end{equation}
+where the error function of a Gaussian distribution is used. Both
+two functions in Eq.~\ref{eq:erf} and Eq.~\ref{eq:logistic} are
+S-shaped (Fig.~\ref{fig:s-shaped}).
+\begin{figure} 
+  \begin{minipage}[t]{0.5\linewidth} 
+    \centering 
+        \subfloat[logistic sigmoid function]{\includegraphics[width=8.0cm]{images/logistic.jpg}}
+  \end{minipage}% 
+  \begin{minipage}[t]{0.5\linewidth} 
+    \centering 
+    \subfloat[error function]{\includegraphics[width=8.0cm]{images/erf.jpg}}
+  \end{minipage} 
+\caption[Logistic sigmoid function and probit function]{Logistic
+  sigmoid function and probit function: Both functions
+  are S-shaped}
+\label{fig:s-shaped}
+\end{figure}
+
+In this thesis, we use both of them to implement the algorithm. They give
+similar results but have different behaviors. Logistic sigmoid function
+can be perfectly interpreted from the perspective of
+probability. Consider the side $s \in \{0,1\}$, the posterior
+distribution for side $s = 1$ can be written as:
+\begin{eqnarray}
+  \label{eq:pdfs}
+  p(s=1|I) &=& \frac{p(I|s=1)p(s=1)}{p(I|s=1)p(s=1)
+    + p(I|s=2)p(s=2)}\\
+&=&  \frac{1}{1+exp(-\mathcal{R})}\qquad,
+\end{eqnarray}
+where I is pixels' RGB value, and $\mathcal{R}$ is defined as:
+\begin{equation}
+  \label{eq:ratio}
+  \mathcal{R} = \frac{p(I|s=1)p(s=1)}{p(I|s=2)p(s=2)}\qquad.
+\end{equation}
+The logistic sigmoid plays an important role in many classification
+algorithms. It satisfies the symmetry property, and its inverse 
+is known as \textit{logit} function, which represents the log of the
+ratio of probabilities $ln [p(s=1|I)/p(s=2|I)]$ for the two classes,
+also known as the log odds~\cite{bishop2006pattern}.
+
+The logistic sigmoid function can be used to transform a broad range
+of class-conditional distributions, described by the exponential
+family, to a non-linear posterior class probabilities. Since not all choices of
+class-conditional density are trivial, the probit function is explored
+to cope with other complex distributions. The results of logistic
+sigmoid function and probit function tend to be similar, except that the
+probit function is sensitive to outliers because the logistic sigmoid
+decays asymptotically like $\mathrm{exp}(-x)$ for $x \rightarrow \infty$, whereas
+for the probit activation function the decay is like
+$\mathrm{exp}(-x^2)$ (Fig.~\ref{fig:outliers}).
+\begin{figure} 
+  \includegraphics[width=\linewidth]{images/outliers.jpg}
+\caption[Classification problem]{Classification problem: The
+  right plot shows the corresponding results obtained when outliers
+  are added at the bottom left of the diagram, showing  that probit
+  regression is highly sensitive to outliers, unlike logistic
+  regression~\cite{bishop2006pattern}}
+\label{fig:outliers}
+\end{figure}
+% Generally, we can call this approximation process as \textit{fuzzy} (or \textit{smooth})
+% assignment. The accuracy of this assignment will increase as the
+% uncertainty of curve governed by covariance $\mathbf{\Sigma}_{\mathrm{\Phi}}$ decreases.
+
+With this assignment and following the suggested rule in~\cite{hanek2004contracting}, we now start to assign two suitable weighting functions
+$\omega_1$, $\omega_2$ to the pixels $\mathrm{v}_{k,l}$ along the
+normal for the two sides of the curve. the weighting functions are
+defined as:
+
+\begin{equation}
+  \label{eq:weight}
+  \omega_{1/2}(d_{k,l}) = C\left(\frac{a_{1/2}(d_{k,l}) -
+    \gamma_1}{1-\gamma_2}\right)^4 \left[e^{-d_{k,l}/(2\hat{\sigma}^2)} - e^{-\gamma_2}\right]^+\qquad,
+\end{equation}
+where $\gamma_1$ equals to $0.5$ (disjoint weight assignment) and $\gamma_2$
+equals to $4$ for the truncated Gaussian~\cite{hanek2004contracting}. 
+
+\begin{figure} 
+  \begin{minipage}[t]{0.5\linewidth} 
+    \centering 
+        \subfloat[]{\includegraphics[width=3.0in]{images/weight1.jpg}}
+  \end{minipage}% 
+  \begin{minipage}[t]{0.5\linewidth} 
+    \centering 
+    \subfloat[]{\includegraphics[width=3.0in]{images/weight2.jpg}}
+  \end{minipage} 
+\caption[Weight functions]{The weight functions of the two sides of the contour, a) the
+  weight function along the positive direction (outside) in the normal of the
+  contour. b) the weight function along the negative direction (inside). }
+\label{fig:weight}
+\end{figure}
+
+In addition, the standard
+deviation is chosen in order to cover the specified distance $h$,
+which yields 
+\begin{equation}
+  \label{eq:deviation}
+  \hat{\sigma} = \max \left[\frac{h}{\sqrt(2\gamma_2)}, \gamma_4
+  \right], \sigma  = \frac{1}{\gamma_3} \hat{\sigma}\qquad,
+\end{equation}
+
+with the two additional constants $\gamma_3 = 6$ (linear dependence
+between $\sigma$ and $\hat{\sigma}$) and $\gamma_4 = 4$ (minimum
+weighting window width) as discussed in~\cite{panin2006efficient}. 
+
+In the implementation of this thesis,
+there are $2 \cdot L \cdot N_C$ distances, fuzzy assignments
+and weight functions which leads to as many weight functions being evaluated offline and stored in an array. Now we have restricted our analysis region of interest in the
+limited area, and collected all statistical information required to learn
+local statistics. In the next part, we will evaluate the local
+statistics.
 
 \subsection{Curve Parametrization}
 Optional....
 
+By applying the (uniform quadratic or cubic) B-spline interpolation to the control points, a new curve
+grouped by a sequence of equidistant distributed points is generated
+. The B-spline curve is defined in eq.~\ref{eq:paramcurve} and is
+composed of a sequence of points $\mathbf{C} = \{C_0, \ldots,
+C_{k}\}$, $k = N_{C-1}$. $N_C$ denotes the number of sample points in the
+parametric curve. $N_C$ is significant for the
+performance of the CCD algorithm, because its value is directly
+proportional to the circumference of the observed object. For a high
+resolution image, more sample points should be taken into account.
+Hence, there is a trade-off between computational expense and the
+accuracy. We recommend to compute the circumference of a given object before
+determining $N_C$ and sample more points near spinodals and corners to
+capture key features of the object.
+
+Since the resulting parametric curve is continuous and
+differentiable, we can easily compute the normal vector $\mathbf{n} = \{n_0, \ldots,
+n_{k}\}$ and the tangent vector $\mathbf{t} = \{t_0, \ldots, t_{k}\}$,
+ which was discussed in Section~\ref{sec:pbc}. 
+
+In the planar affine shape-space $\mathcal{S}$, the contour, a
+hypothetical initial estimate, can be compactly represented using a
+vector $\mathbf{\Phi}$ with 6 real elements, namely model
+parameter vector. From the perspective of probability, the hypothetical
+curve gives a uncertainty, the solution of the curving problem is
+therefore no longer just a single curve, but a whole family of
+possible curves (Fig.~\ref{fig:transform}). The Gaussian probability density for these possible
+curves in shape-space $\mathcal{S}$ is given as:
+
+\begin{equation}
+  \label{eq:prior}
+   p(\mathbf{\Phi}) \propto
+\mathrm{exp} \left\{ -\frac{1}{2} (\mathbf{\Phi} -
+  \mathbf{m}_{\mathbf{\Phi}})^T \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} (\mathbf{\Phi} -
+  \mathbf{m}_{\mathbf{\Phi}}) \right\}\qquad.
+\end{equation}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=10cm]{images/prior.jpg}
+\caption[Sampling from curve families~\cite{blake1998active}]{The top
+  figure is the mean shape, the left one represents the euclidean
+  similarities, the right one
+  sketches some samples in affine space. All these are governed by a
+  Gaussian distribution in shape-space with root-mean-square
+  displacement of 0.3 length units.}
+\label{fig:transform}
+\end{figure}
+
+In two dimensions, the current mean model parameter
+$\mathbf{m}_{\mathbf{\Phi}}$ is a vector with $6$ elements, and current
+covariance matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}$ is a $6 \times 6$ matrix, which measures the variability of
+how much two groups of model parameters change together. The
+information matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}^{-1}$ can be
+written as:
+\begin{equation}
+  \label{eq:infomatrix}
+  \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} = \frac{N_{\mathbf{\Phi}}}{\rho_0^2} \mathbf{A}^T\mathcal{U}\mathbf{A}\qquad,
+\end{equation}
+where $\rho_0^2$ denotes the mean-square displacement along the entire
+curve (\cite{blake1998active}). $\mathbf{A}$ is the shape-matrix, and $\mathcal{U}$ is
+metric matrix for curves. $N_{\mathbf{\Phi}}$ represents
+the number of model parameters. Note $\rho_0^2$
+is a real value and can be computed easily as:
+\begin{equation}
+  \label{eq:trace}
+  \rho_0^2 = \mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}})\qquad,
+\end{equation}
+where $\mathrm{tr}(\cdot)$ operation denotes the trace of a matrix.
+
+The pre-processed input images and the parametric curve model have
+thus been set up. In the following sections, the iterative procedure of the
+CCD algorithm will be described in detail.
+
 \subsection{Automatic Initialization Modes}
 
+After the pre-processing of input images,  we initialize the model contour. For the moment, we only consider two-dimensional
+affine shape-space consisting of 6 DOFs. % It is followed by the process of
+% model parametrization.
+
+In our implementation, we model the
+contour as a continuous, differentiable and uniform quadratic or cubic
+B-Spline in $\mathbb{R}^2$, which was discussed in Chapter~\ref{chapter:bspline}. 
+Given a ROI (region of interest), the first step is to generate
+sufficient control points $\mathbf{P} = \{P_0, \ldots, P_{N_p-1}\}$ to
+account for the complexity of the object shape (Fig.~\ref{fig:prior}).
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\linewidth]{images/cont.jpg}
+\caption[An contour with sample points used for learning local
+statistics]{A contour with sample points used for learning local statistics. The blue contour
+  divided the image into two parts: outside and inside. As depicted in
+  right-bottom image, pixels inside the contour are labeled "0",
+  and those outside the contour are labeled "1". For each point on the
+  contour (the skyblue point), we sample some points (red points) along both positive
+  and negative direction.}
+\label{fig:prior}
+\end{figure}
+
+% Since the former is
+% given as a simple form by hand.
+% It is easy to use and
+% control. However, there are some problems and limitations in case that
+% the cost of manual operation is large, or vision deviation due to
+% similar brightness between object and background. Therefore,
+There are two ways to generate control points:
+manual initialization and automated initialization. 
+Since the former is rather tedious, two new
+intelligent initialization methods are proposed to extract the
+contour.
+In this thesis, an initial contour estimation method is described and
+implemented by employing the well-known SIFT algorithm~\cite{lowe2004distinctive} for
+keypoint detection and matching. In Section~\ref{sec:sift_init} it will be discussed in
+more detail. In addition, we can convert the point cloud generated
+by scanners on PR2 into a polygon. With that polygon we can now model the contour
+of an observed object. This method will be described in
+Section~\ref{sec:tifpc}.
+
+\subsubsection{SIFT}
+\label{sec:sift}
+
+Scale-invariant feature transform (or SIFT) is an algorithm to detect
+and describe local features in images.  It is widely used to solve
+many problems in the field of Computer Vision, such as object
+recognition, robotic mapping and navigation, and video tracking. There are four key stages in the sift algorithm~\cite{lowe2004distinctive}:
+\begin{enumerate}
+\item \textbf{Scale-invariant feature detection}: an image is transformed into
+  a collection of vectors which are scale-invariant. By applying a Difference-of-Gaussian
+function to a series of smoothed and resampled images, potential
+interest points are identified.
+\item \textbf{Keypoint localization and indexing}: keypoints are selected at given
+  candidate location, and then stored as SIFT keys.
+\item \textbf{Orientation assignment}:  one or more orientations are assigned to each keypoint lo-
+cation based on local image gradient directions. All future operations are performed
+on image data that has been transformed relative to the assigned orientation, scale, and
+location for each feature, thereby providing invariance to these transformations.
+\item \textbf{Keypoint descriptor}: the local image gradients are measured at the selected scale
+in the region around each keypoint. These are transformed into a representation that
+allows for significant levels of local shape distortion and change in illumination.
+\end{enumerate}
+
+
+The SIFT keypoints and features are local and based on the appearance
+of the object at particular interest points. The SIFT algorithm has following
+features and advantages:
+\begin{itemize}
+\item Invariant to image scale and rotation, robust to changes in
+  illumination and minor changes in viewpoint.
+\item Highly distinctive, easy to extract, allow for correct object
+  identification and easy to match against a database of local
+  features. 
+\item Need few features (as few as 3) from an object to compute its location
+  and pose. Computational cost is moderate on modern computer hardware.
+\end{itemize}
+
+In this thesis, we use the SIFT algorithm to initialize the
+contour of an object. Assume we have marked the boundary points in the
+training images. In order to project these boundary points to the test
+image, it is essential to estimate the homography between the
+images. However, SIFT matching
+might lead to lots of "false" matches. % In order
+% to evaluate the homography, firstly we have to exclude the
+% mismatches. 
+For filtering out false positives, we use RANSAC, which is an
+iterative process that randomly selects enough matches to fit the
+homography. It contains the following steps~\cite{fischler1981random}.
+
+\subsubsection{PCL}
+\label{sec:pcl}
+
+In this section, we describe an initialization method which utilizes three-dimensional
+point cloud for finding contours.
+
+As depicted in Fig.~\ref{fig:pointcloud}, the PR2 robot simultaneously takes a three-dimensional scan and captures
+an image of the scene in front of it. The robot generates
+object hypotheses by detecting candidate point clusters in
+the three-dimensional point cloud acquired by the depth sensor. % These
+% object hypotheses are then back-projected into the captured
+% image as regions of interest and searched for detecting and
+% recognizing objects.
+The identified point clusters in the
+point cloud are then back-projected into the captured image
+to form the region of interest that corresponds to the object
+candidate. An accurate back-projection is possible thanks to
+the accurate robot calibration. The sensors are calibrated using a non-linear bundle-
+adjustment-like optimization to estimate various parameters
+of the PR2 Robot. However,
+the resulting polygons of the observed object are not smoothed,
+usually it can not completely encompass the whole object.
+By applying the CCD algorithm, we can accurately obtain the contour of
+a observed object. The result of the experiment is similar to the one
+obtained from the SIFT features.
 \section{Applications and Experimental Results}
 \todo{
 \begin{enumerate}
