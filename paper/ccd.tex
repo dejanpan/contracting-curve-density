@@ -358,7 +358,7 @@ Fig.\ref{fig:flowchart} gives the flow chart of the CCD algorithm.
 \section{Contracting Curve Density Algorithm}
 
 \subsection{Logistic Sigmoid Function}
-As claimed in Chapter~\ref{sec:ccdcfp}, one of advantages of the
+One of advantages of the
 model-based approach is that we can restrict a task at hand to the ROI
 which is
 expected to reduce the computational cost. Hence, we first define
@@ -433,7 +433,7 @@ can be approximated by:
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=10cm]{images/dis.jpg}
+  \includegraphics[width=\columnwidth]{images/dis.jpg}
   \caption[The distance between a curve point and a pixel in the vicinity
   of a contour]{The distance between a curve point and a pixel in the
     vicinity of a contour: $C_k$ is the curve point, $v_{k,l}$ is a
@@ -489,16 +489,11 @@ where the error function of a Gaussian distribution is used. Both
 two functions in Eq.~\ref{eq:erf} and Eq.~\ref{eq:logistic} are
 S-shaped (Fig.~\ref{fig:s-shaped}).
 \begin{figure} 
-  \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-        \subfloat[logistic sigmoid function]{\includegraphics[width=8.0cm]{images/logistic.jpg}}
-  \end{minipage}% 
-  \begin{minipage}[t]{0.5\linewidth} 
-    \centering 
-    \subfloat[error function]{\includegraphics[width=8.0cm]{images/erf.jpg}}
-  \end{minipage} 
-\caption[Logistic sigmoid function and probit function]{Logistic
-  sigmoid function and probit function: Both functions
+    \includegraphics[width=0.48\columnwidth]{images/logistic.jpg}
+    \includegraphics[width=0.48\columnwidth]{images/erf.jpg}
+    \caption{\textbf{Left:} Logistic
+  sigmoid function, \textbf{Right:} probit function: Both functions
   are S-shaped}
 \label{fig:s-shaped}
 \end{figure}
@@ -536,8 +531,8 @@ decays asymptotically like $\mathrm{exp}(-x)$ for $x \rightarrow \infty$, wherea
 for the probit activation function the decay is like
 $\mathrm{exp}(-x^2)$ (Fig.~\ref{fig:outliers}).
 \begin{figure} 
-  \includegraphics[width=\linewidth]{images/outliers.jpg}
-\caption[Classification problem]{Classification problem: The
+  \includegraphics[width=\columnwidth]{images/outliers.jpg}
+\caption{Classification problem: The
   right plot shows the corresponding results obtained when outliers
   are added at the bottom left of the diagram, showing  that probit
   regression is highly sensitive to outliers, unlike logistic
@@ -562,15 +557,9 @@ where $\gamma_1$ equals to $0.5$ (disjoint weight assignment) and $\gamma_2$
 equals to $4$ for the truncated Gaussian~\cite{hanek2004contracting}. 
 
 \begin{figure} 
-  \begin{minipage}[t]{0.5\linewidth} 
-    \centering 
-        \subfloat[]{\includegraphics[width=3.0in]{images/weight1.jpg}}
-  \end{minipage}% 
-  \begin{minipage}[t]{0.5\linewidth} 
-    \centering 
-    \subfloat[]{\includegraphics[width=3.0in]{images/weight2.jpg}}
-  \end{minipage} 
-\caption[Weight functions]{The weight functions of the two sides of the contour, a) the
+\includegraphics[width=0.48\columnwidth]{images/weight1.jpg}
+\includegraphics[width=0.48\columnwidth]{images/weight2.jpg}
+\caption{The weight functions of the two sides of the contour, a) the
   weight function along the positive direction (outside) in the normal of the
   contour. b) the weight function along the negative direction (inside). }
 \label{fig:weight}
@@ -600,9 +589,9 @@ statistics.
 Optional....
 
 By applying the (uniform quadratic or cubic) B-spline interpolation to the control points, a new curve
-grouped by a sequence of equidistant distributed points is generated
-. The B-spline curve is defined in eq.~\ref{eq:paramcurve} and is
-composed of a sequence of points $\mathbf{C} = \{C_0, \ldots,
+grouped by a sequence of equidistant distributed points is generated. 
+The B-spline curve %is defined in eq.~\ref{eq:paramcurve} and 
+is composed of a sequence of points $\mathbf{C} = \{C_0, \ldots,
 C_{k}\}$, $k = N_{C-1}$. $N_C$ denotes the number of sample points in the
 parametric curve. $N_C$ is significant for the
 performance of the CCD algorithm, because its value is directly
@@ -615,8 +604,8 @@ capture key features of the object.
 
 Since the resulting parametric curve is continuous and
 differentiable, we can easily compute the normal vector $\mathbf{n} = \{n_0, \ldots,
-n_{k}\}$ and the tangent vector $\mathbf{t} = \{t_0, \ldots, t_{k}\}$,
- which was discussed in Section~\ref{sec:pbc}. 
+n_{k}\}$ and the tangent vector $\mathbf{t} = \{t_0, \ldots, t_{k}\}$.
+% which was discussed in Section~\ref{sec:pbc}. 
 
 In the planar affine shape-space $\mathcal{S}$, the contour, a
 hypothetical initial estimate, can be compactly represented using a
@@ -637,8 +626,8 @@ curves in shape-space $\mathcal{S}$ is given as:
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=10cm]{images/prior.jpg}
-\caption[Sampling from curve families~\cite{blake1998active}]{The top
+  \includegraphics[width=\columnwidth]{images/prior.jpg}
+\caption{The top
   figure is the mean shape, the left one represents the euclidean
   similarities, the right one
   sketches some samples in affine space. All these are governed by a
@@ -680,16 +669,16 @@ affine shape-space consisting of 6 DOFs. % It is followed by the process of
 
 In our implementation, we model the
 contour as a continuous, differentiable and uniform quadratic or cubic
-B-Spline in $\mathbb{R}^2$, which was discussed in Chapter~\ref{chapter:bspline}. 
+B-Spline in $\mathbb{R}^2$.
+% which was discussed in Chapter~\ref{chapter:bspline}. 
 Given a ROI (region of interest), the first step is to generate
 sufficient control points $\mathbf{P} = \{P_0, \ldots, P_{N_p-1}\}$ to
 account for the complexity of the object shape (Fig.~\ref{fig:prior}).
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=\linewidth]{images/cont.jpg}
-\caption[An contour with sample points used for learning local
-statistics]{A contour with sample points used for learning local statistics. The blue contour
+  \includegraphics[width=\columnwidth]{images/cont.jpg}
+\caption{A contour with sample points used for learning local statistics. The blue contour
   divided the image into two parts: outside and inside. As depicted in
   right-bottom image, pixels inside the contour are labeled "0",
   and those outside the contour are labeled "1". For each point on the
@@ -772,7 +761,7 @@ homography. It contains the following steps~\cite{fischler1981random}.
 In this section, we describe an initialization method which utilizes three-dimensional
 point cloud for finding contours.
 
-As depicted in Fig.~\ref{fig:pointcloud}, the PR2 robot simultaneously takes a three-dimensional scan and captures
+As depicted in \todo{Fig.~\ref{fig:pointcloud}}, the PR2 robot simultaneously takes a three-dimensional scan and captures
 an image of the scene in front of it. The robot generates
 object hypotheses by detecting candidate point clusters in
 the three-dimensional point cloud acquired by the depth sensor. % These
@@ -801,7 +790,9 @@ obtained from the SIFT features.
 }
 \subsection{Manual Initialization}
 \subsection{SIFT-based Initialization}
+\label{sec:sift_init}
 \subsection{Model-based Initialization}
+\label{sec:tifpc}
 \subsection{CCD-based tracker}
 
 \section{Conclusions and Future Work}
