@@ -308,44 +308,41 @@ Newton's method\todo{ref}, Gaussian-Newton\todo{ref} and Levenberg-Marquardt
 (LMM) algorithm~\cite{contourpanin2011}, Least Squares Support Vector
 Machine (LS-SVM)~\cite{vapnik2000nature} can be used.
 
-
 \section{System Architecture}
 \label{sec:arch}
-In this section, the basic steps of the CCD algorithm will be
-sketched. 
+In this section we will briefly laid out the basic steps of the initial
+CCD algorithm as presented by Hanek et al~\cite{hanek2004contracting}.
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\columnwidth]{images/flowchart.jpg}
-  \caption[The flow chart of
-  the CCD algorithm]{The flow chart of the CCD algorithm}
+  \caption{The flowchart of the basic steps of the CCD algorithm.}
   \label{fig:flowchart}
 \end{figure}
+The algorithm consists of four major steps which are sketched in Figure~\ref{fig:flowchart}:
 \begin{enumerate}
-\item \textbf{Initialization}: Given an input image as training data, we first choose an initial
-  contour for an object or feature which will be fitted or tracked, and
-  some initial values for the means and covariances. In addition, for most practical
-  applications, 
-  pre-processing stage is necessary to make the problem easier to solve. 
-\item \textbf{Learning of local statistics}: In the step of learning local
-  statistics, for each pixel in the
-  vicinity of the expected curve, two sets of local statistics
+\item \textbf{Initialization}: Given an input image $I$ as training data, we first choose an initial
+  contour for an object which will be fitted or tracked, and
+  initial values for the means and covariances ($P(\Phi)$). In addition, for most practical
+  applications a pre-processing stage (e.g. smoothing) gets applied as well.
+\item \textbf{Learning of local statistics}: 
+  In the step of learning of local statistics for each pixel in the
+  vicinity of the expected curve two sets of local statistics
   are computed, one set for each side of the curve. The local statistics are obtained from
   pixels that are close to the pixel on the contour and most likely lie
   on the corresponding side of the curve, according to the current
   estimate of the model parameters. The resulting local statistics
   represent an expectation of "what the two sides of the curve look
-  like"~\cite{hanek2004contracting}, also known as likelihood.
+  like"~\cite{hanek2004contracting}, also known as likelihood ($P(I|\Phi)$).
 \item \textbf{Refinement of model parameters}: The conditional distribution, namely
-  the product of prior distribution and  the likelihood, is evaluated
+  the product of a prior distribution and the likelihood, is evaluated
   as the cost function. Then MAP estimate is executed to optimize the
-  parameters, as a result, MAP value of model parameter vector and
-  covariance will be given in this step.
-\item \textbf{Checking Convergence}: Check for convergence of either
-  the parameters or log cost function. If the convergence criterion is
-  not satisfied return to step 2.
+  parameters and as a result a MAP value of model parameter vector and
+  covariance will be generated in this step.
+\item \textbf{Convergence}: Check for the convergence of either
+  the parameters or \todo{Which log cost function? log cost function.} 
+  If the convergence criterion is not satisfied return to step 2.
 \end{enumerate}
-Fig.\ref{fig:flowchart} gives the flow chart of the CCD algorithm.
-
+\todo{Dejan: conclude}
 \section{Contracting Curve Density Algorithm}
 \label{sec:ccd_novelties}
 \subsection{Logistic Sigmoid Function}
@@ -425,8 +422,7 @@ can be approximated by:
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\columnwidth]{images/dis.jpg}
-  \caption[The distance between a curve point and a pixel in the vicinity
-  of a contour]{The distance between a curve point and a pixel in the
+  \caption{The distance between a curve point and a pixel in the
     vicinity of a contour: $C_k$ is the curve point, $v_{k,l}$ is a
     pixel in the perpendicular of the contour, $d_{k,l}$ is the
     distance between $C_k$ and $v_{k,l}$.}
