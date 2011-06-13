@@ -41,6 +41,35 @@ void on_mouse(int event, int x, int y, int flags, void *param )
   }
 }
 
+void contourDraw(CCD &my_ccd)
+{
+  my_ccd.pts.push_back(cv::Point3d(257.0,269.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(259.0,296.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(261.0,331.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(264.0,368.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(265.0,382.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(276.0,389.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(315.0,412.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(379.0,447.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(418.0,467.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(427.0,459.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(498.0,391.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(564.0,328.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(569.0,323.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(570.0,315.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(577.0,272.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(586.0,225.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(587.0,213.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(577.0,211.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(507.0,188.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(445.0,168.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(435.0,165.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(428.0,168.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(365.0,207.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(283.0,252.0,1.0));
+  my_ccd.pts.push_back(cv::Point3d(262.0,265.0,1.0));
+}
+
 void contourSift(CCD &my_ccd)
 {
   int row;
@@ -123,7 +152,7 @@ int main (int argc, char * argv[])
   {
     if( string(argv[i]) == "-m" )
     {
-      if( sscanf(argv[++i], "%d", &init_method) != 1 || (init_method <= 0  ||  init_method >=3))
+      if( sscanf(argv[++i], "%d", &init_method) != 1 || (init_method < 0  ||  init_method >3))
       {
         cout << "invalid initialization method" << endl;
         return print_help();
@@ -179,6 +208,10 @@ int main (int argc, char * argv[])
     contourSift(my_ccd);
   else if(init_method == 2)
     contourPCD(my_ccd);
+  else if(init_method == 3)
+  {
+    contourDraw(my_ccd);
+  }
   else
   {
     print_help();

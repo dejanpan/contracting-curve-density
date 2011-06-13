@@ -13,6 +13,42 @@
 /* threshold on squared ratio of distances between NN and 2nd NN */
 #define NN_SQ_DIST_RATIO_THR 0.49
 
+IplImage * merge_imgs(IplImage* img1, IplImage* img2)
+{
+  int max_width = MAX(img1->width, img2->width);
+  int x_start = (MAX(img1->width, img2->width) - img1->width)*0.5;
+  IplImage* stacked =
+      cvCreateImage( cvSize( max_width,
+					     img1->height + img2->height ),
+				     IPL_DEPTH_8U, 3 );
+  cvZero( stacked );
+  int i,j;
+  for (i = 0; i < img1->height; i++)
+  {
+    uchar* ptr = (uchar*) (stacked->imageData + i * stacked->widthStep);
+    for (j = 0; j < x_start; j++)
+    {
+      ptr[3*j] = 100;
+      ptr[3*j + 1] = 100;
+      ptr[3*j + 2] = 100;
+    }
+    for (j = max_width - x_start; j < max_width; j++)
+    {
+      ptr[3*j] = 100;
+      ptr[3*j + 1] = 100;
+      ptr[3*j + 2] = 100;
+    }
+  }
+  cvSetImageROI( stacked, cvRect( x_start, 0, img1->width, img1->height ) );
+  cvAdd( img1, stacked, stacked, NULL );
+  cvSetImageROI( stacked, cvRect(0, img1->height, img2->width, img2->height) );
+  cvAdd( img2, stacked, stacked, NULL );
+  cvResetImageROI( stacked );
+
+  return stacked;
+
+}
+
 CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
 {
   IplImage * stacked;
@@ -30,7 +66,7 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
   char key;
     
 
-  stacked = stack_imgs( img1, img2 );
+  stacked = merge_imgs( img1, img2 );
 
   n1 = sift_features( img1, &feat1 );
   n2 = sift_features( img2, &feat2 );
@@ -45,7 +81,7 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
 	  d1 = descr_dist_sq( feat, nbrs[1] );
 	  if( d0 < d1 * NN_SQ_DIST_RATIO_THR )
       {
-        pt1 = cvPoint( cvRound( feat->x ), cvRound( feat->y ) );
+        pt1 = cvPoint( cvRound( feat->x ) + (MAX(img1->width, img2->width) - img1->width)*0.5, cvRound( feat->y ) );
         pt2 = cvPoint( cvRound( nbrs[0]->x ), cvRound( nbrs[0]->y ) );
         pt2.y += img1->height;
         cvLine( stacked, pt1, pt2, CV_RGB(255,0,255), 1, 8, 0 );
@@ -57,7 +93,8 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
   }
 
   fprintf( stderr, "Found %d total matches\n", m );
-  display_big_img( stacked, "Matches" );
+  /* display_big_img( stacked, "Matches" ); */
+  cvShowImage( "Matches" , stacked );
   cvWaitKey( 0 );
 
   /* 
