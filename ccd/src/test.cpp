@@ -7,9 +7,16 @@
 #include "ccd/bspline.h"
 #include "ccd/ccd.h"
 #include <fstream>
+#include "pcl/point_cloud.h"
+#include "pcl/point_types.h"
+#include "pcl/io/pcd_io.h"
+#include "pcl/range_image/range_image.h"
 
 using namespace cv;
 using namespace std;
+using namespace pcl;
+
+typedef PointWithViewpoint PointType;
 
 std::vector<cv::Point3d> pts;
 void on_mouse(int event, int x, int y, int flags, void *param )
@@ -49,6 +56,35 @@ void contourSift(CCD &my_ccd)
   for (row = 0; row < points_mat_ptr->rows; ++row)
   {
     my_ccd.pts.push_back(cv::Point3d((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2], 1));
+  }
+}
+
+void contourPCD(CCD &my_ccd)
+{
+  pcl::PointCloud<PointXYZ>::Ptr cloud (new pcl::PointCloud<PointXYZ>);
+
+  if (pcl::io::loadPCDFile<PointXYZ> ("data/contour.pcd", *cloud) == -1) //* load the file
+  {
+    PCL_ERROR ("Couldn't read file test_pcd.pcd \n");
+    exit(-1);
+  }
+  std::cerr << "Loaded "
+            << cloud->width * cloud->height
+            << " data points from test_pcd.pcd with the following fields: "
+            << std::endl;
+  float factor = 0.5*my_ccd.image.rows/40*0.6;
+  double x_value =0 , y_value = 0, angle= 0.1;
+  for (size_t i = 0; i < cloud->points.size (); ++i)
+  {
+    // double x_tmp = cloud->points[i].x*factor + my_ccd.image.cols/2;
+    // double y_tmp = cloud->points[i].y*factor + my_ccd.image.rows/2;
+    double x_tmp = cloud->points[i].x*cos(angle) + cloud->points[i].y*sin(angle);
+    double y_tmp = -cloud->points[i].x*sin(angle) + cloud->points[i].y*cos(angle);
+    x_value = x_tmp*factor + my_ccd.image.cols/2;
+    y_value = y_tmp*factor + my_ccd.image.rows/2;
+    // std::cerr << "    " << cloud->points[i].x*factor + my_ccd.image.cols/2
+    //           << " "    << cloud->points[i].y*factor + my_ccd.image.rows/2 << std::endl;
+    my_ccd.pts.push_back(cv::Point3d(x_value, y_value, 1));    
   }
 }
 
@@ -137,7 +173,18 @@ int main (int argc, char * argv[])
   my_ccd.image = cv::imread(image_path, 1);
   if(template_path != "")
     my_ccd.tpl = cv::imread(template_path, 1 );
-  contourManually(my_ccd);
+  if(init_method == 0)
+    contourManually(my_ccd);
+  else if(init_method == 1)
+    contourSift(my_ccd);
+  else if(init_method == 2)
+    contourPCD(my_ccd);
+  else
+  {
+    print_help();
+    exit(0);
+  }
+  // return 0;
   if((int)my_ccd.pts.size() > my_ccd.degree())
   {
     for (int i = 0; i < my_ccd.degree(); ++i)

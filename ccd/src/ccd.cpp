@@ -616,14 +616,15 @@ void CCD::run_ccd()
 
     std::stringstream name;
     name << iter;
-    cv::imwrite(name.str() + "c.png", canvas_tmp);
+    cv::imwrite(name.str() + ".png", canvas_tmp);
     canvas_tmp.release();
     // cv::imwrite(name.str() + ".png", canvas);
 
     // cv::imshow("CCD", canvas);    
     // cv::waitKey(200);
 
-    if(iter >= 20)
+    // if(iter >= 30)
+    if(tol < 0.001 && iter > 3)
     {
       for (int i = 0; i < params_.resolution; ++i)
       {
