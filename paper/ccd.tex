@@ -81,7 +81,8 @@ The CCD algorithm can be best described as follows. Given one or multiple images
 data and a parametric curve model with a priori distribution of model
 parameters, through curve-fitting process, we estimate the model
 parameters which determine the approximation of the posterior
-distribution in order to make the curve models best matching the image data.
+distribution in order to make the curve models best matching the image 
+data~\cite{hanek2004contracting}.
 
 The curve-fitting problem and its variants have a wide range of
 applications in the field of robotics, medical processing, user
@@ -90,108 +91,112 @@ widely applicable to practical personal robotics problems (such as
 perception of mobile manipulation), robustness,
 accuracy, efficiency and versatility should be
 considered when a novel approach is designed and implemented.
-However, in the computer vision community, solving object segmentation and the
+However, solving object segmentation and the
 related object contour tracking problems are always challenging,
 especially in natural and unconstrained scenes. Due to clutter,
-shading, texture, and highlights it is very difficult to segment
-an object from an inhomogeneous background. Furthermore, some physical
+shading, texture, and specular reflections it is very difficult to segment
+an object from an inhomogeneous background. Furthermore, physical
 conditions, such as the illumination or surface properties, will
-influence the efficiency and stability of related approaches. It is
-necessary and significant to develop a method which determines adequate segmentation
-in advance or a single criterion that is applicable for all parts of objects boundaries.
+influence the efficiency and stability of related approaches. 
+We thus aim to introduce the substantial improvements to the original
+version of CCD algorithm and thus devise a single criterion that is 
+applicable for the segmentation of all kinds of objects' boundaries.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\columnwidth]{images/divide1.jpg}\\
   \includegraphics[width=\columnwidth]{images/divide2.jpg}
-  \caption[A classification problem]{A classification problem: Top) The red
-    contour successfully segment the box from the background. Bottom) The
-    blue one is outside, the golden one is inside.}
+  \caption{A classification problem: \textbf{Top:} The blue box was successfully segmented
+    from the background. \textbf{Bottom:} The blue area is inside the curve while
+    the golden area is outside.}
   \label{fig:divide}
 \end{figure}
 
 \subsection{An Alternative View of the CCD Algorithm}
 \label{sec:overview}
-
 In the field of pattern recognition, the key concept is that of
 uncertainty. In image data, the uncertainty arises both
 through noise from measurements, as well as through the nature of
 the objects (e.g. cardiac motion and deformation). Probability theory
 provides a consistent framework for the quantification and
-manipulation of uncertainty.  In this section, we view curve-fitting
-problem from a probabilistic perspective and turn us towards to
+manipulation of uncertainty.  In this section, we consider curve-fitting
+problem from a probabilistic perspective and turn it into
 a classification problem.
 
-In the CCD algorithm, we aim to find the contour of observed object
+In the CCD algorithm, the aim is to find the contour of observed object
 and thus segment it from the background. Therefore, a hypothetical 
-contour divides the image into two part (Fig.\ref{fig:divide}), inside
+contour divides the image into two parts (Fig.\ref{fig:divide}), inside
 and outside. For probabilistic model, we can represent this using
 binary representation (e.g. $\{0, 1\}$). The goal of the CCD algorithm
-is to accurately
-assign a class label to each pixel in the image (Actually, we only need assign those pixels in the vicinity of the
-contour), thus the curve-fitting problem becomes a classification
-one. A powerful approach to solve this problem involves modeling a
+then becomes to accurately assign a class label to each pixel in the vicinity of the
+contour and the curve-fitting problem thus becomes a classification
+one. A powerful approach to solve this problem involves modeling of a
 conditional probability distribution in an inference stage, and then
-subsequently uses this distribution to make optimal decisions. In
+subsequently using this distribution to make optimal decisions. In
 order to derive the conditional probability, prior distribution and
 likelihood function should be given.
 
 We assume that a parametric curve model is governed by a prior distribution
 over the model parameters (usually a multi-dimensional vector). There
 exists a range of probability distributions which can be used to model
-the distribution of shapes. In this paper, for simplicity, let us
+the distribution of shapes. In this paper, for simplicity reasons, we 
 consider the Gaussian distribution, which is commonly used in computer
-vison because of its several outstanding features. 
+vison because of its several outstanding features. \todo{Which ones??}
 
 Defining the prior distribution is only a step of the problem.
 According to the Bayesian theorem, the conditional distribution
 is proportional to the product of prior distribution and the likelihood
 function. Hence, the next step is to define the likelihood function.
 
-In the implementation of the CCD algorithm, it is suggested to use
-local image pixels as the training data to determine the
-likelihood function. If the data is assumed to be drawn  independently
-from the distribution, then the likelihood function is given by the accumulation of all the components.
-By pixel value we denote the vector containing the local single-or multichannel
-image data associated to a pixel. In our experiments, we directly use the sensed RGB
-values as pixel values. However, other types of local features computed in a pre-processing
+In the implementation of the CCD algorithm local image pixel values are used
+as the training data to determine the likelihood function. If the data is 
+assumed to be drawn independently from the distribution, then the likelihood 
+function is given by the accumulation of all the components.
+By pixel value we denote the vector containing the local single- or multichannel
+image data associated to a pixel (e.g. RGB values). 
+However, other types of local features computed in a pre-processing
 step may also be used, e.g. texture descriptors or color values in
-other color spaces.
-
-The likelihood function obtained from the local statistics has
-not a closed-form solution. In addition, the prior distribution is just
-an approximate to the true distribution. Therefore, Maximization
-likelihood method does not work here, we have to use an alternative
-approach known as iterative reweighted least squares (IRLS) to find
-the solution. Here the IRLS process is called Maximum a Posterior (MAP).
+other color spaces. The likelihood function obtained from the local statistics does
+not have a closed-form solution. In addition, the prior distribution is just
+an approximate to the true distribution. Since the maximization
+likelihood method was proven\todo{reference} not to work here, we have to use an alternative
+approach known as Iterative Reweighted Least Squares (IRLS) to find
+the solution. Here the IRLS process is used to find the Maximum a Posterior (MAP)
+estimate.
 
 In the CCD algorithm, because we just need a parameter vector determining
-the shape of specified contour, we do not plan to calculate the
+the shape of the specified contour, we do not plan to calculate the
 predictive distribution. Therefore, the MAP solution mentioned above
-is our objective.
+becomes our final objective function.
 
-However, take account into the fact that exact inference for the
-regression is always intractable, we have encountered some issues before
-implementing the algorithm. In the next section, we will discuss these
-problems.
+An important and decisive issue to consider is the fact that the exact inference for the
+regression is always intractable. In the next sub-section we will discuss how we
+solved this problem yet even improved the robustness and performance. 
 
-\subsection{Contributions}
+\subsection{Key Contributions}
 In order to improve the stability, accuracy and robustness over the original
-implementation we introduce the following novel improvements. Firstly, we use the logistic sigmoid
-function instead of a Gaussian error function which renders a
-curve-fitting problem as a Gaussian logistic regression problem known in the
+implementation we introduce the following novel improvements. Firstly, we use 
+the logistic sigmoid function instead of a Gaussian error function which renders a
+curve-fitting problem as a Gaussian logistic \todo{Why is this not called classification: regression} problem known in the
 field of pattern recognition. Secondly, a quadratic or
 a cubic B-spline curve is used to model the parametric curve
-to avoid the Runge phenomenon without increasing the degree of the
+to avoid the Runge phenomenon~\todo{ref} without increasing the degree of the
 B-spline. Thirdly, the system supports both planar affine (6-DOF) and
 three-dimensional affine (8-DOF) shape-space. The latter affine space can avoid
 curve mismatching caused by major viewpoint changes. Lastly, in
 order to avoid manual intervention by the user, the developed system
 also supports robust global initial curve initialization modules based on both keypoint
-feature matching and back-projections from the 3D point clouds.
+feature matching and projection of concave contours a priori designed mesh models.
 
-\todo{In the remainder of this document ...}
+In the remainder of this paper we first introduce the related approaches, 
+in Section~\ref{sec:arch} we then shortly revisit an original implementation of 
+CCD algorithm and continue with a presentation of our improvements over the
+original idea (Section~\ref{sec:ccd_novelties}). In Section~\ref{sec:results}
+we present the set of possible applications for CCD and evaluation thereof and
+conclude with Section~\ref{sec:conclusions}.
+
 \section{Related Work}
+\label{sec:rw}
 \todo{Shorten significantlly}\\
 We split this section based on the following criteria:
 \begin{itemize}
@@ -320,6 +325,7 @@ Machine (LS-SVM)~\cite{vapnik2000nature} can be used.
 
 
 \section{System Architecture}
+\label{sec:arch}
 In this section, the basic steps of the CCD algorithm will be
 sketched. 
 \begin{figure}[htb]
@@ -356,9 +362,9 @@ sketched.
 Fig.\ref{fig:flowchart} gives the flow chart of the CCD algorithm.
 
 \section{Contracting Curve Density Algorithm}
-
+\label{sec:ccd_novelties}
 \subsection{Logistic Sigmoid Function}
-As claimed in Chapter~\ref{sec:ccdcfp}, one of advantages of the
+One of advantages of the
 model-based approach is that we can restrict a task at hand to the ROI
 which is
 expected to reduce the computational cost. Hence, we first define
@@ -433,7 +439,7 @@ can be approximated by:
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=10cm]{images/dis.jpg}
+  \includegraphics[width=\columnwidth]{images/dis.jpg}
   \caption[The distance between a curve point and a pixel in the vicinity
   of a contour]{The distance between a curve point and a pixel in the
     vicinity of a contour: $C_k$ is the curve point, $v_{k,l}$ is a
@@ -489,16 +495,11 @@ where the error function of a Gaussian distribution is used. Both
 two functions in Eq.~\ref{eq:erf} and Eq.~\ref{eq:logistic} are
 S-shaped (Fig.~\ref{fig:s-shaped}).
 \begin{figure} 
-  \begin{minipage}[t]{0.5\linewidth} 
     \centering 
-        \subfloat[logistic sigmoid function]{\includegraphics[width=8.0cm]{images/logistic.jpg}}
-  \end{minipage}% 
-  \begin{minipage}[t]{0.5\linewidth} 
-    \centering 
-    \subfloat[error function]{\includegraphics[width=8.0cm]{images/erf.jpg}}
-  \end{minipage} 
-\caption[Logistic sigmoid function and probit function]{Logistic
-  sigmoid function and probit function: Both functions
+    \includegraphics[width=0.48\columnwidth]{images/logistic.jpg}
+    \includegraphics[width=0.48\columnwidth]{images/erf.jpg}
+    \caption{\textbf{Left:} Logistic
+  sigmoid function, \textbf{Right:} probit function: Both functions
   are S-shaped}
 \label{fig:s-shaped}
 \end{figure}
@@ -536,8 +537,8 @@ decays asymptotically like $\mathrm{exp}(-x)$ for $x \rightarrow \infty$, wherea
 for the probit activation function the decay is like
 $\mathrm{exp}(-x^2)$ (Fig.~\ref{fig:outliers}).
 \begin{figure} 
-  \includegraphics[width=\linewidth]{images/outliers.jpg}
-\caption[Classification problem]{Classification problem: The
+  \includegraphics[width=\columnwidth]{images/outliers.jpg}
+\caption{Classification problem: The
   right plot shows the corresponding results obtained when outliers
   are added at the bottom left of the diagram, showing  that probit
   regression is highly sensitive to outliers, unlike logistic
@@ -562,15 +563,9 @@ where $\gamma_1$ equals to $0.5$ (disjoint weight assignment) and $\gamma_2$
 equals to $4$ for the truncated Gaussian~\cite{hanek2004contracting}. 
 
 \begin{figure} 
-  \begin{minipage}[t]{0.5\linewidth} 
-    \centering 
-        \subfloat[]{\includegraphics[width=3.0in]{images/weight1.jpg}}
-  \end{minipage}% 
-  \begin{minipage}[t]{0.5\linewidth} 
-    \centering 
-    \subfloat[]{\includegraphics[width=3.0in]{images/weight2.jpg}}
-  \end{minipage} 
-\caption[Weight functions]{The weight functions of the two sides of the contour, a) the
+\includegraphics[width=0.48\columnwidth]{images/weight1.jpg}
+\includegraphics[width=0.48\columnwidth]{images/weight2.jpg}
+\caption{The weight functions of the two sides of the contour, a) the
   weight function along the positive direction (outside) in the normal of the
   contour. b) the weight function along the negative direction (inside). }
 \label{fig:weight}
@@ -600,9 +595,9 @@ statistics.
 Optional....
 
 By applying the (uniform quadratic or cubic) B-spline interpolation to the control points, a new curve
-grouped by a sequence of equidistant distributed points is generated
-. The B-spline curve is defined in eq.~\ref{eq:paramcurve} and is
-composed of a sequence of points $\mathbf{C} = \{C_0, \ldots,
+grouped by a sequence of equidistant distributed points is generated. 
+The B-spline curve %is defined in eq.~\ref{eq:paramcurve} and 
+is composed of a sequence of points $\mathbf{C} = \{C_0, \ldots,
 C_{k}\}$, $k = N_{C-1}$. $N_C$ denotes the number of sample points in the
 parametric curve. $N_C$ is significant for the
 performance of the CCD algorithm, because its value is directly
@@ -615,8 +610,8 @@ capture key features of the object.
 
 Since the resulting parametric curve is continuous and
 differentiable, we can easily compute the normal vector $\mathbf{n} = \{n_0, \ldots,
-n_{k}\}$ and the tangent vector $\mathbf{t} = \{t_0, \ldots, t_{k}\}$,
- which was discussed in Section~\ref{sec:pbc}. 
+n_{k}\}$ and the tangent vector $\mathbf{t} = \{t_0, \ldots, t_{k}\}$.
+% which was discussed in Section~\ref{sec:pbc}. 
 
 In the planar affine shape-space $\mathcal{S}$, the contour, a
 hypothetical initial estimate, can be compactly represented using a
@@ -637,8 +632,8 @@ curves in shape-space $\mathcal{S}$ is given as:
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=10cm]{images/prior.jpg}
-\caption[Sampling from curve families~\cite{blake1998active}]{The top
+  \includegraphics[width=\columnwidth]{images/prior.jpg}
+\caption{The top
   figure is the mean shape, the left one represents the euclidean
   similarities, the right one
   sketches some samples in affine space. All these are governed by a
@@ -680,16 +675,16 @@ affine shape-space consisting of 6 DOFs. % It is followed by the process of
 
 In our implementation, we model the
 contour as a continuous, differentiable and uniform quadratic or cubic
-B-Spline in $\mathbb{R}^2$, which was discussed in Chapter~\ref{chapter:bspline}. 
+B-Spline in $\mathbb{R}^2$.
+% which was discussed in Chapter~\ref{chapter:bspline}. 
 Given a ROI (region of interest), the first step is to generate
 sufficient control points $\mathbf{P} = \{P_0, \ldots, P_{N_p-1}\}$ to
 account for the complexity of the object shape (Fig.~\ref{fig:prior}).
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=\linewidth]{images/cont.jpg}
-\caption[An contour with sample points used for learning local
-statistics]{A contour with sample points used for learning local statistics. The blue contour
+  \includegraphics[width=\columnwidth]{images/cont.jpg}
+\caption{A contour with sample points used for learning local statistics. The blue contour
   divided the image into two parts: outside and inside. As depicted in
   right-bottom image, pixels inside the contour are labeled "0",
   and those outside the contour are labeled "1". For each point on the
@@ -772,7 +767,7 @@ homography. It contains the following steps~\cite{fischler1981random}.
 In this section, we describe an initialization method which utilizes three-dimensional
 point cloud for finding contours.
 
-As depicted in Fig.~\ref{fig:pointcloud}, the PR2 robot simultaneously takes a three-dimensional scan and captures
+As depicted in \todo{Fig.~\ref{fig:pointcloud}}, the PR2 robot simultaneously takes a three-dimensional scan and captures
 an image of the scene in front of it. The robot generates
 object hypotheses by detecting candidate point clusters in
 the three-dimensional point cloud acquired by the depth sensor. % These
@@ -792,6 +787,7 @@ By applying the CCD algorithm, we can accurately obtain the contour of
 a observed object. The result of the experiment is similar to the one
 obtained from the SIFT features.
 \section{Applications and Experimental Results}
+\label{sec:results}
 \todo{
 \begin{enumerate}
 \item initialization parameters
@@ -801,11 +797,13 @@ obtained from the SIFT features.
 }
 \subsection{Manual Initialization}
 \subsection{SIFT-based Initialization}
+\label{sec:sift_init}
 \subsection{Model-based Initialization}
+\label{sec:tifpc}
 \subsection{CCD-based tracker}
 
 \section{Conclusions and Future Work}
-
+\label{sec:conclusions}
 \section*{Acknowledgment}
  This work was supported by the DFG cluster of excellence \emph{CoTeSys} (Cognition for Technical Systems).
 \bibliographystyle{IEEEtran}
