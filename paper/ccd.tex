@@ -686,76 +686,48 @@ account for the complexity of the object shape (Fig.~\ref{fig:prior}).
 \label{fig:prior}
 \end{figure}
 
-% Since the former is
-% given as a simple form by hand.
-% It is easy to use and
-% control. However, there are some problems and limitations in case that
-% the cost of manual operation is large, or vision deviation due to
-% similar brightness between object and background. Therefore,
 There are two ways to generate control points:
 manual initialization and automated initialization. 
 Since the former is rather tedious, two new
 intelligent initialization methods are proposed to extract the
-contour.
-In this thesis, an initial contour estimation method is described and
-implemented by employing the well-known SIFT algorithm~\cite{lowe2004distinctive} for
-keypoint detection and matching. In Section~\ref{sec:sift_init} it will be discussed in
-more detail. In addition, we can convert the point cloud generated
-by scanners on PR2 into a polygon. With that polygon we can now model the contour
-of an observed object. This method will be described in
-Section~\ref{sec:tifpc}.
+contour. Firstly, an initial contour estimation method is described and
+implemented by employing the well-known Scale-Invariant Feature Transform 
+(SIFT) algorithm~\cite{lowe2004distinctive} for
+keypoint detection and matching. Secondly, we make use of the a priori
+modeled meshes of deformable objects (such as T-Shirts), extract their
+concave contours and use projections of those as an initial guess. Both 
+methods are shortly discussed below.
 
-\subsubsection{SIFT}
+\subsubsection{SIFT-based Initialization}
 \label{sec:sift}
-
-Scale-invariant feature transform (or SIFT) is an algorithm to detect
-and describe local features in images.  It is widely used to solve
-many problems in the field of Computer Vision, such as object
-recognition, robotic mapping and navigation, and video tracking. There are four key stages in the sift algorithm~\cite{lowe2004distinctive}:
-\begin{enumerate}
-\item \textbf{Scale-invariant feature detection}: an image is transformed into
-  a collection of vectors which are scale-invariant. By applying a Difference-of-Gaussian
-function to a series of smoothed and resampled images, potential
-interest points are identified.
-\item \textbf{Keypoint localization and indexing}: keypoints are selected at given
-  candidate location, and then stored as SIFT keys.
-\item \textbf{Orientation assignment}:  one or more orientations are assigned to each keypoint lo-
-cation based on local image gradient directions. All future operations are performed
-on image data that has been transformed relative to the assigned orientation, scale, and
-location for each feature, thereby providing invariance to these transformations.
-\item \textbf{Keypoint descriptor}: the local image gradients are measured at the selected scale
-in the region around each keypoint. These are transformed into a representation that
-allows for significant levels of local shape distortion and change in illumination.
-\end{enumerate}
-
-
-The SIFT keypoints and features are local and based on the appearance
-of the object at particular interest points. The SIFT algorithm has following
-features and advantages:
-\begin{itemize}
-\item Invariant to image scale and rotation, robust to changes in
-  illumination and minor changes in viewpoint.
-\item Highly distinctive, easy to extract, allow for correct object
-  identification and easy to match against a database of local
-  features. 
-\item Need few features (as few as 3) from an object to compute its location
-  and pose. Computational cost is moderate on modern computer hardware.
-\end{itemize}
-
-In this thesis, we use the SIFT algorithm to initialize the
+We use the SIFT algorithm to initialize the
 contour of an object. Assume we have marked the boundary points in the
 training images. In order to project these boundary points to the test
 image, it is essential to estimate the homography between the
-images. However, SIFT matching
-might lead to lots of "false" matches. % In order
-% to evaluate the homography, firstly we have to exclude the
-% mismatches. 
-For filtering out false positives, we use RANSAC, which is an
-iterative process that randomly selects enough matches to fit the
-homography. It contains the following steps~\cite{fischler1981random}.
+images. However, SIFT matching might lead to lots of "false" matches.
+For filtering out false positives, we use RANSAC~\cite{fischler1981random}, 
+which is an iterative process that randomly selects enough matches to fit the
+homography.
 
-\subsubsection{PCL}
+\subsubsection{Mesh Model-based Initialization}
 \label{sec:pcl}
+\todod{}
+
+
+% ALTERNATIVE:
+% The robot generates object hypotheses by detecting candidate point clusters in
+% the three-dimensional point cloud acquired by the depth sensor. 
+% The identified point clusters in the
+% point cloud are then back-projected into the captured image
+% to form the region of interest that corresponds to the object
+% candidate. An accurate back-projection is possible thanks to
+% the accurate robot calibration. The sensors are calibrated using a non-linear bundle-
+% adjustment-like optimization to estimate various parameters
+% of the PR2 Robot. However,
+% the resulting polygons of the observed object are not smoothed,
+% usually it can not completely encompass the whole object.
+% By applying the CCD algorithm, we can accurately obtain the contour of
+% a observed object. 
 
 In this section, we describe an initialization method which utilizes three-dimensional
 point cloud for finding contours.
