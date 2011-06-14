@@ -707,6 +707,35 @@ For filtering out false positives, we use RANSAC~\cite{fischler1981random},
 which is an iterative process that randomly selects enough matches to fit the
 homography.
 
+The whole algorithm amounts to the following steps: 
+
+
+\begin{itemize}
+\item  Randomly select a sample of matched points and instantiate the
+  model from this subset.
+\item Determine the set of data points that are within a distance
+  threshold of the homography. The set is the consensus set of the sample
+  and defines the inliers.
+\item If the size of the set (e.g. the number of inliers) is greater
+  than some threshold, re-estimate the homography using all the matched
+  points and terminate. Otherwise, select a new subset and repeat the
+  above.
+\item After some trials the largest consensus set is selected, and the
+  homography is re-estimated using all the points in the subset.
+\end{itemize}
+Fast way to compute the homography in a least squares sense is to use the Normalized
+Direct Linear Transform (normalized
+DLT ~\cite{hartley2003multiple}. The Normalized DLT algorithm computes
+a homography for a projective transformation by using at least 4 point
+correspondences and then minimizing corresponding norm.
+
+After obtaining the homography between the template image and the
+test image, the contour of object can be easily projected
+into the test image to obtain the estimate of the contour
+position. This is illustrated in Fig.~\ref{fig:sift_result}. Note that because SIFT is only invariant
+to minor changes in view points, the method does not always work for
+three-dimensional objects which have substantially different view points.
+
 \subsubsection{Mesh Model-based Initialization}
 \label{sec:pcl}
 \todod{}
@@ -727,39 +756,6 @@ homography.
 % By applying the CCD algorithm, we can accurately obtain the contour of
 % a observed object. 
 
-In this section, we describe an initialization method which utilizes three-dimensional
-point cloud for finding contours.
-
-As depicted in Fig.~\ref{fig:pointcloud}, the PR2 robot simultaneously takes a three-dimensional scan and captures
-an image of the scene in front of it. The robot generates
-object hypotheses by detecting candidate point clusters in
-the three-dimensional point cloud acquired by the depth sensor. % These
-% object hypotheses are then back-projected into the captured
-% image as regions of interest and searched for detecting and
-% recognizing objects.
-The identified point clusters in the
-point cloud are then back-projected into the captured image
-to form the region of interest that corresponds to the object
-candidate. An accurate back-projection is possible thanks to
-the accurate robot calibration. The sensors are calibrated using a non-linear bundle-
-adjustment-like optimization to estimate various parameters
-of the PR2 Robot. However,
-the resulting polygons of the observed object are not smoothed,
-usually it can not completely encompass the whole object.
-By applying the CCD algorithm, we can accurately obtain the contour of
-a observed object. The result of the experiment is similar to the one
-obtained from the SIFT features.
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=6cm]{images/pr2b.jpg}
-  \caption[Kinect camera of the PR2 Robot and object candidate
-  segmented in three-dimensional point cloud.]{Kinect camera of
-    the PR2 Robot and object candidate segmented in three-dimensional point
-    cloud. Encompassing a contour of the back-projected points onto
-    the image is used as an initial contour for the CCD algorithm.}
-  \label{fig:pointcloud}
-\end{figure}
-
 \section{Applications and Experimental Results}
 \label{sec:results}
 \todo{
@@ -769,6 +765,8 @@ obtained from the SIFT features.
 \item if you run it multiple times also the number of False Positives (number of times it did not converge).
 \end{enumerate}
 }
+
+\todos{Describe in 1 or 2 sentences how the test has been done (how many objects, how many runs}
 \subsection{Manual Initialization}
 \begin{figure}[htbp]
   \begin{minipage}[t]{0.49\linewidth} 
@@ -810,52 +808,6 @@ obtained from the SIFT features.
   projected onto the image in the bottom, and used as initial contour
   for the CCD algorithm.}
 \end{figure}
-
-We use the SIFT algorithm to initialize the
-contour of an object. Assume we have marked the boundary points in the
-training images. In order to project these boundary points to the test
-image, it is essential to estimate the homography between the
-images. However, SIFT matching
-might lead to lots of "false" matches. % In order
-% to evaluate the homography, firstly we have to exclude the
-% mismatches. 
-For filtering out false positives, we use RANSAC, which is an
-iterative process that randomly selects enough matches to fit the
-homography. It contains the following steps~\cite{fischler1981random}.
-
-
-\begin{itemize}
-\item  Randomly select a sample of matched points and instantiate the
-  model from this subset.
-\item Determine the set of data points that are within a distance
-  threshold of the homography. The set is the consensus set of the sample
-  and defines the inliers.
-\item If the size of the set (e.g. the number of inliers) is greater
-  than some threshold, re-estimate the homography using all the matched
-  points and terminate. Otherwise, select a new subset and repeat the
-  above.
-\item After some trials the largest consensus set is selected, and the
-  homography is re-estimated using all the points in the subset.
-\end{itemize}
-Fast way to compute the homography in a least squares sense is to use the Normalized
-Direct Linear Transform (normalized
-DLT ~\cite{hartley2003multiple}. The Normalized DLT algorithm computes
-a homography for a projective transformation by using at least 4 point
-correspondences and then minimizing corresponding norm.
-
-% After obtaining the homography between the template image and the
-% test image, the contour of object can be easily projected
-% into the test image to obtain the estimate of the contour
-% position. This is illustrated in Fig.~\ref{fig:sift} and
-% Fig.~\ref{fig:sift_result}. Note that because SIFT is only invariant
-% to minor changes in view points, the method does not always work for
-% three-dimensional objects which have substantially different view points.
-
-% The model hypothesis is obtained by applying the CCD algorithm to a
-% frame of a video sequence. In the following experiments, we can test
-% our naive CCD tracker on PR2, the result is demonstrated in Fig.~\ref{fig:sifttracker} 
-
-
 
 \subsection{Model-based Initialization}
 \label{sec:tifpc}
