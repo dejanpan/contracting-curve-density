@@ -1,4 +1,3 @@
-
 \documentclass[conference]{IEEEtran}
 % *** GRAPHICS RELATED PACKAGES ***
 %
@@ -43,6 +42,7 @@
 \newcommand{\todo}[1]{\textbf{\textcolor{red}{TODO: #1}}}
 \newcommand{\todos}[1]{\textbf{\textcolor{red}{TODO Shulei: #1}}}
 \newcommand{\todod}[1]{\textbf{\textcolor{red}{TODO Dejan: #1}}}
+\newcommand{\dones}[1]{\textbf{\textcolor{blue}{DONE Shulei: #1}}}
 \begin{document}
 %
 % paper title
@@ -144,7 +144,10 @@ over the model parameters (usually a multi-dimensional vector). There
 exists a range of probability distributions which can be used to model
 the distribution of shapes. In this paper, for simplicity reasons, we 
 consider the Gaussian distribution, which is commonly used in computer
-vison because of its several outstanding features. \todos{Which ones??}
+vison because of its several outstanding features. \todos{Which
+  ones??}\dones{Firstly, it does genuinely occur; Secondly,  the
+  normal distribution can be manipulated algebraically much more
+  easily than alternatives even when it just a rough approximation.}
 
 Defining the prior distribution is only a step of the problem.
 According to the Bayesian theorem, the conditional distribution
@@ -162,7 +165,7 @@ step may also be used, e.g. texture descriptors or color values in
 other color spaces. The likelihood function obtained from the local statistics does
 not have a closed-form solution. In addition, the prior distribution is just
 an approximate to the true distribution. Since the maximization
-likelihood method was proven\todos{reference} not to work here, we have to use an alternative
+likelihood method was proven \cite{bishop2006pattern} not to work here, we have to use an alternative
 approach known as Iterative Reweighted Least Squares (IRLS) to find
 the solution. Here the IRLS process is used to find the Maximum a Posterior (MAP)
 estimate.
@@ -180,10 +183,18 @@ solved this problem yet even improved the robustness and performance.
 In order to improve the stability, accuracy and robustness over the original
 implementation we introduce the following novel improvements. Firstly, we use 
 the logistic sigmoid function instead of a Gaussian error function which renders a
-curve-fitting problem as a Gaussian logistic \todos{Why is this not called classification?: regression} problem known in the
+curve-fitting problem as a Gaussian logistic \todos{Why is this not
+  called classification?: regression} \dones{For the two-class
+  classification problem, the posterior probability
+of class $C_1$ can be written as a \textbf{CONTINUOUS} logistic sigmoid acting
+on a linear function of $x$ (equivalent to \textit{fuzzy assignment}),
+the main difference between regression and classification is that
+whether desired output consists of one or more continuous
+variables. In logistic regression problem, the considered variable is
+the logistic function, which is a continous one.} problem known in the
 field of pattern recognition. Secondly, a quadratic or
 a cubic B-spline curve is used to model the parametric curve
-to avoid the Runge phenomenon~\todos{ref} without increasing the degree of the
+to avoid the Runge phenomenon~\cite{wikibspline} without increasing the degree of the
 B-spline. Thirdly, the system supports both planar affine (6-DOF) and
 three-dimensional affine (8-DOF) shape-space. The latter affine space can avoid
 curve mismatching caused by major viewpoint changes. Lastly, in
@@ -306,8 +317,8 @@ optimizers. The latter one is used in the CCD approach and it works as follows:
 first, a smoothed objective function is obtained by fitting
 the curve model to a large scale description. Then the window's size is
 gradually reduced. During the process, many types of  numerical
-optimization methods such as Conjugate Gradient Method\todos{ref}, 
-Newton's method\todos{ref}, Gaussian-Newton\todos{ref} and Levenberg-Marquardt
+optimization methods such as Conjugate Gradient Method~\cite{press2007numerical}, 
+Newton-Raphson iterative optimization scheme~\cite{bishop2006pattern}, Gaussian-Newton~\cite{panin2006fully} and Levenberg-Marquardt
 (LMM) algorithm~\cite{contourpanin2011}, Least Squares Support Vector
 Machine (LS-SVM)~\cite{vapnik2000nature} can be used.
 
@@ -342,7 +353,9 @@ The algorithm consists of four major steps which are sketched in Figure~\ref{fig
   parameters and as a result a MAP value of model parameter vector and
   covariance will be generated in this step.
 \item \textbf{Convergence}: Check for the convergence of either
-  the parameters or \todos{Which log cost function? log cost function.} 
+  the parameters or \todos{Which log cost function? log cost
+    function.} \dones{It should be: log posterior probability
+    $\log{P(\Phi) P(I|\Phi)}$} 
   If the convergence criterion is not satisfied return to step 2.
 \end{enumerate}
 \todod{conclude}
@@ -943,7 +956,7 @@ three-dimensional objects which have substantially different view points.
   \end{minipage} 
   \begin{minipage}[t]{0.49\linewidth} 
     \centering 
-    \subfloat[iteration 20]{\includegraphics[width=1.5in]{experiments/tshirt/19.png}}
+    \subfloat[iteration 28]{\includegraphics[width=1.5in]{experiments/tshirt/27.png}}
   \end{minipage} 
   \caption[Manual Initialization]{}
   \label{fig:book}
@@ -996,7 +1009,7 @@ manual & 5\% & 3.35 & 26 & 0.001\\
 \hline
 sift & 9\% & 3.52 & 5 & 0.001\\
 \hline
-model & 4\% & 10.15 & 27 & 0.001\\
+model & 4\% & 10.15 & 28 & 0.001\\
 \hline
 \end{tabular}}
 \caption{Quantization Results}
@@ -1029,5 +1042,3 @@ model & 0.5 & 5 & 7 & 5 & 1.2 & 0.5 &0.25 &50 &1 & 200 & 4 & 6\\
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 \end{document}
-
-
