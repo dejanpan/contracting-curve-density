@@ -142,12 +142,7 @@ likelihood function should be given.
 We assume that a parametric curve model is governed by a prior distribution
 over the model parameters (usually a multi-dimensional vector). There
 exists a range of probability distributions which can be used to model
-the distribution of shapes. In this paper, for simplicity reasons, we 
-consider the Gaussian distribution, which is commonly used in computer
-vison because of its several outstanding features. \todos{Which
-  ones??}\dones{Firstly, it does genuinely occur; Secondly,  the
-  normal distribution can be manipulated algebraically much more
-  easily than alternatives even when it just a rough approximation.}
+the distribution of shapes. In this paper we consider the Gaussian distribution.
 
 Defining the prior distribution is only a step of the problem.
 According to the Bayesian theorem, the conditional distribution
@@ -183,16 +178,11 @@ solved this problem yet even improved the robustness and performance.
 In order to improve the stability, accuracy and robustness over the original
 implementation we introduce the following novel improvements. Firstly, we use 
 the logistic sigmoid function instead of a Gaussian error function which renders a
-curve-fitting problem as a Gaussian logistic \todos{Why is this not
-  called classification?: regression} \dones{For the two-class
-  classification problem, the posterior probability
-of class $C_1$ can be written as a \textbf{CONTINUOUS} logistic sigmoid acting
-on a linear function of $x$ (equivalent to \textit{fuzzy assignment}),
-the main difference between regression and classification is that
-whether desired output consists of one or more continuous
-variables. In logistic regression problem, the considered variable is
-the logistic function, which is a continous one.} problem known in the
-field of pattern recognition. Secondly, a quadratic or
+curve-fitting problem as a Gaussian logistic problem~\footnote{For the two-class
+classification problem, the posterior probability 
+of class $C$ can be written as a \textbf{continous} logistic sigmoid acting
+on a linear function of $x$ (equivalent to \textit{fuzzy assignment}).} known in the field of pattern 
+recognition. Secondly, a quadratic or
 a cubic B-spline curve is used to model the parametric curve
 to avoid the Runge phenomenon~\cite{wikibspline} without increasing the degree of the
 B-spline. Thirdly, the system supports both planar affine (6-DOF) and
@@ -301,7 +291,7 @@ is used to find the parameters of the model.
 % approach. In the paper, it is integrated into the tracking system of
 % the human body. 
 \subsection{Tracking and Optimization}
-\todod{Describe what CCD tracker is}\\
+\todos{Describe what CCD tracker is}\\
 Both the Snakes and the CCD can be used to build naive tracking
 systems. In contrast to other approaches such as Kalman Filter-based
 tracking described in~\cite{brookner1998tracking} or the Conditional
@@ -352,10 +342,8 @@ The algorithm consists of four major steps which are sketched in Figure~\ref{fig
   as the cost function. Then MAP estimate is executed to optimize the
   parameters and as a result a MAP value of model parameter vector and
   covariance will be generated in this step.
-\item \textbf{Convergence}: Check for the convergence of either
-  the parameters or \todos{Which log cost function? log cost
-    function.} \dones{It should be: log posterior probability
-    $\log{P(\Phi) P(I|\Phi)}$} 
+\item \textbf{Convergence}: Check for the convergence of the 
+  log posterior probability function $\log{P(\Phi) P(I|\Phi)}$. 
   If the convergence criterion is not satisfied return to step 2.
 \end{enumerate}
 \todod{conclude}
