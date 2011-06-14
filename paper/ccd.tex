@@ -789,27 +789,27 @@ obtained from the SIFT features.
     \centering 
     \subfloat[iteration 20]{\includegraphics[width=1.5in]{experiments/book/19.png}}
   \end{minipage} 
-  \caption[Manual Initialization]{}
+  \caption[Manual Initialization]{Segment a partially occluded book in
+    a clutter by mannualy initialization.}
   \label{fig:book}
 \end{figure}
 In this experiment, we use the CCD approach to recognize a book
-in a clutter and analyze the experimental results. 
-In Fig.~\ref{fig:book}, apparently, the tracker has successfully
-captured the contour of the observed plate. However, we find that the
-contour does not completely encompass the edge of the object in the
-beginning of the motion. The edge of the plate is analyzed by the
-Sobel operator, it is shown that the edge in that region is not
-sharp. Moreover, the pixels values of the shadow is
-close to and the ones of the edge of the plate (Fig. ~\ref{fig:rgb}). Hence,
-the contour can not snap to the edge. But the changes of the control
-points in this region have not changed the shape of the whole
-contour, because the contour has limited DOFs. There are two solution
-for this problem:
-\begin{itemize}
-\item Using other local statistics based on other features to replace
-  the RGB statistics.
-\item Sharpen the edge of the observed object.
-\end{itemize}
+in a clutter and analyze the experimental results (Fig.~\ref{fig:book})% , apparently, the tracker has successfully
+% captured the contour of the observed plate. However, we find that the
+% contour does not completely encompass the edge of the object in the
+% beginning of the motion. The edge of the plate is analyzed by the
+% Sobel operator, it is shown that the edge in that region is not
+% sharp. Moreover, the pixels values of the shadow is
+% close to and the ones of the edge of the plate (Fig. ~\ref{fig:rgb}). Hence,
+% the contour can not snap to the edge. But the changes of the control
+% points in this region have not changed the shape of the whole
+% contour, because the contour has limited DOFs. There are two solution
+% for this problem:
+% \begin{itemize}
+% \item Using other local statistics based on other features to replace
+%   the RGB statistics.
+% \item Sharpen the edge of the observed object.
+% \end{itemize}
 \subsection{SIFT-based Initialization}
 \label{sec:sift_init}
 
@@ -817,6 +817,16 @@ for this problem:
   \centering
 \includegraphics[width=6cm]{experiments/book_sift/stacked.jpg}
 \label{fig:sift_result}
+\caption[Contour initialization using the SIFT algorithm]{The image in
+  the upper-left corner is a template. It is projected into the bottom
+  image. The green points in the template image encompass the
+  contour of the observed object. The red lines are used to connect the matching feature
+  points. Obviously, the outliers are excluded using the RANSAC
+  algorithm. The homography is then estimated from these matching
+  feature points.  After finding a perspective
+  transformation from the matching features, the source contour is
+  projected onto the image in the bottom, and used as initial contour
+  for the CCD algorithm.}
 \end{figure}
 Scale-invariant feature transform (or SIFT) is an algorithm to detect
 and describe local features in images.  It is widely used to solve
@@ -865,6 +875,7 @@ features and advantages:
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=6cm]{experiments/book_sift/4.png}
+\caption[Result]{segmentation result}
 \end{figure}
 
 In this thesis, we use the SIFT algorithm to initialize the
@@ -899,13 +910,13 @@ DLT ~\cite{hartley2003multiple}. The Normalized DLT algorithm computes
 a homography for a projective transformation by using at least 4 point
 correspondences and then minimizing corresponding norm.
 
-After obtaining the homography between the template image and the
-test image, the contour of object can be easily projected
-into the test image to obtain the estimate of the contour
-position. This is illustrated in Fig.~\ref{fig:sift} and
-Fig.~\ref{fig:sift_result}. Note that because SIFT is only invariant
-to minor changes in view points, the method does not always work for
-three-dimensional objects which have substantially different view points.
+% After obtaining the homography between the template image and the
+% test image, the contour of object can be easily projected
+% into the test image to obtain the estimate of the contour
+% position. This is illustrated in Fig.~\ref{fig:sift} and
+% Fig.~\ref{fig:sift_result}. Note that because SIFT is only invariant
+% to minor changes in view points, the method does not always work for
+% three-dimensional objects which have substantially different view points.
 
 % The model hypothesis is obtained by applying the CCD algorithm to a
 % frame of a video sequence. In the following experiments, we can test
@@ -937,7 +948,7 @@ three-dimensional objects which have substantially different view points.
     \centering 
     \subfloat[iteration 28]{\includegraphics[width=1.5in]{experiments/tshirt/27.png}}
   \end{minipage} 
-  \caption[Manual Initialization]{}
+  \caption[Manual Initialization]{T-Shirt}
   \label{fig:book}
 \end{figure}
 
