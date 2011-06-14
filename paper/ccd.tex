@@ -291,15 +291,13 @@ is used to find the parameters of the model.
 % approach. In the paper, it is integrated into the tracking system of
 % the human body. 
 \subsection{Tracking and Optimization}
-\todos{Describe what CCD tracker is}\\
-\dones{CCD Tracker: The CCD tracker is based on a fast real-time
-  variant of the CCD algorithm. It is used to fit a curve model to a
-  sequence of images, for example, video data, i.e. Generally,
-  neighboring 2-D slices of a sequnce of images consist of similar
-  information, The CCD tracker takes only a small set of chosen pixels
-  which are likely to reduce the uncertainty of the curve. Thus the
-  CCD tracker can real-timely cope with the large amount of data.
-}
+The CCD tracker is based on a fast real-time
+variant of the CCD algorithm. It is used to fit a curve model to a
+sequence of images, for example, video data, i.e. Generally,
+neighboring 2-D slices of a sequnce of images consist of similar
+information, The CCD tracker takes only a small set of chosen pixels
+which are likely to reduce the uncertainty of the curve. Thus the
+CCD tracker can real-timely cope with the large amount of data.
 Both the Snakes and the CCD can be used to build naive tracking
 systems. In contrast to other approaches such as Kalman Filter-based
 tracking described in~\cite{brookner1998tracking} or the Conditional
@@ -789,33 +787,17 @@ obtained from the SIFT features.
     \centering 
     \subfloat[iteration 20]{\includegraphics[width=1.5in]{experiments/book/19.png}}
   \end{minipage} 
-  \caption[Manual Initialization]{Segment a partially occluded book in
-    a clutter by mannualy initialization.}
+  \caption{Segmentation of a book after manual initialization of the contour.}
   \label{fig:book}
 \end{figure}
-In this experiment, we use the CCD approach to recognize a book
-in a clutter and analyze the experimental results (Fig.~\ref{fig:book})% , apparently, the tracker has successfully
-% captured the contour of the observed plate. However, we find that the
-% contour does not completely encompass the edge of the object in the
-% beginning of the motion. The edge of the plate is analyzed by the
-% Sobel operator, it is shown that the edge in that region is not
-% sharp. Moreover, the pixels values of the shadow is
-% close to and the ones of the edge of the plate (Fig. ~\ref{fig:rgb}). Hence,
-% the contour can not snap to the edge. But the changes of the control
-% points in this region have not changed the shape of the whole
-% contour, because the contour has limited DOFs. There are two solution
-% for this problem:
-% \begin{itemize}
-% \item Using other local statistics based on other features to replace
-%   the RGB statistics.
-% \item Sharpen the edge of the observed object.
-% \end{itemize}
+
 \subsection{SIFT-based Initialization}
 \label{sec:sift_init}
-
 \begin{figure}[htbp]
   \centering
 \includegraphics[width=6cm]{experiments/book_sift/stacked.jpg}
+  \caption{Segmentation of a book after SIFT-based initialization of the contour.}
+  \label{fig:book}
 \label{fig:sift_result}
 \caption[Contour initialization using the SIFT algorithm]{The image in
   the upper-left corner is a template. It is projected into the bottom
@@ -828,57 +810,8 @@ in a clutter and analyze the experimental results (Fig.~\ref{fig:book})% , appar
   projected onto the image in the bottom, and used as initial contour
   for the CCD algorithm.}
 \end{figure}
-Scale-invariant feature transform (or SIFT) is an algorithm to detect
-and describe local features in images.  It is widely used to solve
-many problems in the field of Computer Vision, such as object
-recognition, robotic mapping and navigation, and video tracking. There are four key stages in the sift algorithm~\cite{lowe2004distinctive}:
-\begin{enumerate}
-\item \textbf{Scale-invariant feature detection}: an image is transformed into
-  a collection of vectors which are scale-invariant. By applying a Difference-of-Gaussian
-function to a series of smoothed and resampled images, potential
-interest points are identified.
-\item \textbf{Keypoint localization and indexing}: keypoints are selected at given
-  candidate location, and then stored as SIFT keys.
-\item \textbf{Orientation assignment}:  one or more orientations are assigned to each keypoint lo-
-cation based on local image gradient directions. All future operations are performed
-on image data that has been transformed relative to the assigned orientation, scale, and
-location for each feature, thereby providing invariance to these transformations.
-\item \textbf{Keypoint descriptor}: the local image gradients are measured at the selected scale
-in the region around each keypoint. These are transformed into a representation that
-allows for significant levels of local shape distortion and change in illumination.
-\end{enumerate}
 
-
-The SIFT keypoints and features are local and based on the appearance
-of the object at particular interest points. The SIFT algorithm has following
-features and advantages:
-\begin{itemize}
-\item Invariant to image scale and rotation, robust to changes in
-  illumination and minor changes in viewpoint.
-\item Highly distinctive, easy to extract, allow for correct object
-  identification and easy to match against a database of local
-  features. 
-\item Need few features (as few as 3) from an object to compute its location
-  and pose. Computational cost is moderate on modern computer hardware.
-\end{itemize}
-
-% Based on these features, SIFT is usable for object recognition, the
-% steps are given below.
-% \begin{itemize}
-% \item Extract SIFT features from a series of input template image,
-%   then store these features into a database.
-% \item Given a new input image, after training, the features in
-%   the image are matched to the SIFT feature database obtained from the
-%   training images.
-% \end{itemize}
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=6cm]{experiments/book_sift/4.png}
-\caption[Result]{segmentation result}
-\end{figure}
-
-In this thesis, we use the SIFT algorithm to initialize the
+We use the SIFT algorithm to initialize the
 contour of an object. Assume we have marked the boundary points in the
 training images. In order to project these boundary points to the test
 image, it is essential to estimate the homography between the
