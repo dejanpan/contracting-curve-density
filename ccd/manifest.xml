@@ -18,6 +18,8 @@
   <depend package="libsiftfast"/>
   <!-- <depend package="std_msgs" /> -->
   <depend package="cv_bridge" />
+  <depend package="pcl"/>
+  <depend package="pcl_ros"/>
   <!-- <depend package="rosconsole" /> -->
 <!--   <depend package="libdc1394v2"/> -->
   <!-- <depend package="sensor_msgs"/> -->

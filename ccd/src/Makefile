@@ -5,7 +5,7 @@ ifeq ($(shell arch), x86_64)
 BIT = 64
 endif
 
-CC = g++-4.4
+CC = g++
 GCC= gcc
 EXTRA = 
 INCDIR =-I. `pkg-config --cflags opencv` -I../include -I../../sift/include -I../include

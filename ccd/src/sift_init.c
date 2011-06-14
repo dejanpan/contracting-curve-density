@@ -16,7 +16,7 @@
 IplImage * merge_imgs(IplImage* img1, IplImage* img2)
 {
   int max_width = MAX(img1->width, img2->width);
-  int x_start = (MAX(img1->width, img2->width) - img1->width)*0.5;
+  int x_start = (max_width - img1->width)*0.5;
   IplImage* stacked =
       cvCreateImage( cvSize( max_width,
 					     img1->height + img2->height ),
@@ -185,6 +185,11 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
     }
     /* printf("i == %d \n", i); */
 
+    int x_start = (MAX(img1->width, img2->width) - img1->width)*0.5;
+    for (row = 0; row < coordinates->rows; row++)
+    {
+      cvCircle(stacked, cvPoint((ptr+step*row)[0]/(ptr+step*row)[2]+x_start, (ptr+step*row)[1]/(ptr+step*row)[2]), 2, CV_RGB(0,255,0), 2, 8, 0);
+    }
     
     cvGEMM(H, coordinates, 1, 0,0, coordinates_t, CV_GEMM_B_T);
 
@@ -198,7 +203,12 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
     cvTranspose(coordinates_t, coordinates);
     for (row = 0; row < coordinates->rows; ++row){
       cvCircle(xformed, cvPoint((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]), 2, CV_RGB(0,255,0), 2, 8, 0);
+      cvCircle(stacked, cvPoint((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]+img1->height), 2, CV_RGB(0,255,0), 2, 8, 0);
     }
+
+    cvNamedWindow( "Matched_Object", 1 );
+	cvShowImage( "Matched_Object ", stacked);
+
     cvReleaseMat(&coordinates_t);
     
 	cvNamedWindow( "CCD", 1 );

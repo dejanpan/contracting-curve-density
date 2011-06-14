@@ -184,7 +184,7 @@ of class $C$ can be written as a \textbf{continous} logistic sigmoid acting
 on a linear function of $x$ (equivalent to \textit{fuzzy assignment}).} known in the field of pattern 
 recognition. Secondly, a quadratic or
 a cubic B-spline curve is used to model the parametric curve
-to avoid the Runge phenomenon~\cite{wikibspline} without increasing the degree of the
+to avoid the Runge phenomenon~\cite{süli2003introduction} without increasing the degree of the
 B-spline. Thirdly, the system supports both planar affine (6-DOF) and
 three-dimensional affine (8-DOF) shape-space. The latter affine space can avoid
 curve mismatching caused by major viewpoint changes. Lastly, in
@@ -292,6 +292,14 @@ is used to find the parameters of the model.
 % the human body. 
 \subsection{Tracking and Optimization}
 \todos{Describe what CCD tracker is}\\
+\dones{CCD Tracker: The CCD tracker is based on a fast real-time
+  variant of the CCD algorithm. It is used to fit a curve model to a
+  sequence of images, for example, video data, i.e. Generally,
+  neighboring 2-D slices of a sequnce of images consist of similar
+  information, The CCD tracker takes only a small set of chosen pixels
+  which are likely to reduce the uncertainty of the curve. Thus the
+  CCD tracker can real-timely cope with the large amount of data.
+}
 Both the Snakes and the CCD can be used to build naive tracking
 systems. In contrast to other approaches such as Kalman Filter-based
 tracking described in~\cite{brookner1998tracking} or the Conditional
@@ -752,7 +760,7 @@ homography. It contains the following steps~\cite{fischler1981random}.
 In this section, we describe an initialization method which utilizes three-dimensional
 point cloud for finding contours.
 
-As depicted in \todo{Fig.~\ref{fig:pointcloud}}, the PR2 robot simultaneously takes a three-dimensional scan and captures
+As depicted in Fig.~\ref{fig:pointcloud}, the PR2 robot simultaneously takes a three-dimensional scan and captures
 an image of the scene in front of it. The robot generates
 object hypotheses by detecting candidate point clusters in
 the three-dimensional point cloud acquired by the depth sensor. % These
@@ -771,6 +779,17 @@ usually it can not completely encompass the whole object.
 By applying the CCD algorithm, we can accurately obtain the contour of
 a observed object. The result of the experiment is similar to the one
 obtained from the SIFT features.
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=6cm]{images/pr2b.jpg}
+  \caption[Kinect camera of the PR2 Robot and object candidate
+  segmented in three-dimensional point cloud.]{Kinect camera of
+    the PR2 Robot and object candidate segmented in three-dimensional point
+    cloud. Encompassing a contour of the back-projected points onto
+    the image is used as an initial contour for the CCD algorithm.}
+  \label{fig:pointcloud}
+\end{figure}
+
 \section{Applications and Experimental Results}
 \label{sec:results}
 \todo{
@@ -991,17 +1010,18 @@ three-dimensional objects which have substantially different view points.
 \centering
 \resizebox{0.49\textwidth}{!}{\begin{tabular}{|l|c|c|c|c|}
 \hline
-experiments & fail rate& run time & iteration & tolerance\\
+experiments & failure rate& run time & iteration & tolerance\\
 \hline
-manual & 5\% & 3.35 & 26 & 0.001\\
+manual initialization& 5\% & 3.35 & 26 & 0.001\\
 \hline
-sift & 9\% & 3.52 & 5 & 0.001\\
+sift initialization & 9\% & 3.52 & 5 & 0.001\\
 \hline
-model & 4\% & 10.15 & 28 & 0.001\\
+model-based & 4\% & 10.15 & 28 & 0.001\\
 \hline
 \end{tabular}}
 \caption{Quantization Results}
 \end{table}
+\dones{tolerance means the convergence criteria}
 
 \begin{table}[htbp]
 \label{tab:ip}
@@ -1009,17 +1029,18 @@ model & 4\% & 10.15 & 28 & 0.001\\
 \resizebox{0.49\textwidth}{!}{\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|}
 \hline
 experiments & $\gamma_1$& $\gamma_2$ & $\gamma_3$& $\gamma_4$ & $\alpha$
-& $\kappa$ & $c$ & $h$ & $\Delta_h$ &samples points & degree &dimension\\
+& $\kappa$ & $c$ & $h$ & $\Delta h$ &samples points & degree &dimension\\
 \hline
-manual & 0.5 & 5 & 7 & 5 & 1.2 & 0.5 &0.25 &40 &2 & 60 & 4 & 6\\
+manual initialization& 0.5 & 5 & 7 & 5 & 1.2 & 0.5 &0.25 &40 &2 & 60 & 4 & 6\\
 \hline
-sift & 0.5 & 5 & 7 & 5 & 1.2 & 0.5 &0.25 &48 &1 & 80 & 4 & 6\\
+sift initialization & 0.5 & 5 & 7 & 5 & 1.2 & 0.5 &0.25 &48 &1 & 80 & 4 & 6\\
 \hline
-model & 0.5 & 5 & 7 & 5 & 1.2 & 0.5 &0.25 &50 &1 & 200 & 4 & 6\\
+model-based & 0.5 & 5 & 7 & 5 & 1.2 & 0.5 &0.25 &50 &1 & 200 & 4 & 6\\
 \hline
 \end{tabular}}
 \caption{initialization parameters}
 \end{table}
+\dones{these parameters are explained in Section CCD}
 
 
 
