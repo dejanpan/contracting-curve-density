@@ -9,7 +9,7 @@
 <c>0.25</c>
 <h>48</h>
 <delta_h>1</delta_h>
-<resolution>80</resolution>
+<resolution>150</resolution>
 <degree>4</degree>
 <phi_dim>6</phi_dim>
 </opencv_storage>

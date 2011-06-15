@@ -84,6 +84,7 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
         pt1 = cvPoint( cvRound( feat->x ) + (MAX(img1->width, img2->width) - img1->width)*0.5, cvRound( feat->y ) );
         pt2 = cvPoint( cvRound( nbrs[0]->x ), cvRound( nbrs[0]->y ) );
         pt2.y += img1->height;
+        if(pt2.x > 399 & pt2.x < 740)
         cvLine( stacked, pt1, pt2, CV_RGB(255,0,255), 1, 8, 0 );
         m++;
         feat1[i].fwd_match = nbrs[0];
