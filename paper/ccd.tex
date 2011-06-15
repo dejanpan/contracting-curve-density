@@ -129,7 +129,7 @@ a classification problem.
 
 In the CCD algorithm, the aim is to find the contour of observed object
 and thus segment it from the background. Therefore, a hypothetical 
-contour divides the image into two parts (Fig.\ref{fig:prior}), inside
+contour divides the image into two parts (Fig.~\ref{fig:prior}), inside
 and outside. For probabilistic model, we can represent this using
 binary representation (e.g. $\{0, 1\}$). The goal of the CCD algorithm
 then becomes to accurately assign a class label to each pixel in the vicinity of the
@@ -342,8 +342,8 @@ The algorithm consists of four major steps which are also sketched in Fig.~\ref{
   pixels that are close to the pixel on the contour and most likely lie
   on the corresponding side of the curve, according to the current
   estimate of the model parameters. The resulting local statistics
-  represent an expectation of "what the two sides of the curve look
-  like"~\cite{hanek2004contracting}, also known as likelihood ($p(\mathbf{I}|\mathbf{\Phi})$).
+  represent an expectation of ``what the two sides of the curve look
+  like"~\cite{hanek2004contracting}, also known as likelihood: $p(\mathbf{I}|\mathbf{\Phi})$.
 \item \textbf{Refinement of model parameters}: The conditional distribution, namely
   the product of a prior distribution and the likelihood, is evaluated
   as the cost function. Then MAP estimate is executed to optimize the
@@ -380,8 +380,8 @@ account for the complexity of the object shape (Fig.~\ref{fig:prior}).
   \includegraphics[width=\columnwidth]{images/cont.jpg}
 \caption{A contour with sample points used for learning of local statistics. The blue contour
   divides the image into two parts: outside and inside. As depicted in
-  right-bottom image, pixels inside the contour are labeled "0",
-  and those outside the contour are labeled "1". For each point on the
+  right-bottom image, pixels inside the contour are labeled ``0",
+  and those outside the contour are labeled ``1". For each point on the
   contour (the light-blue point), we sample points (red points) along both positive
   and negative direction of the normal of the contour point.}
 \label{fig:prior}
