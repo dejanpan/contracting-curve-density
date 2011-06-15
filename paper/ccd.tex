@@ -583,8 +583,6 @@ local statistics. In the next part, we will evaluate the local
 statistics.
 
 \subsection{Curve Parametrization}
-Optional....
-
 By applying the (uniform quadratic or cubic) B-spline interpolation to the control points, a new curve
 grouped by a sequence of equidistant distributed points is generated. 
 The B-spline curve %is defined in eq.~\ref{eq:paramcurve} and 
@@ -741,6 +739,16 @@ three-dimensional objects which have substantially different view points.
 \todod{}
 
 
+\subsection{CCD Tracker}
+A CCD tracker is obtained by applying the CCD algorithm to each
+frame of  a sequnce of images independently where the output of the parameters 
+obtained from the previous frame is used in the current frame. Because  of the 
+dependency between the two successive images, the CCD tracker can achive a high
+performance rate and be applied to the time crtical problems. The 
+video~\footnote{\url{http://www.youtube.com/watch?v=nr83zqQ6CCg}} demonstrates the tracking of
+a book on a cart using 5M pixel camera on a Personal Robot 2 (PR2~\cite{Wyrobek08PR1}).
+
+
 % ALTERNATIVE:
 % The robot generates object hypotheses by detecting candidate point clusters in
 % the three-dimensional point cloud acquired by the depth sensor. 
@@ -760,7 +768,7 @@ three-dimensional objects which have substantially different view points.
 \label{sec:results}
 To evaluate the applicability of the herein presented version of the CCD algorithm
 we ran three realistic tests in our kitchen lab on the sensor data from the 
-PR2~\cite{Wyrobek08PR1} robot. The tests were boostrapped using parameters from
+PR2 robot. The tests were boostrapped using parameters from
 the Table~\ref{tab:ip} and are detailed below.
 
 \begin{table}[htbp]
@@ -824,7 +832,7 @@ In the second experiments  the initial contour was generated from the SIFT featu
 matching a priori learnt template of a book shown in Fig.~\ref{fig:sift_result}. 
 We ran the CCD algorithm 100 times which resulted in 9 convergence failures. 
 The average convergence time was 3.52$s$, see also Table~\ref{tab:qr} for the rest
-of the quantitative results. Video of the test is available online on: \url{http://www.youtube.com/watch?v=X2K-h4oHxig}.
+of the quantitative results. Video of the test is available online~\footnote{\url{http://www.youtube.com/watch?v=X2K-h4oHxig}}.
 
 \subsection{Mesh Model-based Initialization}
 \label{sec:tifpc}
