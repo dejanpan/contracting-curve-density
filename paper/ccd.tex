@@ -400,44 +400,22 @@ methods are discussed below.
 
 \subsubsection{SIFT-based Initialization}
 \label{sec:sift}
-We use the SIFT algorithm to initialize the
-contour of an object. Assume we have marked the boundary points in the
-training images. In order to project these boundary points to the test
-image, it is essential to estimate the homography between the
-images. However, SIFT matching might lead to lots of "false" matches.
-For filtering out false positives, we use RANdom SAmple Consensus (RANSAC)~\cite{fischler1981random}, 
-which is an iterative process that randomly selects enough matches to fit the
-homography.
-
-The whole algorithm amounts to the following steps: 
-
-
-\begin{itemize}
-\item  Randomly select a sample of matched points and instantiate the
-  model from this subset.
-\item Determine the set of data points that are within a distance
-  threshold of the homography. The set is the consensus set of the sample
-  and defines the inliers.
-\item If the size of the set (e.g. the number of inliers) is greater
-  than some threshold, re-estimate the homography using all the matched
-  points and terminate. Otherwise, select a new subset and repeat the
-  above.
-\item After some trials the largest consensus set is selected, and the
-  homography is re-estimated using all the points in the subset.
-\end{itemize}
-Fast way to compute the homography in a least squares sense is to use the Normalized
-Direct Linear Transform (normalized
-DLT ~\cite{hartley2003multiple}. The Normalized DLT algorithm computes
+We first extract SIFT features in the test image and match them against the template
+image using Nearest Neighbor Search. For filtering out of false positive matches and estimation
+of the homography, we use RANdom SAmple Consensus (RANSAC)~\cite{fischler1981random}, 
+which is an iterative process that randomly selects matches in the test image, 
+back-projects them onto the template image and verifies the 
+relative normalized difference in order to select inliers.
+  
+In order to speed-up the homography computation we use the Normalized
+Direct Linear Transform (normalized DLT~\cite{hartley2003multiple}). The Normalized DLT algorithm computes
 a homography for a projective transformation by using at least 4 point
-correspondences and then minimizing corresponding norm.
+correspondences and then minimizing the corresponding norm.
 
 After obtaining the homography between the template image and the
-test image, the contour of object can be easily projected
+test image, the bounding box around the feature inliers of the object can be easily projected
 into the test image to obtain the estimate of the contour
-position. This is illustrated in Fig.~\ref{fig:sift_result}. Note that because SIFT is only invariant
-to minor changes in view points, the method does not always work for
-three-dimensional objects which have substantially different view points.
-
+position. This is illustrated in Fig.~\ref{fig:sift_result}.
 \subsubsection{Mesh Model-based Initialization}
 \label{sec:pcl}
 \todod{}
