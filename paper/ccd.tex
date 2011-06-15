@@ -366,7 +366,7 @@ In our implementation, we model the
 contour as a continuous, differentiable and uniform quadratic or cubic
 B-Spline in $\mathbb{R}^2$.
 % which was discussed in Chapter~\ref{chapter:bspline}. 
-Given a ROI (region of interest), the first step is to generate
+Given a region of interest (ROI), the first step is to generate
 sufficient control points $\mathbf{P} = \{P_0, \ldots, P_{N_p-1}\}$ to
 account for the complexity of the object shape (Fig.~\ref{fig:prior}).
 
@@ -401,7 +401,7 @@ contour of an object. Assume we have marked the boundary points in the
 training images. In order to project these boundary points to the test
 image, it is essential to estimate the homography between the
 images. However, SIFT matching might lead to lots of "false" matches.
-For filtering out false positives, we use RANSAC~\cite{fischler1981random}, 
+For filtering out false positives, we use RANdom SAmple Consensus (RANSAC)~\cite{fischler1981random}, 
 which is an iterative process that randomly selects enough matches to fit the
 homography.
 
