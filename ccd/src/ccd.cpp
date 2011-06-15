@@ -577,7 +577,7 @@ void CCD::run_ccd()
     for (int i = 0; i < params_.resolution; ++i)
     {
         int j = (i+1)%params_.resolution;
-        cv::line(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB(255, 0, 0 ),2,8,0);
+        cv::line(canvas_tmp, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB(255, 0, 0 ),6,8,0);
         // cv::line(canvas, cv::Point2d(bs[i].x, bs[i].y),cv::Point2d(bs[j].x, bs[j].y),CV_RGB( 0, 0, 255 ),2,8,0);
     }
 
