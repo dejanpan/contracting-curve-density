@@ -332,8 +332,8 @@ CCD algorithm as presented by Hanek et al~\cite{hanek2004contracting}.
 The algorithm consists of four major steps which are also sketched in Fig.~\ref{fig:flowchart}:
 \begin{enumerate}
 \item \textbf{Initialization}: Given an input image $\mathbf{I}$ as training data, we first choose an initial
-  contour for an object which will be fitted or tracked, and
-  initial values for the means and covariances ($P(\mathbf{\Phi})$). In addition, for most practical
+  contour for an observed object, then model the contour using a
+  parameter vector $\mathbf{\Phi}$. In addition, for most practical
   applications a pre-processing stage (e.g. smoothing) gets applied as well.
 \item \textbf{Learning of local statistics}: 
   In the step of learning of local statistics for each pixel in the
@@ -343,14 +343,14 @@ The algorithm consists of four major steps which are also sketched in Fig.~\ref{
   on the corresponding side of the curve, according to the current
   estimate of the model parameters. The resulting local statistics
   represent an expectation of "what the two sides of the curve look
-  like"~\cite{hanek2004contracting}, also known as likelihood ($P(\mathbf{I}|\mathbf{\Phi})$).
+  like"~\cite{hanek2004contracting}, also known as likelihood ($p(\mathbf{I}|\mathbf{\Phi})$).
 \item \textbf{Refinement of model parameters}: The conditional distribution, namely
   the product of a prior distribution and the likelihood, is evaluated
   as the cost function. Then MAP estimate is executed to optimize the
   parameters and as a result a MAP value of model parameter vector and
   covariance will be generated in this step.
 \item \textbf{Convergence}: Check for the convergence of the 
-  log posterior probability function $\log{P(\mathbf{\Phi}) P(\mathbf{I}|\mathbf{\Phi})}$. 
+  log posterior probability function $\ln{p(\mathbf{\Phi}) p(\mathbf{I}|\mathbf{\Phi})}$. 
   If the convergence criterion is not satisfied return to step 2.
 \end{enumerate}
 
@@ -620,9 +620,11 @@ we need to transform the linear function of $\mathbf{\Phi}$ using a
 non-linear activation function $f(\cdot)$~\cite{bishop2006pattern}:
 \begin{equation}
   \label{eq:nonla}
-  a_{v,1} = f(\frac{d_{k,l}}{\sigma})\qquad.
+  a_{v,1} = f(\frac{d_{k,l}}{\sigma})\qquad,
 \end{equation}
-Currently, two main non-linear activation functions are mostly used
+where $\sigma$
+can be taken as the uncertainty of the curve along the normal
+introduced by the covariance $\mathbf{\Sigma}_{\mathbf{\Phi}}$. Currently, two main non-linear activation functions are mostly used
 to solve the classification problem. The first is known as the
 \textit{logistic sigmoid} function, and is given by:
 \begin{equation}
@@ -684,10 +686,10 @@ normal for the two sides of the curve. the weighting functions are
 defined as:
 \begin{equation}
   \label{eq:weight}
-  \omega_{1/2}(d_{k,l}) = C\left(\frac{a_{1/2}(d_{k,l}) -
+  \omega_{1/2}(d_{k,l}) = \mathcal{C}\left(\frac{a_{1/2}(d_{k,l}) -
     \gamma_1}{1-\gamma_2}\right)^4 \left[e^{-d_{k,l}/(2\hat{\sigma}^2)} - e^{-\gamma_2}\right]^+\qquad,
 \end{equation}
-where $\gamma_1$ equals to $0.5$ (disjoint weight assignment) and $\gamma_2$
+where $\mathcal{C}$ denotes the normalization constant, $\gamma_1$ equals to $0.5$ (disjoint weight assignment) and $\gamma_2$
 equals to $4$ for the truncated Gaussian~\cite{hanek2004contracting},
 % the weight function is shown in Fig.~\ref{fig:weight}.
 
@@ -705,7 +707,7 @@ deviation is chosen in order to cover the specified distance $h$,
 which yields 
 \begin{equation}
   \label{eq:deviation}
-  \hat{\sigma} = \max \left[\frac{h}{\sqrt(2\gamma_2)}, \gamma_4
+  \hat{\sigma} = \max \left[\frac{h}{\sqrt{2\gamma_2}}, \gamma_4
   \right], \sigma  = \frac{1}{\gamma_3} \hat{\sigma}\qquad,
 \end{equation}
 with the two additional constants $\gamma_3 = 6$ (linear dependence
@@ -732,7 +734,7 @@ We first calculate the zero, first and second order weighted moments:
   \mathbf{M}_{k,s}^{(1)}(d_{k,l,s}) &=& \sum_{l=0}^{2L-1} \omega_s(d_{k,l}) \mathrm{I}_{k,l}\\
   \mathbf{M}_{k,s}^{(2)}(d_{k,l,s}) &=& \sum_{l=0}^{2L-1} \omega_s(d_{k,l}) \mathrm{I}_{k,l}\mathrm{I}_{k,l}^T\qquad,
 \end{eqnarray}
-where $\mathbf{I}$ is just the raw RGB value of a pixel, for a
+where $\mathrm{I}_{k,l}$ is just the raw RGB value of a pixel, for a
 3-channel image and the values of three components
 are  between 0 and 255. The local mean vectors $\mathbf{m}_{v,s}$  and
 the local covariance matrices
@@ -744,7 +746,7 @@ $\mathbf{\Sigma}_{\mathbf{\Phi}}$  are obtained by:
   \mathbf{\Sigma}_{k,s} &=& \frac{\mathbf{M}^{(2)}_{k,s}}{M^{(0)}_{k,s}}
   - \mathbf{m}_{k,s}\mathbf{m}_{k,s}^T  + \kappa \mathbf{I}\qquad.
 \end{eqnarray}
-In Eq.~\ref{eq:localcov}, $\kappa I$  means an identity matrix scaled by
+In Eq.~\ref{eq:localcov}, $\kappa \mathbf{I}$  means an identity matrix scaled by
 $\kappa$ in order to avoid numerical singularity. Later it is namely
 required to calculate the inverse matrix of
 $\mathbf{\Sigma}_{k,s}$. In our experiments, we choose $\kappa$ to be
@@ -752,16 +754,16 @@ $\kappa = 0.5$, which is efficient to avoid numerical problems in the
 process of iteration.
 
 With the local mean vectors $\mathbf{m}_{v,s}$  and the local covariance matrices
-$\mathbf{\Sigma}_{\mathbf{\Phi}}$, we can compute the
+$\mathbf{\Sigma}_{k,s}$, we can compute the
 likelihood function   $p(\mathbf{I}_{k,l} | \mathbf{m}_{v,1}, \mathbf{m}_{v,2},
   \mathbf{\Sigma}_{v,1}, \mathbf{\Sigma}_{v,1})$ for each pixel
   $\mathrm{v}_{k,l}$. In terms of observation model, the likelihood
   function describes how probable the observed data set is for
   different settings of the parameter vector. Hence, we first establish
-  the relation between image data $\mathrm{I_{k,l}}$ and the model
+  the relation between image data $\mathrm{I}_{k,l}$ and the model
   parameter $\mathbf{\Phi}$. Here we model the pixel value
   $\hat{\mathbf{m}}_{k,l}$ and $\hat{\mathbf{\Sigma}}_{k,l}$
-  for all pixels $\mathrm{v_{k,l}}$ in the vicinity of the curve as the
+  for all pixels $\mathrm{v}_{k,l}$ in the vicinity of the curve as the
   linear combination of $\mathbf{m}_{v,1}$ and $\mathbf{m}_{v,2}$:
   \begin{equation}
     \label{eq:meankl}
@@ -842,10 +844,10 @@ $\hat{\mathbf{\Phi}}$ can be evaluated as:
 \begin{equation}
   \label{eq:maxcost}
   \hat{\mathbf{\Phi}} =
-  \mathbf{m}_{\mathbf{\Phi}}\underset{\mathbf{\Phi}}{\arg\max} \
+  \underset{\mathbf{\Phi}}{\arg\max} \
   (\mathcal{Q}) \qquad.
 \end{equation}
-To optimize $\mathcal{Q}$ based on the estimated $m_{\mathbf{\Phi}}$,
+To optimize $\mathcal{Q}$ based on the estimated $\mathbf{m}_{\mathbf{\Phi}}$,
 the approximation to the Hessian matrix can be adopted. First we
 compute the partial derivatives of $\mathcal{Q}$:
 \begin{equation}
@@ -853,13 +855,13 @@ compute the partial derivatives of $\mathcal{Q}$:
 \begin{aligned}
 &\nabla_{\mathbf{\Phi}}\{{\mathcal{Q}(\mathbf{\Phi})}\} =
 2\{{\mathbf{\Sigma}_{\mathbf{\Phi}}}^{-1}\}^{T}{\mathbf{\Phi}}\\ 
-&- \sum_{k = 0}^{N_{C}-1} \sum_{l=0}^{2L-1} \left\{\mathcal{J}_{a_{v,1}}^T\hat{\mathbf{\Sigma}}_{k,l}^{-1}\left[I_{k,l}-\hat{\mathbf{m}}_{k,l}(a_{v,1})\right]\right\}\qquad,
+&- \sum_{k = 0}^{N_{C}-1} \sum_{l=0}^{2L-1} \left\{\mathcal{J}_{a_{v,1}}^T\hat{\mathbf{\Sigma}}_{k,l}^{-1}\left[\mathrm{I}_{k,l}-\hat{\mathbf{m}}_{k,l}(a_{v,1})\right]\right\}\qquad,
 \end{aligned}
 \end{equation}
 with being:
 \begin{equation}
   \label{eq:jocob}
-  \mathcal{J}_{a_{v,1}} = \left( \mathbf{m}_{k,1} -\mathbf{m}_{k,2} \right)(\nabla_{\phi} a_{v,1}(d_{k,l}))^T\qquad,
+  \mathcal{J}_{a_{v,1}} = \left( \mathbf{m}_{k,1} -\mathbf{m}_{k,2} \right)(\nabla_{\mathbf{\Phi}} a_{v,1}(d_{k,l}))^T\qquad,
 \end{equation}
 Afterwords, the Gauss-Newton approximation to the Hessian
 matrix is given by
