@@ -107,11 +107,11 @@ applicable for the segmentation of all kinds of objects' boundaries.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\columnwidth]{images/divide1.jpg}\\
-  \includegraphics[width=\columnwidth]{images/divide2.jpg}
-  \caption{A classification problem: \textbf{Top:} The blue box was successfully segmented
+  % \includegraphics[width=\columnwidth]{images/divide1.jpg}\\
+  \includegraphics[width=\columnwidth]{experiments/dishes.png}
+  \caption{\todod{A classification problem: \textbf{Top:} The blue box was successfully segmented
     from the background. \textbf{Bottom:} The blue area is inside the curve while
-    the golden area is outside.}
+    the golden area is outside.}}
   \label{fig:divide}
 \end{figure}
 
@@ -353,315 +353,16 @@ The algorithm consists of four major steps which are sketched in Fig.~\ref{fig:f
   If the convergence criterion is not satisfied return to step 2.
 \end{enumerate}
 \todod{conclude}
+
 \section{Contracting Curve Density Algorithm}
 \label{sec:ccd_novelties}
-\subsection{Logistic Sigmoid Function}
-One of advantages of the
-model-based approach is that we can restrict a task at hand to the ROI
-which is
-expected to reduce the computational cost. Hence, we first define
-the region which contains pixels in the vicinity of the expected image
-curve. Considering the complexity and the expense of computing, it is practicable
-to choose those pixels that are actually required for interpolation along
-normals of the curve (Fig.~\ref{fig:prior}). This is proved useful and important for image
-perception and real-time tracking system. In the implementation of
-this thesis, the processing is limited to a segment of each normal within
-a search region. A fixed distance $h$ along the normal segment is
-chosen according to the hypothetical uncertainty of the parametric curve. In the
-special case of the norm-squared prior in spline space, a reasonable
-search segment is determined as follows:
-
-\begin{equation}
-  \label{eq:radius}
-  h = \sqrt{2} \rho_0 = \sqrt{\mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}}\mathbf{A}^T\mathcal{U}\mathbf{A})}\qquad.
-\end{equation}
-
-$h$ denotes the size of a \textit{window} which is used for computing
-the local statistics. In the beginning of the iterative procedure, the value
-is relatively big and only roughly approximates the vicinity of the image curve
-. The
-uncertainty is reduced after further iteration steps and as a result, the $h$ becomes smaller and
-smaller. After determining the length of the search segment, 
-a set of points located on these segments can be collected and
-evaluated. Note that the parametric model curve is not required to be
-closed, but it shall always encompass a limited area. We only plan to
-analyze the pixels located in the vicinity of the contour (red sample
-pixels in Fig.~\ref{fig:prior}). Therefore,
-we should pay attention to limit the search distance on the
-\textit{inner} side in order to avoid crossing the opposite
-boundary to sample pixels from the wrong area~\cite{panin2006fully}. In order to
-decrease the computational expense, it is advisable to uniformly sample those
-pixels on both segments in the vicinity of the contour. On the other
-hand, we should avoid to collect too small number of pixels, because
-it is statistically invalid and can not
-capture all features (e.g. spinodals and corners) of the contour. Let us denote the
-sample distance using $\Delta h$, then the overall number of spaced
-sample points $L$ ($2L$ for both sides in all) can be given by:
-\begin{equation}
-  \label{eq:sample}
-  L = \lfloor \frac{h}{\Delta h} \rfloor\qquad.
-\end{equation}
-
-Note that the goal of the algorithm is to assign each pixel
-($\mathrm{v}_{k,l}, k \in [0,\ldots,N_{\mathrm{C}}-1], l \in [0,
-2L-1]$) on either side of the contour. By doing so we thus run into a
-classification problem.
-Although each pixel should be assigned to one and only
-one class so that the target variable is discrete, we can model the
-posterior probabilities that lie in $(0,1)$ interval, which converts the classification into the regression problem. To achieve the latter, we model the probabilistic
-assignments $\mathbf{a}_{v}$ for each pixel $\mathrm{v}_{k,l}$ as following:
-\begin{equation}
-  \label{eq:pa}
-  \mathbf{a}_v  = (a_{v,1}, a_{v,2})^T\qquad,
-\end{equation}
-where $a_{v,1}$ describes to which extent a pixel $v$ is expected to
-be influenced by side $1$ of the curve, and $a_{v,2}$ is equivalent
-for side 2 given by $a_{v,2} = 1- a_{v,1}$. For arbitrary curve
-$\mathbf{C}$, it is difficult to give a closed form of $a_v$. In the
-following, an efficient approximation of the assignment is derived.
-
-We will first evaluate the \textbf{signed} distance $d_{k,l}$ between pixel
-$\mathrm{v}_{k,l}$ and a given curve $\mathbf{C}$
-(Fig.~\ref{fig:dis}), which
-can be approximated by:
-\begin{equation}
-  \label{eq:dis}
-  d_{k,l} = \mathbf{n}_k \cdot ( \mathbf{v}_{k,l} - C_k)\qquad,
-\end{equation}
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\columnwidth]{images/dis.jpg}
-  \caption{The distance between a curve point and a pixel in the
-    vicinity of a contour: $C_k$ is the curve point, $v_{k,l}$ is a
-    pixel in the perpendicular of the contour, $d_{k,l}$ is the
-    distance between $C_k$ and $v_{k,l}$.}
-  \label{fig:dis}
-\end{figure}
-
-where $\mathbf{v}_{k,l} = {x_{k,l} \choose y_{k,l}}$ is the axis
-components of a pixel
-$\mathrm{v}_{k,l}$, and $C_k$ is the equivalent for point $C$ on the
-curve given by ${x_k \choose y_k}$. Now consider that the curve is
-distorted by a Gaussian $p(\mathbf{\Phi})$ which makes the displacement $d_{k,l}$ also Gaussian distributed: $p(d_{k,l}) \sim
-\mathcal{N}(d_{k,l}|m_d, \sigma)$, where $m_d$ and $\sigma$ are mean
-and covariance of the distribution. Covariance $\sigma$ is expressed as:
-\begin{equation}
-  \label{eq:cov}
-  \sigma = \mathbf{n}_k \cdot \mathbf{J}_k \cdot \mathbf{\Sigma}_{\Phi}
-  \cdot \mathbf{J}_k^T \cdot \mathbf{n}_k^T\qquad,
-\end{equation}
-where $\mathbf{J}_k$ is the Jacobian of curve $\mathbf{C}$. $\sigma$
-can be taken as the uncertainty of the curve along the normal
-introduced by the covariance
-$\mathbf{\Sigma}_{\mathbf{\Phi}}$, it is a constant and can be
-evaluated offline. The variable
-$\frac{d_{k,l}}{\sigma}$ now becomes a linear function with respect to $\mathbf{\Phi}$.
-
-In order to apply the probabilistic generative models to the
-classification problem,
-% calculate the the probability that a point lies on side 1 of the curve
-we need to transform the linear function of $\mathbf{\Phi}$ using a
-non-linear activation function $f(\cdot)$~\cite{bishop2006pattern}:
-\begin{equation}
-  \label{eq:nonla}
-  a_{v,1} = f(\frac{d_{k,l}}{\sigma})\qquad.
-\end{equation}
-Currently, two main non-linear activation functions are mostly used
-to solve the classification problem. The first is known as the
-\textit{logistic sigmoid} function, and is given by:
-\begin{equation}
-  \label{eq:logistic}
-  a_{v,1} =
-  \frac{1}{1+\mathrm{exp}(\frac{d_{k,l}}{\sqrt{2}\sigma}))}\qquad .
-\end{equation}
-The term \textit{sigmoid} stands for
-S-shaped~\cite{bishop2006pattern}. In~\cite{hanek2004contracting},
-another activation function named probit is used, which is defined by:
-\begin{equation}
-  \label{eq:erf}
-  a_{v,1} = \frac{1}{2}erf(\frac{d_{k,l}}{\sqrt{2}\sigma} + 1)\qquad ,
-\end{equation}
-where the error function of a Gaussian distribution is used. Both
-two functions in Eq.~\ref{eq:erf} and Eq.~\ref{eq:logistic} are
-S-shaped (Fig.~\ref{fig:s-shaped}).
-\begin{figure} 
-    \centering 
-    \includegraphics[width=0.48\columnwidth]{images/logistic.jpg}
-    \includegraphics[width=0.48\columnwidth]{images/erf.jpg}
-    \caption{\textbf{Left:} Logistic
-  sigmoid function, \textbf{Right:} probit function: Both functions
-  are S-shaped}
-\label{fig:s-shaped}
-\end{figure}
-
-In this thesis, we use both of them to implement the algorithm. They give
-similar results but have different behaviors. Logistic sigmoid function
-can be perfectly interpreted from the perspective of
-probability. Consider the side $s \in \{0,1\}$, the posterior
-distribution for side $s = 1$ can be written as:
-\begin{eqnarray}
-  \label{eq:pdfs}
-  p(s=1|I) &=& \frac{p(I|s=1)p(s=1)}{p(I|s=1)p(s=1)
-    + p(I|s=2)p(s=2)}\\
-&=&  \frac{1}{1+exp(-\mathcal{R})}\qquad,
-\end{eqnarray}
-where I is pixels' RGB value, and $\mathcal{R}$ is defined as:
-\begin{equation}
-  \label{eq:ratio}
-  \mathcal{R} = \frac{p(I|s=1)p(s=1)}{p(I|s=2)p(s=2)}\qquad.
-\end{equation}
-The logistic sigmoid plays an important role in many classification
-algorithms. It satisfies the symmetry property, and its inverse 
-is known as \textit{logit} function, which represents the log of the
-ratio of probabilities $ln [p(s=1|I)/p(s=2|I)]$ for the two classes,
-also known as the log odds~\cite{bishop2006pattern}.
-
-The logistic sigmoid function can be used to transform a broad range
-of class-conditional distributions, described by the exponential
-family, to a non-linear posterior class probabilities. Since not all choices of
-class-conditional density are trivial, the probit function is explored
-to cope with other complex distributions. The results of logistic
-sigmoid function and probit function tend to be similar, except that the
-probit function is sensitive to outliers because the logistic sigmoid
-decays asymptotically like $\mathrm{exp}(-x)$ for $x \rightarrow \infty$, whereas
-for the probit activation function the decay is like
-$\mathrm{exp}(-x^2)$ (Fig.~\ref{fig:outliers}).
-\begin{figure} 
-  \includegraphics[width=\columnwidth]{images/outliers.jpg}
-\caption{Classification problem: The
-  right plot shows the corresponding results obtained when outliers
-  are added at the bottom left of the diagram, showing  that probit
-  regression is highly sensitive to outliers, unlike logistic
-  regression~\cite{bishop2006pattern}}
-\label{fig:outliers}
-\end{figure}
-% Generally, we can call this approximation process as \textit{fuzzy} (or \textit{smooth})
-% assignment. The accuracy of this assignment will increase as the
-% uncertainty of curve governed by covariance $\mathbf{\Sigma}_{\mathrm{\Phi}}$ decreases.
-
-With this assignment and following the suggested rule in~\cite{hanek2004contracting}, we now start to assign two suitable weighting functions
-$\omega_1$, $\omega_2$ to the pixels $\mathrm{v}_{k,l}$ along the
-normal for the two sides of the curve. the weighting functions are
-defined as:
-
-\begin{equation}
-  \label{eq:weight}
-  \omega_{1/2}(d_{k,l}) = C\left(\frac{a_{1/2}(d_{k,l}) -
-    \gamma_1}{1-\gamma_2}\right)^4 \left[e^{-d_{k,l}/(2\hat{\sigma}^2)} - e^{-\gamma_2}\right]^+\qquad,
-\end{equation}
-where $\gamma_1$ equals to $0.5$ (disjoint weight assignment) and $\gamma_2$
-equals to $4$ for the truncated Gaussian~\cite{hanek2004contracting}. 
-
-\begin{figure} 
-\includegraphics[width=0.48\columnwidth]{images/weight1.jpg}
-\includegraphics[width=0.48\columnwidth]{images/weight2.jpg}
-\caption{The weight functions of the two sides of the contour, a) the
-  weight function along the positive direction (outside) in the normal of the
-  contour. b) the weight function along the negative direction (inside). }
-\label{fig:weight}
-\end{figure}
-
-In addition, the standard
-deviation is chosen in order to cover the specified distance $h$,
-which yields 
-\begin{equation}
-  \label{eq:deviation}
-  \hat{\sigma} = \max \left[\frac{h}{\sqrt(2\gamma_2)}, \gamma_4
-  \right], \sigma  = \frac{1}{\gamma_3} \hat{\sigma}\qquad,
-\end{equation}
-
-with the two additional constants $\gamma_3 = 6$ (linear dependence
-between $\sigma$ and $\hat{\sigma}$) and $\gamma_4 = 4$ (minimum
-weighting window width) as discussed in~\cite{panin2006efficient}. 
-
-In the implementation of this thesis,
-there are $2 \cdot L \cdot N_C$ distances, fuzzy assignments
-and weight functions which leads to as many weight functions being evaluated offline and stored in an array. Now we have restricted our analysis region of interest in the
-limited area, and collected all statistical information required to learn
-local statistics. In the next part, we will evaluate the local
-statistics.
-
-\subsection{Curve Parametrization}
-By applying the (uniform quadratic or cubic) B-spline interpolation to the control points, a new curve
-grouped by a sequence of equidistant distributed points is generated. 
-The B-spline curve %is defined in eq.~\ref{eq:paramcurve} and 
-is composed of a sequence of points $\mathbf{C} = \{C_0, \ldots,
-C_{k}\}$, $k = N_{C-1}$. $N_C$ denotes the number of sample points in the
-parametric curve. $N_C$ is significant for the
-performance of the CCD algorithm, because its value is directly
-proportional to the circumference of the observed object. For a high
-resolution image, more sample points should be taken into account.
-Hence, there is a trade-off between computational expense and the
-accuracy. We recommend to compute the circumference of a given object before
-determining $N_C$ and sample more points near spinodals and corners to
-capture key features of the object.
-
-Since the resulting parametric curve is continuous and
-differentiable, we can easily compute the normal vector $\mathbf{n} = \{n_0, \ldots,
-n_{k}\}$ and the tangent vector $\mathbf{t} = \{t_0, \ldots, t_{k}\}$.
-% which was discussed in Section~\ref{sec:pbc}. 
-
-In the planar affine shape-space $\mathcal{S}$, the contour, a
-hypothetical initial estimate, can be compactly represented using a
-vector $\mathbf{\Phi}$ with 6 real elements, namely model
-parameter vector. From the perspective of probability, the hypothetical
-curve gives a uncertainty, the solution of the curving problem is
-therefore no longer just a single curve, but a whole family of
-possible curves (Fig.~\ref{fig:transform}). The Gaussian probability density for these possible
-curves in shape-space $\mathcal{S}$ is given as:
-
-\begin{equation}
-  \label{eq:prior}
-   p(\mathbf{\Phi}) \propto
-\mathrm{exp} \left\{ -\frac{1}{2} (\mathbf{\Phi} -
-  \mathbf{m}_{\mathbf{\Phi}})^T \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} (\mathbf{\Phi} -
-  \mathbf{m}_{\mathbf{\Phi}}) \right\}\qquad.
-\end{equation}
-
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=\columnwidth]{images/prior.jpg}
-\caption{The top
-  figure is the mean shape, the left one represents the euclidean
-  similarities, the right one
-  sketches some samples in affine space. All these are governed by a
-  Gaussian distribution in shape-space with root-mean-square
-  displacement of 0.3 length units.}
-\label{fig:transform}
-\end{figure}
-
-In two dimensions, the current mean model parameter
-$\mathbf{m}_{\mathbf{\Phi}}$ is a vector with $6$ elements, and current
-covariance matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}$ is a $6 \times 6$ matrix, which measures the variability of
-how much two groups of model parameters change together. The
-information matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}^{-1}$ can be
-written as:
-\begin{equation}
-  \label{eq:infomatrix}
-  \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} = \frac{N_{\mathbf{\Phi}}}{\rho_0^2} \mathbf{A}^T\mathcal{U}\mathbf{A}\qquad,
-\end{equation}
-where $\rho_0^2$ denotes the mean-square displacement along the entire
-curve (\cite{blake1998active}). $\mathbf{A}$ is the shape-matrix, and $\mathcal{U}$ is
-metric matrix for curves. $N_{\mathbf{\Phi}}$ represents
-the number of model parameters. Note $\rho_0^2$
-is a real value and can be computed easily as:
-\begin{equation}
-  \label{eq:trace}
-  \rho_0^2 = \mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}})\qquad,
-\end{equation}
-where $\mathrm{tr}(\cdot)$ operation denotes the trace of a matrix.
-
-The pre-processed input images and the parametric curve model have
-thus been set up. In the following sections, the iterative procedure of the
-CCD algorithm will be described in detail.
+In this section, we describe the underlying principles of the Contracting Curve Density
+algorithm.
 
 \subsection{Automatic Initialization Modes}
-
-After the pre-processing of input images,  we initialize the model contour. For the moment, we only consider two-dimensional
-affine shape-space consisting of 6 DOFs. % It is followed by the process of
+%After the pre-processing of input images,  we initialize the model contour. For the moment, we only consider two-dimensional
+% affine shape-space consisting of 6 DOFs.  It is followed by the process of
 % model parametrization.
-
 In our implementation, we model the
 contour as a continuous, differentiable and uniform quadratic or cubic
 B-Spline in $\mathbb{R}^2$.
@@ -737,6 +438,457 @@ three-dimensional objects which have substantially different view points.
 \subsubsection{Mesh Model-based Initialization}
 \label{sec:pcl}
 \todod{}
+
+\subsection{Curve Parametrization}
+Given the control points, by applying the (uniform quadratic or
+cubic) B-spline interpolation, a new curve
+grouped by a sequence of equidistant distributed points is generated. 
+The B-spline curve %is defined in eq.~\ref{eq:paramcurve} and 
+is composed of a sequence of points $\mathbf{C} = \{C_0, \ldots,
+C_{k}\}$, $k = N_{C-1}$. $N_C$ denotes the number of sample points in the
+parametric curve. $N_C$ is significant for the
+performance of the CCD algorithm, because its value is directly
+proportional to the circumference of the observed object. For a high
+resolution image, more sample points should be taken into account.
+Hence, there is a trade-off between computational expense and the
+accuracy. We recommend to compute the circumference of a given object before
+determining $N_C$ and sample more points near spinodals and corners to
+capture key features of the object.
+
+Since the resulting parametric curve is continuous and
+differentiable, we can easily compute the normal vector $\mathbf{n} = \{n_0, \ldots,
+n_{k}\}$ and the tangent vector $\mathbf{t} = \{t_0, \ldots, t_{k}\}$.
+% which was discussed in Section~\ref{sec:pbc}. 
+
+In the planar affine shape-space $\mathcal{S}$, the contour, a
+hypothetical initial estimate, can be compactly represented using a
+vector $\mathbf{\Phi}$ with 6 real elements, namely model
+parameter vector. From the perspective of probability, the hypothetical
+curve gives a uncertainty, the solution of the curving problem is
+therefore no longer just a single curve, but a whole family of
+possible curves (Fig.~\ref{fig:transform}). The Gaussian probability density for these possible
+curves in shape-space $\mathcal{S}$ is given as:
+\begin{equation}
+  \label{eq:prior}
+   p(\mathbf{\Phi}) \propto
+\mathrm{exp} \left\{ -\frac{1}{2} (\mathbf{\Phi} -
+  \mathbf{m}_{\mathbf{\Phi}})^T \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} (\mathbf{\Phi} -
+  \mathbf{m}_{\mathbf{\Phi}}) \right\}\qquad.
+\end{equation}
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\columnwidth]{images/prior.jpg}
+\caption{The top
+  figure is the mean shape, the left one represents the euclidean
+  similarities, the right one
+  sketches some samples in affine space. All these are governed by a
+  Gaussian distribution in shape-space with root-mean-square
+  displacement of 0.3 length units.}
+\label{fig:transform}
+\end{figure}
+
+In two dimensions, the current mean model parameter
+$\mathbf{m}_{\mathbf{\Phi}}$ is a vector with $6$ elements, and current
+covariance matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}$ is a $6 \times 6$ matrix, which measures the variability of
+how much two groups of model parameters change together. The
+information matrix $\mathbf{\Sigma}_{\mathbf{\Phi}}^{-1}$ can be
+written as:
+\begin{equation}
+  \label{eq:infomatrix}
+  \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} = \frac{N_{\mathbf{\Phi}}}{\rho_0^2} \mathbf{A}^T\mathcal{U}\mathbf{A}\qquad,
+\end{equation}
+where $\rho_0^2$ denotes the mean-square displacement along the entire
+curve (\cite{blake1998active}). $\mathbf{A}$ is the shape-matrix, and $\mathcal{U}$ is
+metric matrix for curves. $N_{\mathbf{\Phi}}$ represents
+the number of model parameters. Note $\rho_0^2$
+is a real value and can be computed easily as:
+\begin{equation}
+  \label{eq:trace}
+  \rho_0^2 = \mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}})\qquad,
+\end{equation}
+where $\mathrm{tr}(\cdot)$ operation denotes the trace of a matrix.
+
+The pre-processed input images and the parametric curve model have
+thus been set up. In the following sections, the iterative procedure of the
+CCD algorithm will be described in detail.
+
+\subsection{Learning Local Statistics}
+One of advantages of the
+model-based approach is that we can restrict a task at hand to the ROI
+which is
+expected to reduce the computational cost. Hence, we first define
+the region which contains pixels in the vicinity of the expected image
+curve. Considering the complexity and the expense of computing, it is practicable
+to choose those pixels that are actually required for interpolation along
+normals of the curve (Fig.~\ref{fig:prior}). This is proved useful and important for image
+perception and real-time tracking system. In the implementation of
+this work, the processing is limited to a segment of each normal within
+a search region. A fixed distance $h$ along the normal segment is
+chosen according to the hypothetical uncertainty of the parametric curve. In the
+special case of the norm-squared prior in spline space, a reasonable
+search segment is determined as follows:
+\begin{equation}
+  \label{eq:radius}
+  h = \sqrt{2} \rho_0 = \sqrt{\mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}}\mathbf{A}^T\mathcal{U}\mathbf{A})}\qquad.
+\end{equation}
+
+$h$ denotes the size of a \textit{window} which is used for computing
+the local statistics. In the beginning of the iterative procedure, the value
+is relatively big and only roughly approximates the vicinity of the image curve
+. The
+uncertainty is reduced after further iteration steps and as a result, the $h$ becomes smaller and
+smaller. After determining the length of the search segment, 
+a set of points located on these segments can be collected and
+evaluated. Note that the parametric model curve is not required to be
+closed, but it shall always encompass a limited area. We only plan to
+analyze the pixels located in the vicinity of the contour (red sample
+pixels in Fig.~\ref{fig:prior}). Therefore,
+we should pay attention to limit the search distance on the
+\textit{inner} side in order to avoid crossing the opposite
+boundary to sample pixels from the wrong area~\cite{panin2006fully}. In order to
+decrease the computational expense, it is advisable to uniformly sample those
+pixels on both segments in the vicinity of the contour. On the other
+hand, we should avoid to collect too small number of pixels, because
+it is statistically invalid and can not
+capture all features (e.g. spinodals and corners) of the contour. Let us denote the
+sample distance using $\Delta h$, then the overall number of spaced
+sample points $L$ ($2L$ for both sides in all) can be given by:
+\begin{equation}
+  \label{eq:sample}
+  L = \lfloor \frac{h}{\Delta h} \rfloor\qquad.
+\end{equation}
+Note that the goal of the algorithm is to assign each pixel
+($\mathrm{v}_{k,l}, k \in [0,\ldots,N_{\mathrm{C}}-1], l \in [0,
+2L-1]$) on either side of the contour. By doing so we thus run into a
+classification problem.
+Although each pixel should be assigned to one and only
+one class so that the target variable is discrete, we can model the
+posterior probabilities that lie in $(0,1)$ interval, which converts the classification into the regression problem. To achieve the latter, we model the probabilistic
+assignments $\mathbf{a}_{v}$ for each pixel $\mathrm{v}_{k,l}$ as following:
+\begin{equation}
+  \label{eq:pa}
+  \mathbf{a}_v  = (a_{v,1}, a_{v,2})^T\qquad,
+\end{equation}
+where $a_{v,1}$ describes to which extent a pixel $v$ is expected to
+be influenced by side $1$ of the curve, and $a_{v,2}$ is equivalent
+for side 2 given by $a_{v,2} = 1- a_{v,1}$. For arbitrary curve
+$\mathbf{C}$, it is difficult to give a closed form of $a_v$. In the
+following, an efficient approximation of the assignment is derived.
+
+% We will first evaluate the \textbf{signed} distance $d_{k,l}$ between pixel
+% $\mathrm{v}_{k,l}$ and a given curve $\mathbf{C}$
+% (Fig.~\ref{fig:dis}), which
+% can be approximated by:
+% \begin{equation}
+%   \label{eq:dis}
+%   d_{k,l} = \mathbf{n}_k \cdot ( \mathbf{v}_{k,l} - C_k)\qquad,
+% \end{equation}
+
+% \begin{figure}[htbp]
+%   \centering
+%   \includegraphics[width=\columnwidth]{images/dis.jpg}
+%   \caption{The distance between a curve point and a pixel in the
+%     vicinity of a contour: $C_k$ is the curve point, $v_{k,l}$ is a
+%     pixel in the perpendicular of the contour, $d_{k,l}$ is the
+%     distance between $C_k$ and $v_{k,l}$.}
+%   \label{fig:dis}
+% \end{figure}
+
+% where $\mathbf{v}_{k,l} = {x_{k,l} \choose y_{k,l}}$ is the axis
+% components of a pixel
+% $\mathrm{v}_{k,l}$, and $C_k$ is the equivalent for point $C$ on the
+% curve given by ${x_k \choose y_k}$. Now consider that the curve is
+% distorted by a Gaussian $p(\mathbf{\Phi})$ which makes the displacement $d_{k,l}$ also Gaussian distributed: $p(d_{k,l}) \sim
+% \mathcal{N}(d_{k,l}|m_d, \sigma)$, where $m_d$ and $\sigma$ are mean
+% and covariance of the distribution. Covariance $\sigma$ is expressed as:
+% \begin{equation}
+%   \label{eq:cov}
+%   \sigma = \mathbf{n}_k \cdot \mathbf{J}_k \cdot \mathbf{\Sigma}_{\Phi}
+%   \cdot \mathbf{J}_k^T \cdot \mathbf{n}_k^T\qquad,
+% \end{equation}
+% where $\mathbf{J}_k$ is the Jacobian of curve $\mathbf{C}$. $\sigma$
+% can be taken as the uncertainty of the curve along the normal
+% introduced by the covariance
+% $\mathbf{\Sigma}_{\mathbf{\Phi}}$, it is a constant and can be
+% evaluated offline. The variable
+% $\frac{d_{k,l}}{\sigma}$ now becomes a linear function with respect to $\mathbf{\Phi}$.
+
+In order to apply the probabilistic generative models to the
+classification problem,
+% calculate the the probability that a point lies on side 1 of the curve
+we need to transform the linear function of $\mathbf{\Phi}$ using a
+non-linear activation function $f(\cdot)$~\cite{bishop2006pattern}:
+\begin{equation}
+  \label{eq:nonla}
+  a_{v,1} = f(\frac{d_{k,l}}{\sigma})\qquad.
+\end{equation}
+Currently, two main non-linear activation functions are mostly used
+to solve the classification problem. The first is known as the
+\textit{logistic sigmoid} function, and is given by:
+\begin{equation}
+  \label{eq:logistic}
+  a_{v,1} =
+  \frac{1}{1+\mathrm{exp}(\frac{d_{k,l}}{\sqrt{2}\sigma}))}\qquad .
+\end{equation}
+The term \textit{sigmoid} stands for
+S-shaped~\cite{bishop2006pattern}. In~\cite{hanek2004contracting},
+another activation function named probit is used, which is defined by:
+\begin{equation}
+  \label{eq:erf}
+  a_{v,1} = \frac{1}{2}erf(\frac{d_{k,l}}{\sqrt{2}\sigma} + 1)\qquad ,
+\end{equation}
+where the error function of a Gaussian distribution is used. Both
+two functions in Eq.~\ref{eq:erf} and Eq.~\ref{eq:logistic} are
+S-shaped (Fig.~\ref{fig:s-shaped}).
+\begin{figure} 
+    \centering 
+    \includegraphics[width=0.48\columnwidth]{images/logistic.jpg}
+    \includegraphics[width=0.48\columnwidth]{images/erf.jpg}
+    \caption{\textbf{Left:} Logistic
+  sigmoid function, \textbf{Right:} probit function: Both functions
+  are S-shaped}
+\label{fig:s-shaped}
+\end{figure}
+
+In this paper, we use both of them to implement the algorithm. They give
+similar results but have different behaviors. Logistic sigmoid function
+can be perfectly interpreted from the perspective of
+probability.~\cite{bishop2006pattern}.
+
+The logistic sigmoid function can be used to transform a broad range
+of class-conditional distributions, described by the exponential
+family, to a non-linear posterior class probabilities. Since not all choices of
+class-conditional density are trivial, the probit function is explored
+to cope with other complex distributions. The results of logistic
+sigmoid function and probit function tend to be similar, except that the
+probit function is sensitive to outliers because the logistic sigmoid
+decays asymptotically like $\mathrm{exp}(-x)$ for $x \rightarrow \infty$, whereas
+for the probit activation function the decay is like
+$\mathrm{exp}(-x^2)$ (Fig.~\ref{fig:outliers}).
+\begin{figure} 
+  \includegraphics[width=\columnwidth]{images/outliers.jpg}
+\caption{Classification problem: The
+  right plot shows the corresponding results obtained when outliers
+  are added at the bottom left of the diagram, showing  that probit
+  regression is highly sensitive to outliers, unlike logistic
+  regression~\cite{bishop2006pattern}}
+\label{fig:outliers}
+\end{figure}
+% Generally, we can call this approximation process as \textit{fuzzy} (or \textit{smooth})
+% assignment. The accuracy of this assignment will increase as the
+% uncertainty of curve governed by covariance $\mathbf{\Sigma}_{\mathrm{\Phi}}$ decreases.
+
+With this assignment and following the suggested rule in~\cite{hanek2004contracting}, we now start to assign two suitable weighting functions
+$\omega_1$, $\omega_2$ to the pixels $\mathrm{v}_{k,l}$ along the
+normal for the two sides of the curve. the weighting functions are
+defined as:
+\begin{equation}
+  \label{eq:weight}
+  \omega_{1/2}(d_{k,l}) = C\left(\frac{a_{1/2}(d_{k,l}) -
+    \gamma_1}{1-\gamma_2}\right)^4 \left[e^{-d_{k,l}/(2\hat{\sigma}^2)} - e^{-\gamma_2}\right]^+\qquad,
+\end{equation}
+where $\gamma_1$ equals to $0.5$ (disjoint weight assignment) and $\gamma_2$
+equals to $4$ for the truncated Gaussian~\cite{hanek2004contracting},
+% the weight function is shown in Fig.~\ref{fig:weight}.
+
+% \begin{figure} 
+% \includegraphics[width=0.48\columnwidth]{images/weight1.jpg}
+% \includegraphics[width=0.48\columnwidth]{images/weight2.jpg}
+% \caption{The weight functions of the two sides of the contour, a) the
+%   weight function along the positive direction (outside) in the normal of the
+%   contour. b) the weight function along the negative direction (inside). }
+% \label{fig:weight}
+% \end{figure}
+
+In addition, the standard
+deviation is chosen in order to cover the specified distance $h$,
+which yields 
+\begin{equation}
+  \label{eq:deviation}
+  \hat{\sigma} = \max \left[\frac{h}{\sqrt(2\gamma_2)}, \gamma_4
+  \right], \sigma  = \frac{1}{\gamma_3} \hat{\sigma}\qquad,
+\end{equation}
+with the two additional constants $\gamma_3 = 6$ (linear dependence
+between $\sigma$ and $\hat{\sigma}$) and $\gamma_4 = 4$ (minimum
+weighting window width) as discussed in~\cite{panin2006efficient}. 
+
+In the implementation of this work,
+there are $2 \cdot L \cdot N_C$ distances, fuzzy assignments
+and weight functions which leads to as many weight functions being evaluated offline and stored in an array. Now we have restricted our analysis region of interest in the
+limited area, and collected all statistical information required to learn
+local statistics. In the next part, we will evaluate the local
+statistics.
+
+
+Given the pixel coordinates and RGB values (For the moment, we only consider raw RGB
+statistics), assignment and weight
+function, local mean vectors $\mathbf{m}_{v,s}$  and local covariance matrix
+$\mathbf{\Sigma}_{\mathbf{\Phi}}$ will be derived for each side $s \in
+\{1,2\}$ of the curve.
+We first calculate the zero, first and second order weighted moments:
+\begin{eqnarray}
+  \label{eq:localm}
+  M_{k,s}^{(0)}(d_{k,l,s}) &=& \sum_{l=0}^{2L-1} \omega_s(d_{k,l})\\
+  \mathbf{M}_{k,s}^{(1)}(d_{k,l,s}) &=& \sum_{l=0}^{2L-1} \omega_s(d_{k,l}) \mathrm{I}_{k,l}\\
+  \mathbf{M}_{k,s}^{(2)}(d_{k,l,s}) &=& \sum_{l=0}^{2L-1} \omega_s(d_{k,l}) \mathrm{I}_{k,l}\mathrm{I}_{k,l}^T\qquad,
+\end{eqnarray}
+where $\mathbf{I}$ is just the raw RGB value of a pixel, for a
+3-channel image and the values of three components
+are  between 0 and 255. The local mean vectors $\mathbf{m}_{v,s}$  and
+the local covariance matrices
+$\mathbf{\Sigma}_{\mathbf{\Phi}}$  are obtained by:
+\begin{eqnarray}
+  \label{eq:localmean}
+  \mathbf{m}_{k,s} &=& \frac{\mathbf{M}^{(1)}_{k,s}}{M^{(0)}_{k,s}}\\
+  \label{eq:localcov}
+  \mathbf{\Sigma}_{k,s} &=& \frac{\mathbf{M}^{(2)}_{k,s}}{M^{(0)}_{k,s}}
+  - \mathbf{m}_{k,s}\mathbf{m}_{k,s}^T  + \kappa \mathbf{I}\qquad.
+\end{eqnarray}
+In Eq.~\ref{eq:localcov}, $\kappa I$  means an identity matrix scaled by
+$\kappa$ in order to avoid numerical singularity. Later it is namely
+required to calculate the inverse matrix of
+$\mathbf{\Sigma}_{k,s}$. In our experiments, we choose $\kappa$ to be
+$\kappa = 0.5$, which is efficient to avoid numerical problems in the
+process of iteration.
+
+With the local mean vectors $\mathbf{m}_{v,s}$  and the local covariance matrices
+$\mathbf{\Sigma}_{\mathbf{\Phi}}$, we can compute the
+likelihood function   $p(\mathbf{I}_{k,l} | \mathbf{m}_{v,1}, \mathbf{m}_{v,2},
+  \mathbf{\Sigma}_{v,1}, \mathbf{\Sigma}_{v,1})$ for each pixel
+  $\mathrm{v}_{k,l}$. In terms of observation model, the likelihood
+  function describes how probable the observed data set is for
+  different settings of the parameter vector. Hence, we first establish
+  the relation between image data $\mathrm{I_{k,l}}$ and the model
+  parameter $\mathbf{\Phi}$. Here we model the pixel value
+  $\hat{\mathbf{m}}_{k,l}$ and $\hat{\mathbf{\Sigma}}_{k,l}$
+  for all pixels $\mathrm{v_{k,l}}$ in the vicinity of the curve as the
+  linear combination of $\mathbf{m}_{v,1}$ and $\mathbf{m}_{v,2}$:
+  \begin{equation}
+    \label{eq:meankl}
+    \hat{\mathbf{m}}_{k,l} = a_{v,1}(d_{k,l})\mathbf{m}_{v,1} + a_{v,2}(d_{k,l})\mathbf{m}_{v,2}\qquad.
+  \end{equation}
+If we define  $\hat{\mathbf{\Sigma}}_{k,l}$ using the rule as
+$\hat{\mathbf{m}}_{k,l}$ resulting in a function with respect to $d_{k,l}$, the computational cost in the procedure of
+parameters refinement which is discussed in the next section  will be very high. Instead, we decide to
+model the covariance matrix $\hat{\mathbf{\Sigma}}_{k,l}$ following the
+rule in~\cite{hanek2004fitting}, but we discard this relation:
+\begin{equation}
+  \label{eq:sigmakl}
+  \hat{\mathbf{\mathbf{\Sigma}}}_{k,l} = a_{v,1}(d_{k,l})\mathbf{\Sigma}_{v,1} + a_{v,2}(d_{k,l})\mathbf{\Sigma}_{v,2}\qquad.
+\end{equation}
+Now for each observed pixel $\mathbf{I}_{k,l}$, the likelihood
+function is given by:
+\begin{equation}
+  \label{eq:likelihood}
+p(\mathbf{I}_{k,l} | \mathbf{m}_{v,1}, \mathbf{m}_{v,2},
+  \mathbf{\Sigma}_{v,1}, \mathbf{\Sigma}_{v,1}) = p(\mathbf{I}_{k,l} | \hat{\mathbf{\mathbf{m}}}_{k,l},\hat{\mathbf{\mathbf{\Sigma}}}_{k,l}) \qquad.
+\end{equation}
+However, we require the likelihood for all pixels in the vicinity of
+the curve. If we consider the coupling or other complex relation among
+different group of pixels, the problem will become intractable and the cost of computing will be very expensive. We can
+avoid these problems if we assume pixels to be drawn independently from the same distribution
+, namely independent and identically distributed
+(i.i.d)~\cite{bishop2006pattern}. Thus we can model the likelihood function as:
+\begin{equation}
+  \label{eq:liklihoodall}
+  p(\mathbf{I}_{\mathcal{V}} |
+  \hat{\mathbf{\mathbf{m}}}_{\mathcal{V}},\hat{\mathbf{\mathbf{\Sigma}}}_{\mathcal{V}})
+  = \prod_l \prod_k p(\mathbf{I}_{k,l} | \hat{\mathbf{\mathbf{m}}}_{k,l},\hat{\mathbf{\mathbf{\Sigma}}}_{k,l}) \qquad.
+\end{equation}
+The index $\mathcal{V}$ indicates quantities for all pixels $v$ in
+$\mathcal{V}$. Note that we only take into account those pixels which are
+in the vicinity $\mathcal{V}$ of the curve, whereas pixels outside
+$\mathcal{V}$ are not considered.
+
+Having the likelihood function of observed pixels, as well as
+the input data and prior knowledge, now we can go into the parameters
+refinement stage to model the conditional distribution.
+
+\subsection{Refinement of  Parameters}
+\label{sec:ref}
+In this section, an iterative reweighted least square (IRLS) process
+is executed to refine parameters, model parameter vector and covariance matrix.
+
+With the likelihood function in Eq.~\ref{eq:liklihoodall} and prior distribution in
+Eq.~\ref{eq:prior}, we can model the conditional possibility distribution using:
+ % we can estimate the $\hat{\Phi}$ using MAP which is based the
+% Bayesian treatment.
+% Firstly, the posterior distribution holds
+\begin{align}
+\label{eq:costf}
+    p(\mathbf{\Phi}|\mathbf{\mathbf{I}}_{\mathcal{V}}) 
+    \propto &
+    p(\mathbf{\mathbf{I}_{\mathcal{V}}}
+    |\hat{\mathbf{\mathbf{m}}}_{\mathcal{V}}(\mathbf{\Phi}),\hat{\mathbf{\mathbf{\Sigma}}}_{\mathcal{V}}(\mathbf{\Phi}))p(\mathbf{\Phi}
+    | \mathbf{m}_{\mathbf{\Phi}},
+    \mathbf{\mathbf{\Sigma}}_{\mathbf{\Phi}})\qquad.
+\end{align}
+The difference between this conditional distribution and posterior
+distribution is that here the former function has not been normalized yet.
+If applying logarithm operation to the conditional possibility
+distribution, we can define a common cost function $\mathcal{Q}$,
+which is given by:
+\begin{align}
+  \label{eq:costd}
+  \mathcal{Q} = & -2 \ln \left\{  p(\mathbf{\mathbf{I}_{\mathcal{V}}}
+    |\hat{\mathbf{\mathbf{m}}}_{\mathcal{V}}(\mathbf{\Phi}),\hat{\mathbf{\mathbf{\Sigma}}}_{\mathcal{V}}(\mathbf{\Phi}))p(\mathbf{\Phi}
+    | \mathbf{m}_{\mathbf{\Phi}},
+    \mathbf{\mathbf{\Sigma}}_{\mathbf{\Phi}})\right\}\qquad.
+\end{align}
+We interpret the estimate $\hat{\mathbf{\Phi}}$ of the model
+parameters $\mathbf{\Phi}$ as  the mean $\mathbf{m}_{\mathbf{\Phi}}$ of a Gaussian
+approximation of the posterior distribution, and
+$\hat{\mathbf{\Phi}}$ can be evaluated as:
+\begin{equation}
+  \label{eq:maxcost}
+  \hat{\mathbf{\Phi}} =
+  \mathbf{m}_{\mathbf{\Phi}}\underset{\mathbf{\Phi}}{\arg\max} \
+  (\mathcal{Q}) \qquad.
+\end{equation}
+To optimize $\mathcal{Q}$ based on the estimated $m_{\mathbf{\Phi}}$,
+the approximation to the Hessian matrix can be adopted. First we
+compute the partial derivatives of $\mathcal{Q}$:
+\begin{equation}
+\label{eq:partcost}
+\begin{aligned}
+&\nabla_{\mathbf{\Phi}}\{{\mathcal{Q}(\mathbf{\Phi})}\} =
+2\{{\mathbf{\Sigma}_{\mathbf{\Phi}}}^{-1}\}^{T}{\mathbf{\Phi}}\\ 
+&- \sum_{k = 0}^{N_{C}-1} \sum_{l=0}^{2L-1} \left\{\mathcal{J}_{a_{v,1}}^T\hat{\mathbf{\Sigma}}_{k,l}^{-1}\left[I_{k,l}-\hat{\mathbf{m}}_{k,l}(a_{v,1})\right]\right\}\qquad,
+\end{aligned}
+\end{equation}
+with being:
+\begin{equation}
+  \label{eq:jocob}
+  \mathcal{J}_{a_{v,1}} = \left( \mathbf{m}_{k,1} -\mathbf{m}_{k,2} \right)(\nabla_{\phi} a_{v,1}(d_{k,l}))^T\qquad,
+\end{equation}
+Afterwords, the Gauss-Newton approximation to the Hessian
+matrix is given by
+\begin{equation}
+  \label{eq:hessian}
+  \mathcal{H}_{\mathbf{\Phi}} \mathcal{Q}  =
+  \mathbf{\Sigma}_{\mathbf{\Phi}}^{-1} + \sum_{k = 0}^{N_{C}-1}
+  \sum_{l=0}^{2L-1} \left\{\mathcal{J}_{a_{v,1}}^T\hat{\mathbf{\Sigma}}_{k,l}^{-1}\mathcal{J}_{a_{v,1}}\right\}\qquad.
+\end{equation}
+The overall gradient and Hessian matrices for the optimization
+are obtained by adding the prior cost function
+derivatives, and the Newton optimization step can finally be
+performed as:
+\begin{eqnarray}
+\label{eq:newton}
+  \mathbf{m}_{\mathbf{\Phi}}^{new} & = &
+  \mathbf{m}_{\mathbf{\Phi}} - (\mathcal{H}_{\mathbf{\Phi}}
+  \mathcal{Q})^{-1} \nabla_{\mathbf{\Phi}} \mathcal{Q} \nonumber \\
+  \mathbf{\Sigma}_{\mathbf{\Phi}}^{new} & = &
+  c\mathbf{\Sigma}_{\mathbf{\Phi}} - (1-c)(\mathcal{H}_{\mathbf{\Phi}}
+  \mathcal{Q})^{-1}\qquad.
+\end{eqnarray}
+with $c$ empirically set to $\frac{1}{4}$. Note that the covariance
+matrix is updated by an exponential decay rule as well. Coefficient $c$ specifies the
+maximum decrease of the covariance within one iteration
+step~\cite{hanek2004contracting}. If $c$ is very large, due to the slow reduction of covariance the
+convergence process will be very slow. On one hand if $c$ is
+very small, CCD might diverge.
+
 
 % ALTERNATIVE:
 % The robot generates object hypotheses by detecting candidate point clusters in
