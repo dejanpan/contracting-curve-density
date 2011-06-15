@@ -331,9 +331,9 @@ CCD algorithm as presented by Hanek et al~\cite{hanek2004contracting}.
 \end{figure}
 The algorithm consists of four major steps which are also sketched in Fig.~\ref{fig:flowchart}:
 \begin{enumerate}
-\item \textbf{Initialization}: Given an input image $I$ as training data, we first choose an initial
+\item \textbf{Initialization}: Given an input image $\mathbf{I}$ as training data, we first choose an initial
   contour for an object which will be fitted or tracked, and
-  initial values for the means and covariances ($P(\Phi)$). In addition, for most practical
+  initial values for the means and covariances ($P(\mathbf{\Phi})$). In addition, for most practical
   applications a pre-processing stage (e.g. smoothing) gets applied as well.
 \item \textbf{Learning of local statistics}: 
   In the step of learning of local statistics for each pixel in the
@@ -343,14 +343,14 @@ The algorithm consists of four major steps which are also sketched in Fig.~\ref{
   on the corresponding side of the curve, according to the current
   estimate of the model parameters. The resulting local statistics
   represent an expectation of "what the two sides of the curve look
-  like"~\cite{hanek2004contracting}, also known as likelihood ($P(I|\Phi)$).
+  like"~\cite{hanek2004contracting}, also known as likelihood ($P(\mathbf{I}|\mathbf{\Phi})$).
 \item \textbf{Refinement of model parameters}: The conditional distribution, namely
   the product of a prior distribution and the likelihood, is evaluated
   as the cost function. Then MAP estimate is executed to optimize the
   parameters and as a result a MAP value of model parameter vector and
   covariance will be generated in this step.
 \item \textbf{Convergence}: Check for the convergence of the 
-  log posterior probability function $\log{P(\Phi) P(I|\Phi)}$. 
+  log posterior probability function $\log{P(\mathbf{\Phi}) P(\mathbf{I}|\mathbf{\Phi})}$. 
   If the convergence criterion is not satisfied return to step 2.
 \end{enumerate}
 
@@ -635,7 +635,7 @@ S-shaped~\cite{bishop2006pattern}. In~\cite{hanek2004contracting},
 another activation function named probit is used, which is defined by:
 \begin{equation}
   \label{eq:erf}
-  a_{v,1} = \frac{1}{2}erf(\frac{d_{k,l}}{\sqrt{2}\sigma} + 1)\qquad ,
+  a_{v,1} = \frac{1}{2}\mathrm{erf}(\frac{d_{k,l}}{\sqrt{2}\sigma} + 1)\qquad ,
 \end{equation}
 where the error function of a Gaussian distribution is used. Both
 two functions in Eq.~\ref{eq:erf} and Eq.~\ref{eq:logistic} are
