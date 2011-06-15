@@ -354,10 +354,14 @@ The algorithm consists of four major steps which are also sketched in Fig.~\ref{
   If the convergence criterion is not satisfied return to step 2.
 \end{enumerate}
 
-\section{Contracting Curve Density Algorithm}
+\section{Contracting Curve Density Algorithm for Personal Robotics}
 \label{sec:ccd_novelties}
-In this section, we describe the underlying principles of the Contracting Curve Density
-algorithm.
+In this section, we describe all important underlying principles of the CCD
+algorithm and its extensions that make it suitable for the use in personal robotics field.
+After a thorough evaluation of the original implementation we spotted the following three
+issues which needed to be substaintally improved in order to assure the robust performance
+and automatic boostrapping: i) automatic initialization, ii) curve parametrization models and
+iii) learning of local statistics.
 
 \subsection{Automatic Initialization Modes}
 %After the pre-processing of input images,  we initialize the model contour. For the moment, we only consider two-dimensional
@@ -368,32 +372,31 @@ contour as a continuous, differentiable and uniform quadratic or cubic
 B-Spline in $\mathbb{R}^2$.
 % which was discussed in Chapter~\ref{chapter:bspline}. 
 Given a region of interest (ROI), the first step is to generate
-sufficient control points $\mathbf{P} = \{P_0, \ldots, P_{N_p-1}\}$ to
+enough control points $\mathbf{P} = \{P_0, \ldots, P_{N_p-1}\}$ to
 account for the complexity of the object shape (Fig.~\ref{fig:prior}).
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\columnwidth]{images/cont.jpg}
-\caption{A contour with sample points used for learning local statistics. The blue contour
-  divided the image into two parts: outside and inside. As depicted in
+\caption{A contour with sample points used for learning of local statistics. The blue contour
+  divides the image into two parts: outside and inside. As depicted in
   right-bottom image, pixels inside the contour are labeled "0",
   and those outside the contour are labeled "1". For each point on the
-  contour (the skyblue point), we sample some points (red points) along both positive
-  and negative direction.}
+  contour (the light-blue point), we sample points (red points) along both positive
+  and negative direction of the normal of the contour point.}
 \label{fig:prior}
 \end{figure}
 
-There are two ways to generate control points:
-manual initialization and automated initialization. 
-Since the former is rather tedious, two new
+There are two ways to generate control points, manually and automatically. 
+Since the former is rather tedious, the two new
 intelligent initialization methods are proposed to extract the
 contour. Firstly, an initial contour estimation method is described and
 implemented by employing the well-known Scale-Invariant Feature Transform 
 (SIFT) algorithm~\cite{lowe2004distinctive} for
 keypoint detection and matching. Secondly, we make use of the a priori
-modeled meshes of deformable objects (such as T-Shirts), extract their
-concave contours and use projections of those as an initial guess. Both 
-methods are shortly discussed below.
+modeled meshes of deformable objects (such as e.g. T-shirts from Fig.~\ref{fig:tshirt}), 
+extract their concave contours and use projections of those as an initial guess. Both 
+methods are discussed below.
 
 \subsubsection{SIFT-based Initialization}
 \label{sec:sift}
@@ -976,12 +979,13 @@ of the quantitative results. Video of the test is available online~\footnote{\ur
 
 \subsection{Mesh Model-based Initialization}
 \label{sec:tifpc}
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=6cm]{experiments/tshirt/tshirt_pcd.jpg}
-\end{figure}
+% \begin{figure}[h!]
+%   \centering
+
+% \end{figure}
 
 \begin{figure}[htbp]
+  \includegraphics[width=0.8\columnwidth]{experiments/tshirt/tshirt_pcd.jpg}
   \begin{minipage}[t]{0.49\linewidth} 
     \centering 
     \subfloat[iteration 1]{\includegraphics[width=1.5in]{experiments/tshirt/0.png}}
@@ -998,8 +1002,9 @@ of the quantitative results. Video of the test is available online~\footnote{\ur
     \centering 
     \subfloat[iteration 28]{\includegraphics[width=1.5in]{experiments/tshirt/27.png}}
   \end{minipage} 
-  \caption{Detection of the T-Shirt for the purpose of robotic cloth folding. Courtesy:
-  Christian Bersch}
+  \caption{\textbf{Top row:} Mesh of the T-shirt. \textbf{Middle and Bottom Row:} 
+Detection of the T-shirt using concave hull of above mesh for the application of robotic 
+cloth folding. Image courtesy of Christian Bersch.}
   \label{fig:tshirt}
 \end{figure}
 
