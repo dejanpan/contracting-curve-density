@@ -129,7 +129,7 @@ a classification problem.
 
 In the CCD algorithm, the aim is to find the contour of observed object
 and thus segment it from the background. Therefore, a hypothetical 
-contour divides the image into two parts (Fig.\ref{fig:divide}), inside
+contour divides the image into two parts (Fig.\ref{fig:prior}), inside
 and outside. For probabilistic model, we can represent this using
 binary representation (e.g. $\{0, 1\}$). The goal of the CCD algorithm
 then becomes to accurately assign a class label to each pixel in the vicinity of the
@@ -171,9 +171,9 @@ the shape of the specified contour, we do not plan to calculate the
 predictive distribution. Therefore, the MAP solution mentioned above
 becomes our final objective function.
 
-An important and decisive issue to consider is the fact that the exact inference for the
-regression is always intractable. In the next sub-section we will discuss how we
-solved this problem yet even improved the robustness and performance. 
+% An important and decisive issue to consider is the fact that the exact inference for the
+% regression is always intractable. In the next sub-section we will discuss how we
+% solved this problem yet even improved the robustness and performance. 
 
 \subsection{Key Contributions}
 In order to improve the stability, accuracy and robustness over the original
