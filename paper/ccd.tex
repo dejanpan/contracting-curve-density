@@ -360,7 +360,7 @@ The algorithm consists of four major steps which are also sketched in Fig.~\ref{
 In this section, we describe all important underlying principles of the CCD
 algorithm and its extensions that make it suitable for the use in personal robotics field.
 After a thorough evaluation of the original implementation we spotted the following three
-issues which needed to be substaintally improved in order to assure the robust performance
+issues which needed to be substantially improved in order to assure the robust performance
 and automatic boostrapping: i) automatic initialization, ii) curve parametrization models and
 iii) learning of local statistics.
 
@@ -636,9 +636,9 @@ for the probit activation function the decay is like
 $\mathrm{exp}(-x^2)$ (Fig.~\ref{fig:outliers}).
 \begin{figure} 
   \includegraphics[width=\columnwidth]{images/outliers.jpg}
-\caption{Classification problem: When the outliers 
-are added to this example set of points the probit activation
-function (violet line) misclassifies the set.}
+\caption{Classification problem: 
+In the the presence of outliers, the probit activation
+function (violet line) has a higher misclassification rate.}
 \label{fig:outliers}
 \end{figure}
 % Generally, we can call this approximation process as \textit{fuzzy} (or \textit{smooth})
@@ -941,8 +941,8 @@ of the quantitative results. Video of the test is available online~\footnote{\ur
 \subsection{Mesh Model-based Initialization}
 \label{sec:tifpc}
 We used CCD in order to detect and localize a spread-out T-shirt in the application
-of robotic folding. We ran the algorithm 100 times where we substaintally varied
-the pose of the initally projected T-shirt hull. The algorithm failed 4 times and took
+of robotic folding. We ran the algorithm 100 times where we substantially varied
+the pose of the initially projected T-shirt hull. The algorithm failed 4 times and took
 on average 10.15 seconds to converge. While the failed cases are mostly due to the 
 too large initial curve displacement, the run time got increased with the number of 
 the control points. See also Table~\ref{tab:qr}.
@@ -973,10 +973,10 @@ cloth folding. Image courtesy of Christian Bersch.}
 
 \subsection{CCD-based Tracker}
 A CCD tracker is obtained by applying the CCD algorithm to each
-frame of  a sequnce of images independently where the output of the parameters 
+frame of  a sequence of images independently where the output of the parameters 
 obtained from the previous frame is used in the current frame. Because  of the 
-dependency between the two successive images, the CCD tracker can achive a high
-performance rate and be applied to the time crtical problems. The 
+dependency between the two successive images, the CCD tracker can achieve a high
+performance rate and be applied to the time critical problems. The 
 video~\footnote{\url{http://www.youtube.com/watch?v=nr83zqQ6CCg}} demonstrates the tracking of
 a book on a cart using 5M pixel camera on a PR2 robot.
 % \begin{figure}[htbp]
