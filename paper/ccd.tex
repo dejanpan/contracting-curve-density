@@ -192,6 +192,7 @@ curve mismatching caused by major viewpoint changes. Lastly, in
 order to avoid manual intervention by the user, the developed system
 also supports robust global initial curve initialization modules based on both keypoint
 feature matching and projection of concave contours a priori designed mesh models.
+\todo{point to openssource implementation}
 
 In the remainder of this paper we first introduce the related approaches, 
 in Section~\ref{sec:arch} we then shortly revisit an original implementation of 
@@ -441,24 +442,22 @@ parametric curve. $N_C$ is significant for the
 performance of the CCD algorithm, because its value is directly
 proportional to the circumference of the observed object. For a high
 resolution image, more sample points should be taken into account.
-Hence, there is a trade-off between computational expense and the
-accuracy. We recommend to compute the circumference of a given object before
-determining $N_C$ and sample more points near spinodals and corners to
-capture key features of the object.
+Hence, there is a trade-off between the computational expense and the
+accuracy. Sampling more points near spinodals and corners is thus
+crucial for the successful operation of the algorithm.
 
 Since the resulting parametric curve is continuous and
 differentiable, we can easily compute the normal vector $\mathbf{n} = \{n_0, \ldots,
-n_{k}\}$ and the tangent vector $\mathbf{t} = \{t_0, \ldots, t_{k}\}$.
+n_{k}\}$ and the tangent vector $\mathbf{t} = \{t_0, \ldots, t_{k}\}$
+for every contour points (see Fig.~\ref{fig:prior}).
 % which was discussed in Section~\ref{sec:pbc}. 
 
-In the planar affine shape-space $\mathcal{S}$, the contour, a
-hypothetical initial estimate, can be compactly represented using a
-vector $\mathbf{\Phi}$ with 6 real elements, namely model
-parameter vector. From the perspective of probability, the hypothetical
-curve gives a uncertainty, the solution of the curving problem is
-therefore no longer just a single curve, but a whole family of
-possible curves (Fig.~\ref{fig:transform}). The Gaussian probability density for these possible
-curves in shape-space $\mathcal{S}$ is given as:
+In the planar affine shape-space $\mathcal{S}$, the contour can be compactly 
+represented using a vector $\mathbf{\Phi}$ with 6 real elements, namely a model
+parameter vector. In order to model the whole family of
+possible curves (Fig.~\ref{fig:transform}) let us first
+introduce a Gaussian Probability Density Function that is used for modeling 
+of these possible curves in shape-space $\mathcal{S}$:
 \begin{equation}
   \label{eq:prior}
    p(\mathbf{\Phi}) \propto
@@ -469,10 +468,10 @@ curves in shape-space $\mathcal{S}$ is given as:
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\columnwidth]{images/prior.jpg}
-\caption{The top
-  figure is the mean shape, the left one represents the euclidean
-  similarities, the right one
-  sketches some samples in affine space. All these are governed by a
+\caption{The top-row figure represents the mean shape curve, 
+  the bottom-left figure represents the euclidean
+  similarities and the bottom-right figure
+  some samples in affine space. All these are governed by a
   Gaussian distribution in shape-space with root-mean-square
   displacement of 0.3 length units.}
 \label{fig:transform}
@@ -490,18 +489,19 @@ written as:
 \end{equation}
 where $\rho_0^2$ denotes the mean-square displacement along the entire
 curve (\cite{blake1998active}). $\mathbf{A}$ is the shape-matrix, and $\mathcal{U}$ is
-metric matrix for curves. $N_{\mathbf{\Phi}}$ represents
-the number of model parameters. Note $\rho_0^2$
-is a real value and can be computed easily as:
+a metric matrix for curves. $N_{\mathbf{\Phi}}$ represents
+the number of model parameters. Note that $\rho_0^2$
+is a real value and can be computed as:
 \begin{equation}
   \label{eq:trace}
   \rho_0^2 = \mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}})\qquad,
 \end{equation}
 where $\mathrm{tr}(\cdot)$ operation denotes the trace of a matrix.
 
-The pre-processed input images and the parametric curve model have
-thus been set up. In the following sections, the iterative procedure of the
-CCD algorithm will be described in detail.
+The parametric curve model using uniform quadratic or
+cubic B-spline has thus been set up. In the following sub-section the
+logistic sigmoid function for the purpose of the local statistics learning 
+will be discussed.
 
 \subsection{Learning Local Statistics}
 One of advantages of the
