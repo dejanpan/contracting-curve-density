@@ -67,9 +67,9 @@ implementation of the state-of-the-art local curve fitting algorithm
 named Contracting Curve Density (CCD) algorithm, originally developed 
 by Hanek et al. In particular, we investigate its application  
 in the field of personal robotics for the tasks such as the mobile
-manipulation which requires segmentation
-of objects in clutter and the tracking of objects. 
-The developed system mainly consists of two functional parts, the CCD
+manipulation which requires a segmentation
+of objects in clutter and the tracking of them. 
+The developed system mainly consists of the two functional parts, the CCD
 algorithm to fit the model curve in still images and the CCD tracker to
 track the model in the videos. We demonstrate algorithm's working 
 in various scenes using handheld camera and the cameras from the 
@@ -103,14 +103,18 @@ an object from an inhomogeneous background. Furthermore, physical
 conditions, such as the illumination or surface properties, will
 influence the efficiency and stability of related approaches. 
 We thus aim to introduce the substantial improvements to the original
-version of CCD algorithm and thus devise a single criterion that is 
-applicable for the segmentation of all kinds of objects' boundaries.
+version of CCD algorithm which adaptively learns background and 
+foregorund models and leverages from other techniques such as
+SIFT features matching or back-projection of point clouds (Fig.~\ref{fig:divide}) 
+onto the test image to robustly segment the target objects.
 
 \begin{figure}[htbp]
   \centering
   % \includegraphics[width=\columnwidth]{images/divide1.jpg}\\
   \includegraphics[width=\columnwidth]{experiments/teaser.jpg}
   \caption{Personal Robot 2 (PR2~\cite{Wyrobek08PR1}) robot segmenting the book using CCD algorithm. 
+    The initial contour of of the book was generated through a 3D-based cluster segmentation
+    and back-projection of the bounding box onto the test image.
     \textbf{Bottom-right:} Segmentation of a plate in a rather
   challenging scene.}
   \label{fig:divide}
