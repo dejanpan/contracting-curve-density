@@ -418,7 +418,17 @@ into the test image to obtain the estimate of the contour
 position. This is illustrated in Fig.~\ref{fig:sift_result}.
 \subsubsection{Mesh Model-based Initialization}
 \label{sec:pcl}
-\todod{}
+In this mode we use publicly available mesh models, such as the ones from the 
+Google 3D Warehouse (see a mesh of the T-shirt in top row of Fig.~\ref{fig:tshirt}).
+In order to generate the initial contour we first sample vertex points and convert
+the meshes into point clouds. Next we compute the 3D concave hull of the resulting 
+point cloud using a delaunay triangulation algorithm and thus obtain an approximate
+object shape identifier. In order to account for multi-scale of images we build the 
+pyramid of different hull sizes normalized between the $[1/2...1.0]$ of the image
+width. Finally we project all contour sizes onto the test image and
+check the convergence criterion. Fig.~\ref{fig:tshirt} depict a successful
+segmentation of a T-shirt which enables the robot to detect the article
+and e.g. folds it. 
 
 \subsection{Curve Parametrization}
 Given the control points, by applying the (uniform quadratic or
