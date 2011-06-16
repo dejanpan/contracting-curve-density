@@ -770,8 +770,8 @@ refinement stage to model the conditional distribution.
 
 \subsection{Refinement of  Parameters}
 \label{sec:ref}
-In this section, an iterative reweighted least square (IRLS) process
-is executed to refine parameters, model parameter vector and covariance matrix.
+In this section, an Iterative Reweighted Least Square (IRLS) process
+is presented in order to refine the model parameter vector and the covariance matrix.
 
 With the likelihood function in Eq.~\ref{eq:liklihoodall} and prior distribution in
 Eq.~\ref{eq:prior}, we can model the conditional possibility distribution using:
@@ -799,9 +799,9 @@ which is given by:
     | \mathbf{m}_{\mathbf{\Phi}},
     \mathbf{\mathbf{\Sigma}}_{\mathbf{\Phi}})\right\}\qquad.
 \end{align}
-We interpret the estimate $\hat{\mathbf{\Phi}}$ of the model
-parameters $\mathbf{\Phi}$ as  the mean $\mathbf{m}_{\mathbf{\Phi}}$ of a Gaussian
-approximation of the posterior distribution, and
+We substitute the estimate $\hat{\mathbf{\Phi}}$ of the model
+parameters $\mathbf{\Phi}$ with the mean $\mathbf{m}_{\mathbf{\Phi}}$ of a Gaussian
+approximation of the posterior distribution, and thus
 $\hat{\mathbf{\Phi}}$ can be evaluated as:
 \begin{equation}
   \label{eq:maxcost}
@@ -820,10 +820,10 @@ compute the partial derivatives of $\mathcal{Q}$:
 &- \sum_{k = 0}^{N_{C}-1} \sum_{l=0}^{2L-1} \left\{\mathcal{J}_{a_{v,1}}^T\hat{\mathbf{\Sigma}}_{k,l}^{-1}\left[\mathrm{I}_{k,l}-\hat{\mathbf{m}}_{k,l}(a_{v,1})\right]\right\}\qquad,
 \end{aligned}
 \end{equation}
-with being:
+with:
 \begin{equation}
   \label{eq:jocob}
-  \mathcal{J}_{a_{v,1}} = \left( \mathbf{m}_{k,1} -\mathbf{m}_{k,2} \right)(\nabla_{\mathbf{\Phi}} a_{v,1}(d_{k,l}))^T\qquad,
+  \mathcal{J}_{a_{v,1}} = \left( \mathbf{m}_{k,1} -\mathbf{m}_{k,2} \right)(\nabla_{\mathbf{\Phi}} a_{v,1}(d_{k,l}))^T\qquad.
 \end{equation}
 Afterwords, the Gauss-Newton approximation to the Hessian
 matrix is given by
@@ -836,7 +836,7 @@ matrix is given by
 The overall gradient and Hessian matrices for the optimization
 are obtained by adding the prior cost function
 derivatives, and the Newton optimization step can finally be
-performed as:
+formulated as:
 \begin{eqnarray}
 \label{eq:newton}
   \mathbf{m}_{\mathbf{\Phi}}^{new} & = &
@@ -846,11 +846,11 @@ performed as:
   c\mathbf{\Sigma}_{\mathbf{\Phi}} - (1-c)(\mathcal{H}_{\mathbf{\Phi}}
   \mathcal{Q})^{-1}\qquad.
 \end{eqnarray}
-with $c$ empirically set to $\frac{1}{4}$. Note that the covariance
+$c$ is empirically set to $\frac{1}{4}$. Note that the covariance
 matrix is updated by an exponential decay rule as well. Coefficient $c$ specifies the
 maximum decrease of the covariance within one iteration
 step~\cite{hanek2004contracting}. If $c$ is very large, due to the slow reduction of covariance the
-convergence process will be very slow. On one hand if $c$ is
+convergence process will be very slow. On the other hand if $c$ is
 very small, CCD might diverge.
 
 
