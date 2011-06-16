@@ -938,12 +938,14 @@ We ran the CCD algorithm 100 times which resulted in 9 convergence failures.
 The average convergence time was 3.52$s$, see also Table~\ref{tab:qr} for the rest
 of the quantitative results. Video of the test is available online~\footnote{\url{http://www.youtube.com/watch?v=X2K-h4oHxig}}.
 
-% \subsection{Mesh Model-based Initialization}
-% \label{sec:tifpc}
-% \begin{figure}[h!]
-%   \centering
-
-% \end{figure}
+\subsection{Mesh Model-based Initialization}
+\label{sec:tifpc}
+We used CCD in order to detect and localize a spread-out T-shirt in the application
+of robotic folding. We ran the algorithm 100 times where we substaintally varied
+the pose of the initally projected T-shirt hull. The algorithm failed 4 times and took
+on average 10.15 seconds to converge. While the failed cases are mostly due to the 
+too large initial curve displacement, the run time got increased with the number of 
+the control points. See also Table~\ref{tab:qr}.
 
 \begin{figure}[htbp]
   \includegraphics[width=0.8\columnwidth]{experiments/tshirt/tshirt_pcd.jpg}
