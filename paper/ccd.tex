@@ -37,7 +37,7 @@
 
 % correct bad hyphenation here
 \hyphenation{op-tical net-works semi-conduc-tor}
-\graphicspath{{../master_thesis/}}
+\graphicspath{{paper_figures/}}
 
 \newcommand{\todo}[1]{\textbf{\textcolor{red}{TODO: #1}}}
 \newcommand{\todos}[1]{\textbf{\textcolor{red}{TODO Shulei: #1}}}
@@ -111,7 +111,7 @@ onto the test image to robustly segment the target objects.
 \begin{figure}[htbp]
   \centering
   % \includegraphics[width=\columnwidth]{images/divide1.jpg}\\
-  \includegraphics[width=\columnwidth]{experiments/teaser.jpg}
+  \includegraphics[width=\columnwidth]{teaser.jpg}
   \caption{Personal Robot 2 (PR2~\cite{Wyrobek08PR1}) robot segmenting the book using CCD algorithm. 
     The initial contour of of the book was generated through a 3D-based cluster segmentation
     and back-projection of the bounding box onto the test image.
@@ -330,7 +330,7 @@ In this section we will briefly laid out the basic steps of the initial
 CCD algorithm as presented by Hanek et al~\cite{hanek2004contracting}.
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=\columnwidth]{images/flowchart.jpg}
+  \includegraphics[width=\columnwidth]{flowchart.jpg}
   \caption{The flowchart of the basic steps of the CCD algorithm.}
   \label{fig:flowchart}
 \end{figure}
@@ -382,7 +382,7 @@ account for the complexity of the object shape (Fig.~\ref{fig:prior}).
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=\columnwidth]{images/cont.jpg}
+  \includegraphics[width=\columnwidth]{cont.jpg}
 \caption{A contour with sample points used for learning of local statistics. The blue contour
   divides the image into two parts: outside and inside. As depicted in
   right-bottom image, pixels inside the contour are labeled ``0",
@@ -471,7 +471,7 @@ of these possible curves in shape-space $\mathcal{S}$:
 \end{equation}
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=\columnwidth]{images/prior.jpg}
+  \includegraphics[width=\columnwidth]{prior.jpg}
 \caption{The top-row figure represents the mean shape curve, 
   the bottom-left figure represents the euclidean
   similarities and the bottom-right figure
@@ -624,8 +624,8 @@ called \textit{logistic sigmoid} function given by (and depicted in Fig.~\ref{fi
 The term \textit{sigmoid} stands for S-shaped~\cite{bishop2006pattern}. 
 \begin{figure} 
     \centering 
-    \includegraphics[width=0.48\columnwidth]{images/logistic.jpg}
-    \includegraphics[width=0.48\columnwidth]{images/erf.jpg}
+    \includegraphics[width=0.48\columnwidth]{logistic.jpg}
+    \includegraphics[width=0.48\columnwidth]{erf.jpg}
     \caption{\textbf{Left:} Logistic
   sigmoid function, \textbf{Right:} Probit function from original CCD.}
 \label{fig:s-shaped}
@@ -639,7 +639,7 @@ outliers because the logistic sigmoid decays asymptotically like $\mathrm{exp}(-
 for the probit activation function the decay is like
 $\mathrm{exp}(-x^2)$ (Fig.~\ref{fig:outliers}).
 \begin{figure} 
-  \includegraphics[width=\columnwidth]{images/outliers.jpg}
+  \includegraphics[width=\columnwidth]{outliers.jpg}
 \caption{Classification problem: 
 In the the presence of outliers, the probit activation
 function (violet line) has a higher misclassification rate.}
@@ -909,19 +909,19 @@ failed in two cases. The average convergence time was 3.35$s$, see also Table~\r
 \begin{figure}[htbp]
   \begin{minipage}[t]{0.49\linewidth} 
     \centering 
-    \subfloat[iteration 1]{\includegraphics[width=1.5in]{experiments/book/0.png}}
+    \subfloat[iteration 1]{\includegraphics[width=1.5in]{book/0.png}}
   \end{minipage} 
   \begin{minipage}[t]{0.49\linewidth} 
     \centering 
-    \subfloat[iteration 5 ]{\includegraphics[width=1.5in]{experiments/book/4.png}}
+    \subfloat[iteration 5 ]{\includegraphics[width=1.5in]{book/4.png}}
   \end{minipage} 
   \begin{minipage}[t]{0.49\linewidth} 
     \centering 
-    \subfloat[iteration 10]{\includegraphics[width=1.5in]{experiments/book/9.png}}
+    \subfloat[iteration 10]{\includegraphics[width=1.5in]{book/9.png}}
   \end{minipage} 
   \begin{minipage}[t]{0.49\linewidth} 
     \centering 
-    \subfloat[iteration 20]{\includegraphics[width=1.5in]{experiments/book/19.png}}
+    \subfloat[iteration 20]{\includegraphics[width=1.5in]{book/19.png}}
   \end{minipage} 
   \caption{Segmentation of a book after manual initialization of the contour.}
   \label{fig:book}
@@ -931,7 +931,7 @@ failed in two cases. The average convergence time was 3.35$s$, see also Table~\r
 \label{sec:sift_init}
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.8\columnwidth]{experiments/book_sift/sift_result.png}
+  \includegraphics[width=0.8\columnwidth]{book/sift_result.png}
   \caption{Segmentation of a book using SIFT-based initialization.}
   \label{fig:sift_result}
 \end{figure}
@@ -952,22 +952,22 @@ too large initial curve displacement, the run time got increased with the number
 the control points. See also Table~\ref{tab:qr}.
 
 \begin{figure}[htbp]
-  \includegraphics[width=0.8\columnwidth]{experiments/tshirt/tshirt_pcd.jpg}
+  \includegraphics[width=0.8\columnwidth]{tshirt/tshirt_pcd.jpg}
   \begin{minipage}[t]{0.49\linewidth} 
     \centering 
-    \subfloat[iteration 1]{\includegraphics[width=1.5in]{experiments/tshirt/0.png}}
+    \subfloat[iteration 1]{\includegraphics[width=1.5in]{tshirt/0.png}}
   \end{minipage} 
   \begin{minipage}[t]{0.49\linewidth} 
     \centering 
-    \subfloat[iteration 5 ]{\includegraphics[width=1.5in]{experiments/tshirt/4.png}}
+    \subfloat[iteration 5 ]{\includegraphics[width=1.5in]{tshirt/4.png}}
   \end{minipage} 
   \begin{minipage}[t]{0.49\linewidth} 
     \centering 
-    \subfloat[iteration 10]{\includegraphics[width=1.5in]{experiments/tshirt/9.png}}
+    \subfloat[iteration 10]{\includegraphics[width=1.5in]{tshirt/9.png}}
   \end{minipage} 
   \begin{minipage}[t]{0.49\linewidth} 
     \centering 
-    \subfloat[iteration 28]{\includegraphics[width=1.5in]{experiments/tshirt/27.png}}
+    \subfloat[iteration 28]{\includegraphics[width=1.5in]{tshirt/27.png}}
   \end{minipage} 
   \caption{\textbf{Top row:} Mesh of the T-shirt. \textbf{Middle and Bottom Row:} 
 Detection of the T-shirt using concave hull of above mesh for the application of robotic 
