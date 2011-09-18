@@ -112,15 +112,13 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
   if( H )
   {
     int   step  = H->step/sizeof(double);
-    /* 
-     * for (row = 0; row < H->rows; ++row){
-     *   double *ptr = H->data.db;
-     *   for (col = 0; col < H->cols; ++col){
-     *     printf("%f ", (ptr+row*step)[col]);
-     *   }
-     *   printf("\n");
-     * }
-     */
+    for (row = 0; row < H->rows; ++row){
+      double *ptr = H->data.db;
+      for (col = 0; col < H->cols; ++col){
+        printf("%f ", (ptr+row*step)[col]);
+      }
+      printf("\n");
+    }
     /* printf("cont_n = %d\n", control_points_number); */
 
 
@@ -203,6 +201,7 @@ CvMat sift_init(IplImage *img1, IplImage *img2, int inteval)
                        cvScalarAll( 0 ) );
     cvTranspose(coordinates_t, coordinates);
     for (row = 0; row < coordinates->rows; ++row){
+	  printf("%f %f %f\n",(ptr+step*row)[0] , (ptr+step*row)[1] , (ptr+step*row)[2]); 
       cvCircle(xformed, cvPoint((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]), 2, CV_RGB(0,255,0), 2, 8, 0);
       cvCircle(stacked, cvPoint((ptr+step*row)[0]/(ptr+step*row)[2], (ptr+step*row)[1]/(ptr+step*row)[2]+img1->height), 2, CV_RGB(0,255,0), 2, 8, 0);
     }

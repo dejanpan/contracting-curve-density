@@ -15,7 +15,7 @@
   <!-- <review status="experimental" notes="beta"/> -->
   <depend package="roscpp" />
   <depend package="opencv2" /> 
-  <depend package="libsiftfast"/>
+<!--  <depend package="libsiftfast"/> -->
   <!-- <depend package="std_msgs" /> -->
   <depend package="cv_bridge" />
   <depend package="pcl"/>

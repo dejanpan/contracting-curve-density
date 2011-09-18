@@ -81,6 +81,7 @@
 \newcommand{\todos}[1]{\textbf{\textcolor{red}{TODO Shulei: #1}}}
 \newcommand{\todod}[1]{\textbf{\textcolor{red}{TODO Dejan: #1}}}
 \newcommand{\dones}[1]{\textbf{\textcolor{blue}{DONE Shulei: #1}}}
+\newcommand{\review}[1]{\textbf{\textcolor{cyan}{#1}}}
 \begin{document}
 %
 % paper title
@@ -187,10 +188,24 @@ over the model parameters (usually a multi-dimensional vector). There
 exists a range of probability distributions which can be used to model
 the distribution of shapes. In this paper we consider the Gaussian distribution.
 
-Defining the prior distribution is only a step of the problem.
-According to the Bayesian theorem, the conditional distribution
-is proportional to the product of prior distribution and the likelihood
-function. Hence, the next step is to define the likelihood function.
+% Defining the prior distribution is only a step of the problem.
+% According to the Bayesian theorem, the conditional distribution
+% is proportional to the product of prior distribution and the likelihood
+% function. Hence, the next step is to define the likelihood function.
+\review{The introduction of prior distribution with a certain number of degrees of freedom
+imposes constraints to the classification problem. On the one hand,
+these constraints restrain the degrees of freedom of the whole curve,
+which increases inflexibility but decreases computational cost. On the
+other hand, the constraints can greatly avoid converging to
+local minima, because local convergence must keep consistent with the
+global behavior. Except those extreme cases, e.g., fitting a circular
+contour to a tiny ring (both inner and outer edges are ring shaped.),
+the CCD method always converges to the global minimum. In a word, in
+some extent the real contour of the observed object is similar to its
+initial contour. With the prior distribution, According to the
+Bayesian theorem, we need to define the likelihood function in the
+following step.}
+
 
 In the implementation of the CCD algorithm local image pixel values are used
 as the training data to determine the likelihood function. If the data is 
@@ -257,13 +272,21 @@ We will split this section based on the following two criteria:
 Many traditional segmentation methods are effected by the assumption that the
 images studied in computer vision are usually self-contained, namely,
 the information needed for a successful segmentation can be extracted
-from the images. In 1980s, a paradigm named \textit{Active Vision}~\cite{aloimonos1988active} 
+from the images. \review{In the real world, however, segmentation problems often require much
+information external to the image.} In 1980s, a paradigm named \textit{Active Vision}~\cite{aloimonos1988active} 
 escaped this bind and pushed the vision process in a more goal-directed fashion. 
 After that the \textit{Snakes} algorithm was proposed in a seminar work conducted 
-by Kass~\cite{kass1988snakes}. The original paper, spawned many variations
-and extensions including the use of Fourier parametrization~\cite{scott1987alternative}, 
-and incorporation of the topologically adaptable models~\cite{mcinerney1995topologically}.
-A realization of the Snakes using B-splines was developed in~\cite{brigger2000b}. 
+by Kass~\cite{kass1988snakes}. % The original paper, spawned many variations
+% and extensions including the use of Fourier parametrization~\cite{scott1987alternative}, 
+% and incorporation of the topologically adaptable models~\cite{mcinerney1995topologically}.
+A realization of the Snakes using B-splines was developed
+in~\cite{brigger2000b}. \review{In the last two decades ``active contour'' or
+``snake'' has been developed as an effective interactive image segmentation tool
+in a wide range of applications. In addition, drawing a box around an intended
+segmentation target is another popular interaction paradigm considered
+by many image segmentation frameworks
+(e.g.,~\cite{lempitsky2009image,gradysegmentation,santner2011interactive}).}
+
 % In two dimensions, the Snakes have a variation named active shape
 % model~\cite{cootes1995active}, which is a discrete version of this
 % approach.
@@ -311,7 +334,11 @@ In this paper, we assume that the shapes' priors have a Gaussian form in
 shape-space. In the case of a norm-squared density over  quadratic spline space,
 the prior is a Gaussian Markov Random Field (MRF)~\cite{blake1998active}, 
 which is used widely  for modeling prior distributions for 
-curves~\cite{storvik1994bayesian}.
+curves~\cite{storvik1994bayesian}. \review{In contrast to the  MRF-based
+approaches, ~\cite{gocmo2011} proposed a novel
+framework for for a general multilabel regularizer allowing to model
+certain shape priors based on the viewpoint of spatially continuous
+optimization.}
 
 Defining a prior distribution for shape is only a part of the
 problem as prior knowledge only controls the feature interpretation in the
@@ -319,7 +346,7 @@ image and thus just approximates the contour of an observed object. In
 order to snap to the exact shape of the object a likelihood function is required. In some
 special cases, we can get a solution by maximizing the likelihood, but
 usually it is intractable because there is no closed-form solution available. 
-An indirect approach known as Iterative Reweighted Least Squares~\cite{bishop2006pattern} 
+An indirect approach known as Iterative Reweighted Least Squares~\cite{munk2006convergence} 
 is used to find the parameters of the model.
 
 % The CCD algorithm uses local statistics to evaluate a conditional distribution, 
@@ -412,7 +439,7 @@ minimum height=2em,text centered,}]
 \end{scope}
 \end{tikzpicture} 
 
-  \caption{The flowchart of the basic steps of the CCD algorithm.}
+  \caption{Tihe flowchart of the basic steps of the CCD algorithm.}
   \label{fig:flowchart}
 \end{figure}
 The algorithm consists of four major steps which are also sketched in Fig.~\ref{fig:flowchart}:
@@ -463,7 +490,7 @@ account for the complexity of the object shape (Fig.~\ref{fig:prior}).
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=\columnwidth]{cont.jpg}
+  \includegraphics[width=\columnwidth]{cont.png}
 \caption{A contour with sample points used for learning of local statistics. The blue contour
   divides the image into two parts: outside and inside. As depicted in
   right-bottom image, pixels inside the contour are labeled ``0",
@@ -615,8 +642,10 @@ closed, but it shall always encompass a limited area. We only
 analyze the pixels located in the vicinity of the contour (red sample
 pixels in Fig.~\ref{fig:prior}). Therefore, we should limit the search distance on the
 \textit{inner} side in order to avoid crossing the opposite
-boundary to sample pixels from the outer area~\cite{panin2006fully}. 
-On the other hand we should avoid collecting statistics from too few pixels, because
+boundary to sample pixels from the outer area~\cite{panin2006fully}.
+\review{However, the search distance must be long enough to cover the real
+contour of the given object. Otherwise local statistics will be invalid.} On the other hand we should
+avoid collecting statistics from too few pixels, because
 it is statistically invalid and we can not capture all features 
 (e.g. spinodals and corners) of the contour. Let us denote the
 sample distance using $\Delta h$, then the overall number of spaced
@@ -986,7 +1015,10 @@ The control points of the initial contour were drawn manually.
 If the contour snaps to the book within the tolerance limit
 the test is deemed successful. The test image is depicted in Fig.~\ref{fig:book}
 in different iteration steps. We ran the CCD algorithm with 40 different initializations and the convergence
-failed in two cases. The average convergence time was 3.35$s$, see also Table~\ref{tab:qr}.
+failed in two cases. The average convergence time was 3.35$s$, see
+also Table~\ref{tab:qr} \review{(The hardware specification is: PR2:
+  Processors: Two Quad-Core i7 Xeon Processors (8 cores)), Memory: 24
+  GB /My computer: Processors: Quad-Core 6200 Processors (4 cores)), Memory: 4GB)?????}.
 \begin{figure}[htbp]
   \begin{minipage}[t]{0.49\linewidth} 
     \centering 
@@ -1101,7 +1133,7 @@ a book on a cart using 5M pixel camera on a PR2 robot.
 \centering
 \resizebox{0.49\textwidth}{!}{\begin{tabular}{|l|c|c|c|c|}
 \hline
-Experiments & Failure rate& Run time & Iteration & Tolerance\\
+Experiments & Failure rate& Run time(s) & Iteration & Tolerance\\
 \hline
 Manual initialization& 5\% & 3.35 & 26 & 0.001\\
 \hline
