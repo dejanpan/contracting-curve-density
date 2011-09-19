@@ -386,22 +386,22 @@ CCD algorithm as presented by Hanek et al~\cite{hanek2004contracting}.
 [auto,
 decision/.style={diamond, draw=blue, thick, fill=gray!60,
 text width=5em, text badly centered,
-inner sep=1pt},
+inner sep=1pt, scale=0.5},
 block1/.style ={rectangle, draw=blue, thick, fill=blue!20,
 text width=6em, text centered, rounded corners,
-minimum height=5em},
+minimum height=5em, scale=0.5},
 block2/.style ={rectangle, draw=blue, thick, fill=red!60,
 text width=6em, text centered, rounded corners,
-minimum height=5em},
+minimum height=5em, scale=0.5},
 block3/.style ={rectangle, draw=blue, thick, fill=yellow!80,
 text width=6em, text centered, rounded corners,
-minimum height=5em},
+minimum height=5em, scale=0.5},
 block5/.style ={rectangle, draw=blue, thick, fill=green!50,
 text width=6em, text centered, rounded corners,
-minimum height=5em},
+minimum height=5em, scale=0.5},
 line/.style ={draw, thick, -latex',shorten >=2pt},
 cloud/.style ={draw=red, thick, ellipse,fill=pink!50,
-minimum height=2em,text centered,}]
+minimum height=2em,text centered}]
 \matrix [column sep=5mm,row sep=7mm]
 {
 % row 1
@@ -1167,6 +1167,8 @@ to clutter, partial occlusions and even changes of illumination.
 In the future we plan to work on CUDA CCD implementation to make the convergence 
 faster and use other features than RGB color values in order to improve the stability
 even further. 
+
+\review{CPU:Linux x86\_64 Intel(R) Core(TM)2 Quad CPU Q6600 @ 2.40GHz GenuineIntel GNU/Linux, Mem: 3 G}
 \section*{Acknowledgment}
  This work was supported by the DFG cluster of excellence \emph{CoTeSys} (Cognition for Technical Systems).
 \bibliographystyle{IEEEtran}
