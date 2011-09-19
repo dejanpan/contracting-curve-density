@@ -192,21 +192,6 @@ the distribution of shapes. In this paper we consider the Gaussian distribution.
 % According to the Bayesian theorem, the conditional distribution
 % is proportional to the product of prior distribution and the likelihood
 % function. Hence, the next step is to define the likelihood function.
-\review{The introduction of prior distribution with a certain number of degrees of freedom
-imposes constraints to the classification problem. On the one hand,
-these constraints restrain the degrees of freedom of the whole curve,
-which increases inflexibility but decreases computational cost. On the
-other hand, the constraints can greatly avoid converging to
-local minima, because local convergence must keep consistent with the
-global behavior. Except those extreme cases, e.g., fitting a circular
-contour to a tiny ring (both inner and outer edges are ring shaped.),
-the CCD method always converges to the global minimum. In a word, in
-some extent the real contour of the observed object is similar to its
-initial contour. With the prior distribution, According to the
-Bayesian theorem, we need to define the likelihood function in the
-following step.}
-
-
 In the implementation of the CCD algorithm local image pixel values are used
 as the training data to determine the likelihood function. If the data is 
 assumed to be drawn independently from the distribution, then the likelihood 
@@ -256,7 +241,7 @@ In the remainder of this paper we first introduce the related approaches,
 in Section~\ref{sec:arch} we then shortly revisit an original implementation of 
 CCD algorithm and continue with a presentation of our improvements over the
 original idea (Section~\ref{sec:ccd_novelties}). In Section~\ref{sec:results}
-we present the set of possible applications for CCD and evaluation thereof and
+we present the set of possible applications for CCD and evaluation of thereof and
 conclude with Section~\ref{sec:conclusions}.
 
 \section{Related Work}
@@ -272,20 +257,21 @@ We will split this section based on the following two criteria:
 Many traditional segmentation methods are effected by the assumption that the
 images studied in computer vision are usually self-contained, namely,
 the information needed for a successful segmentation can be extracted
-from the images. \review{In the real world, however, segmentation problems often require much
-information external to the image.} In 1980s, a paradigm named \textit{Active Vision}~\cite{aloimonos1988active} 
+from the images. In the real world, however, segmentation problems often require much
+information external to the image. In 1980s, a paradigm named \textit{Active Vision}~\cite{aloimonos1988active} 
 escaped this bind and pushed the vision process in a more goal-directed fashion. 
 After that the \textit{Snakes} algorithm was proposed in a seminar work conducted 
 by Kass~\cite{kass1988snakes}. % The original paper, spawned many variations
 % and extensions including the use of Fourier parametrization~\cite{scott1987alternative}, 
 % and incorporation of the topologically adaptable models~\cite{mcinerney1995topologically}.
 A realization of the Snakes using B-splines was developed
-in~\cite{brigger2000b}. \review{In the last two decades ``active contour'' or
-``snake'' has been developed as an effective interactive image segmentation tool
-in a wide range of applications. In addition, drawing a box around an intended
-segmentation target is another popular interaction paradigm considered
-by many image segmentation frameworks
-(e.g.,~\cite{lempitsky2009image,gradysegmentation,santner2011interactive}).}
+in~\cite{brigger2000b}. 
+%% In the last two decades ``active contour'' or
+%% ``snake'' has been developed as an effective interactive image segmentation tool
+%% in a wide range of applications. In addition, drawing a box around an intended
+%% segmentation target is another popular interaction paradigm considered
+%% by many image segmentation frameworks
+%% (e.g.,~\cite{lempitsky2009image,gradysegmentation,santner2011interactive}).
 
 % In two dimensions, the Snakes have a variation named active shape
 % model~\cite{cootes1995active}, which is a discrete version of this
@@ -334,11 +320,11 @@ In this paper, we assume that the shapes' priors have a Gaussian form in
 shape-space. In the case of a norm-squared density over  quadratic spline space,
 the prior is a Gaussian Markov Random Field (MRF)~\cite{blake1998active}, 
 which is used widely  for modeling prior distributions for 
-curves~\cite{storvik1994bayesian}. \review{In contrast to the  MRF-based
+curves~\cite{storvik1994bayesian}. In contrast to the  MRF-based
 approaches, ~\cite{gocmo2011} proposed a novel
 framework for for a general multilabel regularizer allowing to model
 certain shape priors based on the viewpoint of spatially continuous
-optimization.}
+optimization.
 
 Defining a prior distribution for shape is only a part of the
 problem as prior knowledge only controls the feature interpretation in the
@@ -445,18 +431,18 @@ minimum height=2em,text centered,}]
 \path (decide) -- node [midway] {yes} (stop);
 \path [dashed] (irls) -- (map);
 \end{scope}
-\end{tikzpicture} 
+\end{tikzpicture}
 
   \caption{The flowchart of the basic steps of the CCD algorithm.}
   \label{fig:flowchart}
 \end{figure}
 The algorithm consists of four major steps which are also sketched in Fig.~\ref{fig:flowchart}:
 \begin{enumerate}
-\item \textbf{Initialization}: Given an input image $\mathbf{I}$ as training data, we first choose an initial
+\item \textbf{Initialization (Blue)}: Given an input image $\mathbf{I}$ as training data, we first choose an initial
   contour for an observed object, then model the contour using a
   parameter vector $\mathbf{\Phi}$. In addition, for most practical
   applications a pre-processing stage (e.g. smoothing) gets applied as well.
-\item \textbf{Learning of local statistics}: 
+\item \textbf{Learning of local statistics (Red)}: 
   In the step of learning of local statistics for each pixel in the
   vicinity of the expected curve two sets of local statistics
   are computed, one set for each side of the curve. The local statistics are obtained from
@@ -465,12 +451,12 @@ The algorithm consists of four major steps which are also sketched in Fig.~\ref{
   estimate of the model parameters. The resulting local statistics
   represent an expectation of ``what the two sides of the curve look
   like"~\cite{hanek2004contracting}, also known as likelihood: $p(\mathbf{I}|\mathbf{\Phi})$.
-\item \textbf{Refinement of model parameters}: The conditional distribution, namely
+\item \textbf{Refinement of model parameters (Yellow)}: The conditional distribution, namely
   the product of a prior distribution and the likelihood, is evaluated
   as the cost function. Then MAP estimate is executed to optimize the
   parameters and as a result a MAP value of model parameter vector and
   covariance will be generated in this step.
-\item \textbf{Convergence}: Check for the convergence of the 
+\item \textbf{Convergence (Gray)}: Check for the convergence of the 
   log posterior probability function $\ln{p(\mathbf{\Phi}) p(\mathbf{I}|\mathbf{\Phi})}$. 
   If the convergence criterion is not satisfied return to step 2.
 \end{enumerate}
@@ -479,9 +465,9 @@ The algorithm consists of four major steps which are also sketched in Fig.~\ref{
 \label{sec:ccd_novelties}
 In this section, we describe all important underlying principles of the CCD
 algorithm and its extensions that make it suitable for the use in personal robotics field.
-After a thorough evaluation of the original implementation we spotted the following three
+After a thorough evaluation of the original implementation we identified the following three
 issues which needed to be substantially improved in order to assure the robust performance
-and automatic boostrapping: i) automatic initialization, ii) curve parametrization models and
+and automatic boostrapping: i) automatic initialization, ii) parametrization of curve models and
 iii) learning of local statistics.
 
 \subsection{Automatic Initialization Modes}
@@ -510,7 +496,7 @@ account for the complexity of the object shape (Fig.~\ref{fig:prior}).
 
 There are two ways to generate control points, manually and automatically. 
 Since the former is rather tedious, the two new
-intelligent initialization methods are proposed to extract the
+initialization methods are proposed to extract the
 contour. Firstly, an initial contour estimation method is described and
 implemented by employing the well-known Scale-Invariant Feature Transform 
 (SIFT) algorithm~\cite{lowe2004distinctive} for
@@ -526,30 +512,43 @@ image using Nearest Neighbor Search. For filtering out of false positive matches
 of the homography, we use RANdom SAmple Consensus (RANSAC)~\cite{fischler1981random}, 
 which is an iterative process that randomly selects matches in the test image, 
 back-projects them onto the template image and verifies the 
-relative normalized difference in order to select inliers.
+relative normalized difference in order to select the inliers.
   
-In order to speed-up the homography computation we use the Normalized
-Direct Linear Transform (normalized DLT~\cite{hartley2003multiple}). The Normalized DLT algorithm computes
-a homography for a projective transformation by using at least 4 point
-correspondences and then minimizing the corresponding norm.
-
+%% In order to speed-up the homography computation we use the Normalized
+%% Direct Linear Transform (normalized DLT~\cite{hartley2003multiple}). The Normalized DLT algorithm computes
+%% a homography for a projective transformation by using at least 4 point
+%% correspondences and then minimizing the corresponding norm.
 After obtaining the homography between the template image and the
-test image, the bounding box around the feature inliers of the object can be easily projected
+test image, the bounding box around the feature inliers of the object is projected
 into the test image to obtain the estimate of the contour
-position. This is illustrated in Fig.~\ref{fig:sift_result}.
+position (Fig.~\ref{fig:sift_result}).
 \subsubsection{Mesh Model-based Initialization}
 \label{sec:pcl}
 In this mode we use publicly available mesh models, such as the ones from the 
 Google 3D Warehouse (see a mesh of the T-shirt in top row of Fig.~\ref{fig:tshirt}).
 In order to generate the initial contour we first sample vertex points and convert
 the meshes into point clouds. Next we compute the 3D concave hull of the resulting 
-point cloud using a delaunay triangulation algorithm and thus obtain an approximate
+point cloud using a Delaunay Triangulation algorithm and thus obtain an approximate
 object shape identifier. In order to account for multi-scale of images we build the 
 pyramid of different hull sizes normalized between the $[1/2...1.0]$ of the image
 width. Finally we project all contour sizes onto the test image and
 check the convergence criterion. Fig.~\ref{fig:tshirt} depict a successful
-segmentation of a T-shirt which enables the robot to detect the article
+segmentation of the T-shirt which enables the robot to detect the cloth article
 and e.g. folds it. 
+%% The introduction of prior distribution with a certain number of degrees of freedom
+%% imposes constraints to the classification problem. On the one hand,
+%% these constraints restrain the degrees of freedom of the whole curve,
+%% which increases inflexibility but decreases computational cost. On the
+%% other hand, the constraints can greatly avoid converging to
+%% local minima, because local convergence must keep consistent with the
+%% global behavior.
+Except those extreme cases, e.g., fitting a circular
+contour to a tiny ring (both inner and outer edges are ring shaped),
+the CCD method always converges to the global minimum granted that
+ the real contour of the observed object is similar to its
+initial contour. %% With the prior distribution, According to the
+%% Bayesian theorem, we need to define the likelihood function in the
+%% following step.
 
 \subsection{Curve Parametrization}
 Given the control points, by applying the (uniform quadratic or
@@ -637,9 +636,9 @@ In order to learn local statistics (raw RGB pixel values), we first have
 to define the search interval $h$ on both sides of the curve:
 \begin{equation}
   \label{eq:radius}
-  h = \sqrt{2} \rho_0 = \sqrt{\mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}}\mathbf{A}^T\mathcal{U}\mathbf{A})}\qquad.
+  h = \sqrt{2} \rho_0 = \sqrt{\mathrm{tr}(\mathbf{\Sigma}_{\mathbf{\Phi}}\mathbf{A}^T\mathcal{U}\mathbf{A})}\qquad,
 \end{equation}
-$h$ thus denotes the size of a \textit{window} which is used for computing
+where $h$ denotes the size of a \textit{window} which is used for computing
 the local statistics. In the beginning of the iterative procedure, the value
 is relatively big and only roughly approximates the vicinity of the image curve. The
 uncertainty is reduced after further iteration steps and as a result, the $h$ becomes smaller and
@@ -651,13 +650,14 @@ analyze the pixels located in the vicinity of the contour (red sample
 pixels in Fig.~\ref{fig:prior}). Therefore, we should limit the search distance on the
 \textit{inner} side in order to avoid crossing the opposite
 boundary to sample pixels from the outer area~\cite{panin2006fully}.
-\review{However, the search distance must be long enough to cover the real
-contour of the given object. Otherwise local statistics will be invalid.} On the other hand we should
+However, the search distance must be long enough to cover the real
+contour of the given object. Otherwise local statistics will be invalid. 
+On the other hand we should
 avoid collecting statistics from too few pixels, because
 it is statistically invalid and we can not capture all features 
 (e.g. spinodals and corners) of the contour. Let us denote the
-sample distance using $\Delta h$, then the overall number of spaced
-sample points $L$ ($2L$ for both sides in all) can be given by:
+sample distance as $\Delta h$, then the overall number of spaced
+sample points $L$ ($2L$ for both sides) can be given by:
 \begin{equation}
   \label{eq:sample}
   L = \lfloor \frac{h}{\Delta h} \rfloor\qquad.
@@ -666,9 +666,10 @@ Note that the goal of the algorithm is to assign each pixel
 ($\mathrm{v}_{k,l}, k \in [0,\ldots,N_{\mathrm{C}}-1], l \in [0,
 2L-1]$) on either side of the contour. By doing so we thus run into a
 classification problem.
-Although each pixel should be assigned to one and only
-one class so that the target variable is discrete, we can model the
-posterior probabilities that lie in $(0,1)$ interval, which converts the classification into the regression problem. To achieve the latter, we model the probabilistic
+%% Although each pixel should be assigned to one and only
+%% one class so that the target variable is discrete, we can model the
+%% posterior probabilities that lie in $(0,1)$ interval, which converts the classification into the regression problem.
+To achieve this, we model the probabilistic
 assignments $\mathbf{a}_{v}$ for each pixel $\mathrm{v}_{k,l}$ as following:
 \begin{equation}
   \label{eq:pa}
@@ -778,7 +779,7 @@ defined as:
     \gamma_1}{1-\gamma_2}\right)^4 \left[e^{-d_{k,l}/(2\hat{\sigma}^2)} - e^{-\gamma_2}\right]^+\qquad,
 \end{equation}
 where $\mathcal{C}$ denotes the normalization constant, $\gamma_1$ equals to $0.5$ (disjoint weight assignment) and $\gamma_2$
-equals to $4$ for the truncated Gaussian~\cite{hanek2004contracting},
+equals to $4$ for the truncated Gaussian~\cite{hanek2004contracting}.
 % the weight function is shown in Fig.~\ref{fig:weight}.
 
 % \begin{figure} 
@@ -792,7 +793,7 @@ equals to $4$ for the truncated Gaussian~\cite{hanek2004contracting},
 
 In addition, the standard
 deviation is chosen in order to cover the specified distance $h$,
-which yields 
+which yields: 
 \begin{equation}
   \label{eq:deviation}
   \hat{\sigma} = \max \left[\frac{h}{\sqrt{2\gamma_2}}, \gamma_4
@@ -805,12 +806,12 @@ weighting window width) as discussed in~\cite{panin2006efficient}.
 In the implementation of this work,
 there are $2 \cdot L \cdot N_C$ distances, fuzzy assignments
 and weight functions which leads to as many weight functions being 
-evaluated offline and stored in an array. Now we have restricted our analysis region of interest in the
+evaluated offline and stored in an array. 
+
+Now we have restricted our analysis region of interest in the
 limited area, and collected all statistical information required to learn
 local statistics. In the next part, we will evaluate the local
-statistics.
-
-Given the pixel coordinates and their RGB values, assignment and weight
+statistics. Given the pixel coordinates and their RGB values, assignment and weight
 function, local mean vectors $\mathbf{m}_{v,s}$  and local covariance matrix
 $\mathbf{\Sigma}_{\mathbf{\Phi}}$ will be derived for each side $s \in
 \{1,2\}$ of the curve.
@@ -828,7 +829,7 @@ the local covariance matrices
 $\mathbf{\Sigma}_{\mathbf{\Phi}}$  are obtained by:
 \begin{eqnarray}
   \label{eq:localmean}
-  \mathbf{m}_{k,s} &=& \frac{\mathbf{M}^{(1)}_{k,s}}{M^{(0)}_{k,s}}\\
+  \mathbf{m}_{k,s} &=& \frac{\mathbf{M}^{(1)}_{k,s}}{M^{(0)}_{k,s}},\\
   \label{eq:localcov}
   \mathbf{\Sigma}_{k,s} &=& \frac{\mathbf{M}^{(2)}_{k,s}}{M^{(0)}_{k,s}}
   - \mathbf{m}_{k,s}\mathbf{m}_{k,s}^T  + \kappa \mathbf{I}\qquad.
@@ -947,7 +948,7 @@ with:
   \label{eq:jocob}
   \mathcal{J}_{a_{v,1}} = \left( \mathbf{m}_{k,1} -\mathbf{m}_{k,2} \right)(\nabla_{\mathbf{\Phi}} a_{v,1}(d_{k,l}))^T\qquad.
 \end{equation}
-Afterwords, the Gauss-Newton approximation to the Hessian
+Afterwards, the Gauss-Newton approximation to the Hessian
 matrix is given by
 \begin{equation}
   \label{eq:hessian}
