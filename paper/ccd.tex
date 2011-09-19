@@ -996,7 +996,8 @@ very small, CCD might diverge.
 To evaluate the applicability of the herein presented version of the CCD algorithm
 we ran three realistic tests in our kitchen lab on the sensor data from the 
 PR2 robot. The tests were boostrapped using parameters from
-the Table~\ref{tab:ip} and are detailed below.
+the Table~\ref{tab:ip} and are detailed below. All the tests were performed on a Desktop
+computer with a Quad-Core 6200 processor and  4GB memory.
 
 \begin{table}[htbp]
 \large
@@ -1024,9 +1025,7 @@ If the contour snaps to the book within the tolerance limit
 the test is deemed successful. The test image is depicted in Fig.~\ref{fig:book}
 in different iteration steps. We ran the CCD algorithm with 40 different initializations and the convergence
 failed in two cases. The average convergence time was 3.35$s$, see
-also Table~\ref{tab:qr} \review{(The hardware specification is: PR2:
-  Processors: Two Quad-Core i7 Xeon Processors (8 cores)), Memory: 24
-  GB /My computer: Processors: Quad-Core 6200 Processors (4 cores)), Memory: 4GB)?????}.
+also Table~\ref{tab:qr}.
 \begin{figure}[htbp]
   \begin{minipage}[t]{0.49\linewidth} 
     \centering 
@@ -1058,10 +1057,10 @@ also Table~\ref{tab:qr} \review{(The hardware specification is: PR2:
 \end{figure}
 
 In the second experiments  the initial contour was generated from the SIFT features 
-matching a priori learned template of a book shown in Fig.~\ref{fig:sift_result}. 
+matching a priori learned template of a book as shown in Fig.~\ref{fig:sift_result}. 
 We ran the CCD algorithm 100 times which resulted in 9 convergence failures. 
-The average convergence time was 3.52$s$, see also Table~\ref{tab:qr} for the rest
-of the quantitative results. Video of the test is available online~\footnote{\url{http://www.youtube.com/watch?v=X2K-h4oHxig}}.
+The average convergence time was 3.52$s$ (Table~\ref{tab:qr}). 
+We would also like to refer the reader to the video associated with this submission~\footnote{\todo{}}.
 
 \subsection{Mesh Model-based Initialization}
 \label{sec:tifpc}
@@ -1096,13 +1095,33 @@ cloth folding. Image courtesy of Christian Bersch.}
   \label{fig:tshirt}
 \end{figure}
 
+\begin{table}[htbp]
+\centering
+\resizebox{0.49\textwidth}{!}{\begin{tabular}{|l|c|c|c|c|}
+\hline
+Experiments & Failure rate& Run time(s) & Iteration & Tolerance\\
+\hline
+Manual initialization& 5\% & 3.35 & 26 & 0.001\\
+\hline
+SIFT initialization & 9\% & 3.52 & 5 & 0.001\\
+\hline
+Model-based & 4\% & 10.15 & 28 & 0.001\\
+\hline
+\end{tabular}}
+\caption{Experimental Results: Failure rate is the ratio between failures and all test cases. 
+Run time is the average run time of all successful test cases, which characterizes the
+computational cost. The tolerance is the converge criteria defined as the curve-displacement
+between two successive iterations.}
+\label{tab:qr}
+\end{table}
+
 \subsection{CCD-based Tracker}
 A CCD tracker is obtained by applying the CCD algorithm to each
 frame of  a sequence of images independently where the output of the parameters 
 obtained from the previous frame is used in the current frame. Because  of the 
 dependency between the two successive images, the CCD tracker can achieve a high
 performance rate and be applied to the time critical problems. The 
-video~\footnote{\url{http://www.youtube.com/watch?v=nr83zqQ6CCg}} demonstrates the tracking of
+video~\footnote{\todo{}} demonstrates the tracking of
 a book on a cart using 5M pixel camera on a PR2 robot.
 % \begin{figure}[htbp]
 %   \begin{minipage}[t]{0.49\linewidth} 
@@ -1136,27 +1155,6 @@ a book on a cart using 5M pixel camera on a PR2 robot.
 %   \label{fig:sifttracker}
 % \end{figure}
 
-
-\begin{table}[htbp]
-\centering
-\resizebox{0.49\textwidth}{!}{\begin{tabular}{|l|c|c|c|c|}
-\hline
-Experiments & Failure rate& Run time(s) & Iteration & Tolerance\\
-\hline
-Manual initialization& 5\% & 3.35 & 26 & 0.001\\
-\hline
-SIFT initialization & 9\% & 3.52 & 5 & 0.001\\
-\hline
-Model-based & 4\% & 10.15 & 28 & 0.001\\
-\hline
-\end{tabular}}
-\caption{Experimental Results: Failure rate is the ratio between failures and all test cases. 
-Run time is the average run time of all successful test cases, which characterizes the
-computational cost. The tolerance is the converge criteria defined as the curve-displacement
-between two successive iterations.}
-\label{tab:qr}
-\end{table}
-
 \section{Conclusions and Future Work}
 \label{sec:conclusions}
 We presented various extensions to the existing contour fitting algorithm CCD
@@ -1167,7 +1165,6 @@ In the future we plan to work on CUDA CCD implementation to make the convergence
 faster and use other features than RGB color values in order to improve the stability
 even further. 
 
-\review{CPU:Linux x86\_64 Intel(R) Core(TM)2 Quad CPU Q6600 @ 2.40GHz GenuineIntel GNU/Linux, Mem: 3 G}
 \section*{Acknowledgment}
  This work was supported by the DFG cluster of excellence \emph{CoTeSys} (Cognition for Technical Systems).
 \bibliographystyle{IEEEtran}
