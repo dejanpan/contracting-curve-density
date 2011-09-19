@@ -398,23 +398,23 @@ CCD algorithm as presented by Hanek et al~\cite{hanek2004contracting}.
   % \includegraphics[width=\columnwidth]{flowchart.jpg}
 \begin{tikzpicture}
 [auto,
-decision/.style={diamond, draw=blue, thick, fill=violet!20,
+decision/.style={diamond, draw=blue, thick, fill=gray!60,
 text width=5em, text badly centered,
 inner sep=1pt},
 block1/.style ={rectangle, draw=blue, thick, fill=blue!20,
 text width=6em, text centered, rounded corners,
 minimum height=5em},
-block2/.style ={rectangle, draw=blue, thick, fill=red!20,
+block2/.style ={rectangle, draw=blue, thick, fill=red!60,
 text width=6em, text centered, rounded corners,
 minimum height=5em},
-block3/.style ={rectangle, draw=blue, thick, fill=pink!20,
+block3/.style ={rectangle, draw=blue, thick, fill=yellow!80,
 text width=6em, text centered, rounded corners,
 minimum height=5em},
-block5/.style ={rectangle, draw=blue, thick, fill=green!20,
+block5/.style ={rectangle, draw=blue, thick, fill=green!50,
 text width=6em, text centered, rounded corners,
 minimum height=5em},
 line/.style ={draw, thick, -latex',shorten >=2pt},
-cloud/.style ={draw=red, thick, ellipse,fill=red!50,
+cloud/.style ={draw=red, thick, ellipse,fill=pink!50,
 minimum height=2em,text centered,}]
 \matrix [column sep=5mm,row sep=7mm]
 {
@@ -424,11 +424,10 @@ minimum height=2em,text centered,}]
 \node [block1] (rawdata) {input image: $\mathbf{I}$};
 \\
 % row 2
-\node [block2] (refine) {refine parameters}; & \node [block2] (identify) {identify prior probability: $p(\mathbf{\Phi})$}; 
+ & \node [block2] (identify) {identify prior probability: $p(\mathbf{\Phi})$}; 
 & \node [block2] (evaluate) {evaluate local statistics: $p(\mathbf{I}|\mathbf{\Phi})$};\\
 % row 3
-&
-\node [block3] (map) {MAP estimate: $p(\mathbf{\Phi}|\mathbf{I})$}; &  \\
+\node [block3] (refine) {refine parameters}; &\node [block3] (map) {MAP estimate: $p(\mathbf{\Phi}|\mathbf{I})$}; &  \\
 % row 4
 & \node [decision] (decide) {test of convergence}; & \node [cloud] (irls) {IRLS};\\
 % row 5
